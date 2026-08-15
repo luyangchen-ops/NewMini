@@ -73,3 +73,8 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+Assets/map/Level_02_InkSnowCourtyard/Art/Buildings/Building_01_UpperLeftPine.png.meta
+Assets/map/Level_02_InkSnowCourtyard/Art/Buildings/Building_02_UpperRightFence.png.meta
+Assets/map/Level_02_InkSnowCourtyard/Art/Buildings/Building_03_MiddleLeftRocks.png.meta
+Assets/map/Level_02_InkSnowCourtyard/Art/Buildings/Building_04_MiddleRightPine.png.meta
+Assets/map/Level_02_InkSnowCourtyard/Art/Buildings/Building_05_LowerWell.png.meta
