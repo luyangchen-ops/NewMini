@@ -23,3 +23,5 @@ MonoBehaviour:
   <ProjectileSpawnOffset>k__BackingField: 1.5
   <ProjectileSpeed>k__BackingField: 7
   <FireInterval>k__BackingField: 1.2
+  <RangedAttackReleaseDelay>k__BackingField: 0.25
+  <RangedAttackDuration>k__BackingField: 0.34

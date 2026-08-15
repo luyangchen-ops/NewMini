@@ -1222,6 +1222,7 @@ MonoBehaviour:
   attackDashDuration: 0.18
   bulletTimeEnemyScale: 0.1
   enemyNamePrefix: Enemy
+  bloodHitEffectPrefab: {fileID: 8127791811110766970, guid: 34f62bd5e3ad4a499b46c9d09d7c4a5d, type: 3}
   arrowRoot: {fileID: 1331282475}
   killChainRangeOverlay: {fileID: 920000001}
   arrowLine: {fileID: 727600406}

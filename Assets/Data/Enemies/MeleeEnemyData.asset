@@ -15,6 +15,10 @@ MonoBehaviour:
   <Archetype>k__BackingField: 0
   <MoveSpeed>k__BackingField: 2.5
   <StoppingDistance>k__BackingField: 1.2
+  <MeleeFormationRadius>k__BackingField: 1.05
+  <MeleeFormationArrivalDistance>k__BackingField: 0.18
+  <MeleeSeparationRadius>k__BackingField: 0.8
+  <MeleeSeparationStrength>k__BackingField: 0.9
   <Damage>k__BackingField: 0
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4
@@ -25,3 +29,8 @@ MonoBehaviour:
   <FireInterval>k__BackingField: 1.2
   <MeleePerfectDodgeDelay>k__BackingField: 0.35
   <MeleePerfectDodgeDuration>k__BackingField: 0.18
+  <ShieldRearKillHalfAngle>k__BackingField: 55
+  <ShieldBlockDuration>k__BackingField: 0.55
+  <ShieldAttackWindup>k__BackingField: 0.6
+  <ShieldAttackDuration>k__BackingField: 0.95
+  <ShieldAttackInterval>k__BackingField: 2.8

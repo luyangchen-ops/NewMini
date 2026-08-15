@@ -49,4 +49,4 @@ MonoBehaviour:
   <KillConfirmSfx>k__BackingField: {fileID: 8300000, guid: 6465becbd55741ecac0a8cfc0f434e5f, type: 3}
   <KillChainEndSfx>k__BackingField: {fileID: 8300000, guid: 00f8e63296fa4bf68a0324d43605cd8e, type: 3}
   <NormalAttackCooldown>k__BackingField: 0.5
-  <NormalAttackRange>k__BackingField: 1.25
+  <NormalAttackRange>k__BackingField: 1.5
