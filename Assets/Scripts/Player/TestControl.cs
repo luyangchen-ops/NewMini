@@ -505,7 +505,7 @@ public class TestControl : MonoBehaviour
 
     private Vector2 ClampToBoundary(Vector2 position)
     {
-        return ExtraCameraBounds.Clamp(worldCamera, position, boundaryPadding, transform.position.z);
+        return CameraBounds.Clamp(worldCamera, position, boundaryPadding, transform.position.z);
     }
 
     private void UpdateArrow()

@@ -72,13 +72,13 @@ public sealed class EnemyAgent : MonoBehaviour
 
         stateMachine.FixedTick();
         Vector2 currentPosition = body.position;
-        Vector2 clampedPosition = ExtraCameraBounds.Clamp(worldCamera, currentPosition, boundaryPadding, transform.position.z);
+        Vector2 clampedPosition = CameraBounds.Clamp(worldCamera, currentPosition, boundaryPadding, transform.position.z);
         if ((clampedPosition - currentPosition).sqrMagnitude > 0.000001f)
         {
             body.position = clampedPosition;
         }
 
-        Vector2 clampedNext = ExtraCameraBounds.Clamp(
+        Vector2 clampedNext = CameraBounds.Clamp(
             worldCamera, clampedPosition + desiredVelocity * Time.fixedDeltaTime, boundaryPadding, transform.position.z);
         body.linearVelocity = (clampedNext - clampedPosition) / Time.fixedDeltaTime;
     }
