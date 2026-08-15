@@ -1,0 +1,141 @@
+{
+  "assetPack": "InkWuxiaHero_DirectionalCombatSprites",
+  "version": "1.0.0",
+  "projectRoot": "Assets/Resources/InkWuxiaHero/Art",
+  "format": "PNG",
+  "colorMode": "RGBA",
+  "sourceSheets": {
+    "size": [
+      3840,
+      2160
+    ],
+    "order": "row-major-left-to-right"
+  },
+  "frames": {
+    "size": [
+      1024,
+      768
+    ],
+    "pixelsPerUnit": 100,
+    "pivot": [
+      0.5,
+      0.05
+    ],
+    "outerTransparentBorder": 16,
+    "mipMaps": false,
+    "compression": "None"
+  },
+  "bindingIncluded": false,
+  "animations": [
+    {
+      "id": "RunRight",
+      "transparentSheet": "Assets/Resources/InkWuxiaHero/Art/Sheets/Hero_Run_Right_12Frames_Transparent.png",
+      "framesDirectory": "Assets/Resources/InkWuxiaHero/Art/Sprites/Run",
+      "frames": [
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_00.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_01.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_02.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_03.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_04.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_05.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_06.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_07.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_08.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_09.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_10.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/Run/Run_11.png"
+      ],
+      "frameCount": 12,
+      "loop": true,
+      "suggestedFps": 14,
+      "replaces": "existing horizontal Run frames"
+    },
+    {
+      "id": "RunUp",
+      "transparentSheet": "Assets/Resources/InkWuxiaHero/Art/Sheets/Hero_Run_Up_12Frames_Transparent.png",
+      "framesDirectory": "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp",
+      "frames": [
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_00.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_01.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_02.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_03.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_04.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_05.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_06.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_07.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_08.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_09.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_10.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunUp/RunUp_11.png"
+      ],
+      "frameCount": 12,
+      "loop": true,
+      "suggestedFps": 14
+    },
+    {
+      "id": "RunDown",
+      "transparentSheet": "Assets/Resources/InkWuxiaHero/Art/Sheets/Hero_Run_Down_12Frames_Transparent.png",
+      "framesDirectory": "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown",
+      "frames": [
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_00.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_01.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_02.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_03.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_04.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_05.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_06.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_07.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_08.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_09.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_10.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/RunDown/RunDown_11.png"
+      ],
+      "frameCount": 12,
+      "loop": true,
+      "suggestedFps": 14
+    },
+    {
+      "id": "NormalAttackUp",
+      "transparentSheet": "Assets/Resources/InkWuxiaHero/Art/Sheets/Hero_NormalAttack_Up_8Frames_Transparent.png",
+      "framesDirectory": "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackUp",
+      "frames": [
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackUp/NormalAttackUp_00.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackUp/NormalAttackUp_01.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackUp/NormalAttackUp_02.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackUp/NormalAttackUp_03.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackUp/NormalAttackUp_04.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackUp/NormalAttackUp_05.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackUp/NormalAttackUp_06.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackUp/NormalAttackUp_07.png"
+      ],
+      "frameCount": 8,
+      "loop": false,
+      "suggestedFps": 16
+    },
+    {
+      "id": "NormalAttackDown",
+      "transparentSheet": "Assets/Resources/InkWuxiaHero/Art/Sheets/Hero_NormalAttack_Down_8Frames_Transparent.png",
+      "framesDirectory": "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackDown",
+      "frames": [
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackDown/NormalAttackDown_00.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackDown/NormalAttackDown_01.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackDown/NormalAttackDown_02.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackDown/NormalAttackDown_03.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackDown/NormalAttackDown_04.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackDown/NormalAttackDown_05.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackDown/NormalAttackDown_06.png",
+        "Assets/Resources/InkWuxiaHero/Art/Sprites/NormalAttackDown/NormalAttackDown_07.png"
+      ],
+      "frameCount": 8,
+      "loop": false,
+      "suggestedFps": 16
+    }
+  ],
+  "validation": {
+    "frameCount": 52,
+    "emptyFrames": 0,
+    "borderFailures": 0,
+    "totalGreenSpillPixels": 0,
+    "removedNeighborBleedPixels": 43562
+  }
+}
