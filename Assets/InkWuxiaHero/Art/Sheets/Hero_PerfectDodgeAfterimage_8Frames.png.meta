@@ -1,0 +1,533 @@
+fileFormatVersion: 2
+guid: 9d3b0ea42328cf9449795be6f3503ee9
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 8024210822692502238
+    second: Hero_PerfectDodgeAfterimage_8Frames_0
+  - first:
+      213: -8975347540742636378
+    second: Hero_PerfectDodgeAfterimage_8Frames_1
+  - first:
+      213: -3093820084731804827
+    second: Hero_PerfectDodgeAfterimage_8Frames_2
+  - first:
+      213: -2682907144937205426
+    second: Hero_PerfectDodgeAfterimage_8Frames_3
+  - first:
+      213: -2368912679443470924
+    second: Hero_PerfectDodgeAfterimage_8Frames_4
+  - first:
+      213: -2504331591985700241
+    second: Hero_PerfectDodgeAfterimage_8Frames_5
+  - first:
+      213: -7313036428610087685
+    second: Hero_PerfectDodgeAfterimage_8Frames_6
+  - first:
+      213: -8495335844977603523
+    second: Hero_PerfectDodgeAfterimage_8Frames_7
+  - first:
+      213: -3604795368739167688
+    second: Hero_PerfectDodgeAfterimage_8Frames_8
+  - first:
+      213: -8677782111239625948
+    second: Hero_PerfectDodgeAfterimage_8Frames_9
+  - first:
+      213: 3308917806557930337
+    second: Hero_PerfectDodgeAfterimage_8Frames_10
+  - first:
+      213: -1474490567271848559
+    second: Hero_PerfectDodgeAfterimage_8Frames_11
+  - first:
+      213: -3512675692369011539
+    second: Hero_PerfectDodgeAfterimage_8Frames_12
+  - first:
+      213: 8457418643932176999
+    second: Hero_PerfectDodgeAfterimage_8Frames_13
+  - first:
+      213: 9162145351611707418
+    second: Hero_PerfectDodgeAfterimage_8Frames_14
+  - first:
+      213: -1412577372141566460
+    second: Hero_PerfectDodgeAfterimage_8Frames_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 9
+  spritePivot: {x: 0.5, y: 0.05}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_0
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 649
+        width: 429
+        height: 351
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eda7e69aa39bb5f60800000000000000
+      internalID: 8024210822692502238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_1
+      rect:
+        serializedVersion: 2
+        x: 519
+        y: 649
+        width: 444
+        height: 324
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6acfb5217f8217380800000000000000
+      internalID: -8975347540742636378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_2
+      rect:
+        serializedVersion: 2
+        x: 1549
+        y: 643
+        width: 355
+        height: 290
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5638792560b8015d0800000000000000
+      internalID: -3093820084731804827
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_3
+      rect:
+        serializedVersion: 2
+        x: 1732
+        y: 928
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4119a49a2664cad0800000000000000
+      internalID: -2682907144937205426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_4
+      rect:
+        serializedVersion: 2
+        x: 981
+        y: 644
+        width: 484
+        height: 280
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b56ad5187eef1fd0800000000000000
+      internalID: -2368912679443470924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_5
+      rect:
+        serializedVersion: 2
+        x: 1881
+        y: 657
+        width: 28
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f6267e38fa3de3dd0800000000000000
+      internalID: -2504331591985700241
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_6
+      rect:
+        serializedVersion: 2
+        x: 55
+        y: 370
+        width: 13
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf454334d10e28a90800000000000000
+      internalID: -7313036428610087685
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_7
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 176
+        width: 393
+        height: 335
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d3c87782f018a1a80800000000000000
+      internalID: -8495335844977603523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_8
+      rect:
+        serializedVersion: 2
+        x: 515
+        y: 374
+        width: 12
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 832245e06b139fdc0800000000000000
+      internalID: -3604795368739167688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_9
+      rect:
+        serializedVersion: 2
+        x: 530
+        y: 178
+        width: 400
+        height: 310
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 423a25d8523529780800000000000000
+      internalID: -8677782111239625948
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_10
+      rect:
+        serializedVersion: 2
+        x: 985
+        y: 173
+        width: 426
+        height: 279
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 163a9d2b633abed20800000000000000
+      internalID: 3308917806557930337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_11
+      rect:
+        serializedVersion: 2
+        x: 1454
+        y: 171
+        width: 410
+        height: 367
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 195e81924ae898be0800000000000000
+      internalID: -1474490567271848559
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_12
+      rect:
+        serializedVersion: 2
+        x: 498
+        y: 271
+        width: 11
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dac12399118704fc0800000000000000
+      internalID: -3512675692369011539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_13
+      rect:
+        serializedVersion: 2
+        x: 509
+        y: 274
+        width: 38
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 762e7548279ce5570800000000000000
+      internalID: 8457418643932176999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_14
+      rect:
+        serializedVersion: 2
+        x: 1450
+        y: 282
+        width: 19
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a10ff4777aa762f70800000000000000
+      internalID: 9162145351611707418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_PerfectDodgeAfterimage_8Frames_15
+      rect:
+        serializedVersion: 2
+        x: 60
+        y: 262
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4064fbb3d54856ce0800000000000000
+      internalID: -1412577372141566460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Hero_PerfectDodgeAfterimage_8Frames_0: 8024210822692502238
+      Hero_PerfectDodgeAfterimage_8Frames_1: -8975347540742636378
+      Hero_PerfectDodgeAfterimage_8Frames_10: 3308917806557930337
+      Hero_PerfectDodgeAfterimage_8Frames_11: -1474490567271848559
+      Hero_PerfectDodgeAfterimage_8Frames_12: -3512675692369011539
+      Hero_PerfectDodgeAfterimage_8Frames_13: 8457418643932176999
+      Hero_PerfectDodgeAfterimage_8Frames_14: 9162145351611707418
+      Hero_PerfectDodgeAfterimage_8Frames_15: -1412577372141566460
+      Hero_PerfectDodgeAfterimage_8Frames_2: -3093820084731804827
+      Hero_PerfectDodgeAfterimage_8Frames_3: -2682907144937205426
+      Hero_PerfectDodgeAfterimage_8Frames_4: -2368912679443470924
+      Hero_PerfectDodgeAfterimage_8Frames_5: -2504331591985700241
+      Hero_PerfectDodgeAfterimage_8Frames_6: -7313036428610087685
+      Hero_PerfectDodgeAfterimage_8Frames_7: -8495335844977603523
+      Hero_PerfectDodgeAfterimage_8Frames_8: -3604795368739167688
+      Hero_PerfectDodgeAfterimage_8Frames_9: -8677782111239625948
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

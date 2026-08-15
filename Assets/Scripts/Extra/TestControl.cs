@@ -30,6 +30,20 @@ public class TestControl : MonoBehaviour
     [Tooltip("Matches Enemy and Unity-style duplicate names such as Enemy (1).")]
     [SerializeField] private string enemyNamePrefix = "Enemy";
 
+    [Header("Character Visual")]
+    [SerializeField] private Animator visualAnimator;
+    [SerializeField] private SpriteRenderer visualRenderer;
+    [SerializeField] private PerfectDodgeAfterimage perfectDodgeAfterimage;
+
+    [Header("Combat Audio")]
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip normalAttackSfx;
+    [SerializeField] private AudioClip dashAttackSfx;
+    [SerializeField] private AudioClip rollSfx;
+    [SerializeField] private AudioClip parrySfx;
+    [SerializeField] private AudioClip killSfx;
+    [SerializeField, Min(0f)] private float normalAttackCooldown = 0.5f;
+
     [Header("Arrow (authored in the scene)")]
     [Tooltip("Root object containing the complete arrow hierarchy.")]
     [SerializeField] private GameObject arrowRoot;
@@ -51,6 +65,13 @@ public class TestControl : MonoBehaviour
     private float dashElapsed;
     private float activeDashDuration;
     private float dashReadyTime;
+    private float normalAttackReadyTime;
+
+    private static readonly int SpeedParameter = Animator.StringToHash("Speed");
+    private static readonly int NormalAttackParameter = Animator.StringToHash("NormalAttack");
+    private static readonly int DashAttackParameter = Animator.StringToHash("DashAttack");
+    private static readonly int RollParameter = Animator.StringToHash("Roll");
+    private static readonly int IsDeadParameter = Animator.StringToHash("IsDead");
 
     private void Awake()
     {
@@ -63,7 +84,38 @@ public class TestControl : MonoBehaviour
             worldCamera = Camera.main;
         }
 
+        if (visualAnimator == null)
+        {
+            visualAnimator = GetComponentInChildren<Animator>(true);
+        }
+
+        if (visualRenderer == null && visualAnimator != null)
+        {
+            visualRenderer = visualAnimator.GetComponent<SpriteRenderer>();
+        }
+
+        if (perfectDodgeAfterimage == null)
+        {
+            perfectDodgeAfterimage = GetComponentInChildren<PerfectDodgeAfterimage>(true);
+        }
+
+        if (visualAnimator != null)
+        {
+            visualAnimator.SetBool(IsDeadParameter, false);
+        }
+
+        if (sfxSource == null)
+        {
+            sfxSource = GetComponent<AudioSource>();
+        }
+
         SetArrowVisible(false);
+    }
+
+    private void OnEnable()
+    {
+        GameAudioSettings.VolumesChanged += ApplySfxVolume;
+        ApplySfxVolume();
     }
 
     private void Update()
@@ -71,6 +123,8 @@ public class TestControl : MonoBehaviour
         ReadMovementInput();
         HandleDashInput();
         HandlePointerInput();
+        HandleNormalAttackInput();
+        UpdateCharacterVisual();
     }
 
     private void FixedUpdate()
@@ -116,6 +170,11 @@ public class TestControl : MonoBehaviour
                        - (keyboard.sKey.isPressed ? 1f : 0f);
 
         moveInput = Vector2.ClampMagnitude(new Vector2(horizontal, vertical), 1f);
+
+        if (!isDashing && Mathf.Abs(moveInput.x) > 0.01f)
+        {
+            SetFacingDirection(moveInput.x);
+        }
     }
 
     private void HandleDashInput()
@@ -156,6 +215,33 @@ public class TestControl : MonoBehaviour
         {
             HandleKillChainPointerInput(pointer);
         }
+    }
+
+    private void HandleNormalAttackInput()
+    {
+        Mouse mouse = Mouse.current;
+        if (mouse == null
+            || isDashing
+            || isKillChainTargeting
+            || Time.time < normalAttackReadyTime
+            || !mouse.leftButton.wasPressedThisFrame)
+        {
+            return;
+        }
+
+        if (worldCamera != null)
+        {
+            Vector2 attackDirection = ScreenToWorld(mouse.position.ReadValue()) - body.position;
+            SetFacingDirection(attackDirection.x);
+        }
+
+        if (visualAnimator != null)
+        {
+            visualAnimator.SetTrigger(NormalAttackParameter);
+        }
+
+        PlaySfx(normalAttackSfx);
+        normalAttackReadyTime = Time.time + normalAttackCooldown;
     }
 
     private void HandleKillChainPointerInput(Pointer pointer)
@@ -210,6 +296,14 @@ public class TestControl : MonoBehaviour
         activeDashDuration = Mathf.Max(0.01f, duration);
         dashCanKill = canKill;
         SetDashState(true);
+        SetFacingDirection(direction.x);
+
+        if (visualAnimator != null)
+        {
+            visualAnimator.SetTrigger(canKill ? DashAttackParameter : RollParameter);
+        }
+
+        PlaySfx(canKill ? dashAttackSfx : rollSfx);
 
         if (!canKill)
         {
@@ -237,6 +331,27 @@ public class TestControl : MonoBehaviour
         if (!dashing)
         {
             dashCanKill = false;
+        }
+    }
+
+    private void UpdateCharacterVisual()
+    {
+        if (visualAnimator == null)
+        {
+            return;
+        }
+
+        float movementSpeed = isDashing || isKillChainTargeting
+            ? 0f
+            : moveInput.magnitude;
+        visualAnimator.SetFloat(SpeedParameter, movementSpeed);
+    }
+
+    private void SetFacingDirection(float horizontalDirection)
+    {
+        if (visualRenderer != null && Mathf.Abs(horizontalDirection) > 0.01f)
+        {
+            visualRenderer.flipX = horizontalDirection < 0f;
         }
     }
 
@@ -291,6 +406,11 @@ public class TestControl : MonoBehaviour
         SetDashState(false);
         body.linearVelocity = Vector2.zero;
         EnterKillChainTargeting();
+        PlaySfx(parrySfx);
+        if (perfectDodgeAfterimage != null)
+        {
+            perfectDodgeAfterimage.Play(visualRenderer != null && visualRenderer.flipX);
+        }
         return true;
     }
 
@@ -338,6 +458,7 @@ public class TestControl : MonoBehaviour
         }
 
         Destroy(enemy.gameObject);
+        PlaySfx(killSfx);
 
         // Stop on impact and immediately enter bullet-time targeting for the next dash.
         SetDashState(false);
@@ -427,14 +548,36 @@ public class TestControl : MonoBehaviour
         }
     }
 
+    private void PlaySfx(AudioClip clip)
+    {
+        if (sfxSource != null && clip != null)
+        {
+            sfxSource.PlayOneShot(clip);
+        }
+    }
+
+    private void ApplySfxVolume()
+    {
+        if (sfxSource != null)
+        {
+            sfxSource.volume = GameAudioSettings.SfxVolume;
+        }
+    }
+
     private void OnDisable()
     {
+        GameAudioSettings.VolumesChanged -= ApplySfxVolume;
         isKillChainTargeting = false;
         RefreshEnemyTimeScale();
         SetDashState(false);
         dashReadyTime = 0f;
+        normalAttackReadyTime = 0f;
         moveInput = Vector2.zero;
         SetArrowVisible(false);
+        if (perfectDodgeAfterimage != null)
+        {
+            perfectDodgeAfterimage.StopAndRestore();
+        }
     }
 
     private void OnValidate()
@@ -445,6 +588,7 @@ public class TestControl : MonoBehaviour
         perfectDodgeDistanceRatio = Mathf.Clamp01(perfectDodgeDistanceRatio);
         attackDashDistance = Mathf.Max(0f, attackDashDistance);
         attackDashDuration = Mathf.Max(0.01f, attackDashDuration);
+        normalAttackCooldown = Mathf.Max(0f, normalAttackCooldown);
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
