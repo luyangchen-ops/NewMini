@@ -30,6 +30,7 @@ public class PlayerCharacterController : MonoBehaviour
     [SerializeField] private Animator visualAnimator;
     [SerializeField] private SpriteRenderer visualRenderer;
     [SerializeField] private PerfectDodgeAfterimage perfectDodgeAfterimage;
+    [SerializeField] private BloodHitEffect bloodHitEffectPrefab;
     [SerializeField] private AudioSource sfxSource;
     [SerializeField] private AudioSource bulletTimeLoopSource;
     [SerializeField, Range(0f, 1f)] private float bulletTimeLoopVolume = .45f;
@@ -43,7 +44,8 @@ public class PlayerCharacterController : MonoBehaviour
     [SerializeField] private AudioClip parrySfx;
     [SerializeField] private AudioClip killSfx;
     [SerializeField, Min(0f)] private float normalAttackCooldown = .5f;
-    [SerializeField, Min(0f)] private float normalAttackRange = 1.25f;
+    [SerializeField, Min(0f)] private float normalAttackRange = 1.5f;
+    [SerializeField, Range(1f, 360f)] private float normalAttackArcAngle = 220f;
 
     [Header("Vitals and Momentum")]
     [SerializeField, Min(1f)] private float maximumHealth = 100f;
@@ -157,6 +159,7 @@ public class PlayerCharacterController : MonoBehaviour
     public float HealthNormalized => maximumHealth <= 0f ? 0f : currentHealth / maximumHealth;
     public int MaximumMomentum => maximumMomentum;
     public int CurrentMomentum => currentMomentum;
+    public bool IsMomentumFull => currentMomentum >= maximumMomentum;
     public bool CanUseUltimate => currentMomentum >= maximumMomentum && State == PlayerStateId.Locomotion;
     public Transform CurrentKillChainTarget => currentTarget != null ? currentTarget : lockedDashTarget;
     public float KillChainWindowNormalized => Mathf.Clamp01(chainWindowRemaining / KillChainMaximumWindow);
@@ -492,6 +495,7 @@ public class PlayerCharacterController : MonoBehaviour
         body.linearVelocity = Vector2.zero;
         lastKilledTarget = enemy;
         if (bufferedTarget == enemy) bufferedTarget = null;
+        PlayBloodHitEffect(enemy, killDashDirection);
         Destroy(enemy.gameObject);
         lockedDashTarget = null;
         killChainCount++;
@@ -544,7 +548,8 @@ public class PlayerCharacterController : MonoBehaviour
         exitProtectionUntil = Time.unscaledTime + KillChainExitProtection;
         cameraController.EndKillChain();
         perfectDodgeAfterimage?.StopAndRestore();
-        if (completedKills > 0) PlaySfx(KillChainEndSfx, killChainEndVolume);
+        if (completedKills >= 3 && HasNoActiveEnemies())
+            PlaySfx(KillChainEndSfx, killChainEndVolume);
         stateMachine.Change(PlayerStateId.Locomotion);
         onKillChainEnded?.Invoke(completedKills);
         KillChainFinished?.Invoke(completedKills);
@@ -570,6 +575,8 @@ public class PlayerCharacterController : MonoBehaviour
         {
             Transform enemy = FindEnemy(hit.transform);
             if (enemy == null || enemy == excludedTarget || enemy == lastKilledTarget || !targetCandidates.Add(enemy)) continue;
+            EnemyAgent agent = enemy.GetComponent<EnemyAgent>();
+            if (agent != null && !agent.CanBeKilledBy(body.position, IsMomentumFull)) continue;
 
             Vector2 offset = (Vector2)enemy.position - playerPosition;
             float distance = offset.magnitude;
@@ -605,7 +612,10 @@ public class PlayerCharacterController : MonoBehaviour
     private bool IsValidTarget(Transform target)
     {
         if (!IsTargetAlive(target)) return false;
-        return ((Vector2)target.position - body.position).sqrMagnitude <= AttackDashDistance * AttackDashDistance + .01f;
+        if (((Vector2)target.position - body.position).sqrMagnitude > AttackDashDistance * AttackDashDistance + .01f)
+            return false;
+        EnemyAgent agent = target.GetComponent<EnemyAgent>();
+        return agent == null || agent.CanBeKilledBy(body.position, IsMomentumFull);
     }
 
     private static bool IsTargetAlive(Transform target)
@@ -648,15 +658,24 @@ public class PlayerCharacterController : MonoBehaviour
             Transform enemy = FindEnemy(hit.transform);
             if (enemy == null) continue;
             Vector2 offset = (Vector2)enemy.position - body.position;
-            if (offset.sqrMagnitude > Mathf.Epsilon && Vector2.Dot(direction, offset.normalized) <= 0f) continue;
+            if (offset.sqrMagnitude > Mathf.Epsilon
+                && Vector2.Angle(direction, offset) > normalAttackArcAngle * .5f) continue;
             if (offset.sqrMagnitude >= closestDistanceSquared) continue;
             closestEnemy = enemy;
             closestDistanceSquared = offset.sqrMagnitude;
         }
 
         if (closestEnemy == null) return;
+        EnemyAgent enemyAgent = closestEnemy.GetComponent<EnemyAgent>();
+        if (enemyAgent != null && !enemyAgent.CanBeKilledBy(body.position, IsMomentumFull))
+        {
+            enemyAgent.BlockIncomingAttack();
+            return;
+        }
+        PlayBloodHitEffect(closestEnemy, direction);
         Destroy(closestEnemy.gameObject);
         AwardMomentum(0);
+        PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
         PlaySfx(killSfx);
     }
 
@@ -827,6 +846,7 @@ public class PlayerCharacterController : MonoBehaviour
             transform.position.z);
         body.linearVelocity = Vector2.zero;
         RestoreUltimateTargetColor(target);
+        PlayBloodHitEffect(target, slashDirection);
         Destroy(target.gameObject);
         ultimateExecutedKills++;
 
@@ -841,7 +861,6 @@ public class PlayerCharacterController : MonoBehaviour
         stateTimer = ultimateFinisherDuration;
         stateMachine.Change(PlayerStateId.UltimateFinisher);
         cameraController.AddKillImpact(Vector2.up, MaximumCameraShake * 1.4f, ultimateExecutedKills + 3);
-        PlaySfx(KillChainEndSfx != null ? KillChainEndSfx : killSfx, 1f);
     }
 
     private void HandleUltimateFinisher()
@@ -977,6 +996,7 @@ public class PlayerCharacterController : MonoBehaviour
         stateMachine.Change(PlayerStateId.Locomotion);
 
         if (!completed) return;
+        PlaySfx(KillChainEndSfx, killChainEndVolume);
         onUltimateFinished?.Invoke(completedKills);
         UltimateFinished?.Invoke(completedKills);
     }
@@ -989,6 +1009,9 @@ public class PlayerCharacterController : MonoBehaviour
 
     private Transform FindEnemy(Transform candidate)
     {
+        EnemyAgent agent = candidate != null ? candidate.GetComponentInParent<EnemyAgent>() : null;
+        if (agent != null) return agent.transform;
+
         while (candidate != null)
         {
             if (candidate.name == enemyNamePrefix || candidate.name.StartsWith(enemyNamePrefix + " (")) return candidate;
@@ -996,6 +1019,30 @@ public class PlayerCharacterController : MonoBehaviour
         }
 
         return null;
+    }
+
+    private static bool HasNoActiveEnemies()
+    {
+        return FindObjectsByType<EnemyAgent>(FindObjectsInactive.Exclude).Length == 0;
+    }
+
+    private void PlayBloodHitEffect(Transform enemy, Vector2 slashDirection)
+    {
+        if (bloodHitEffectPrefab == null || enemy == null) return;
+
+        Collider2D hitCollider = enemy.GetComponentInChildren<Collider2D>();
+        Vector2 hitPosition = hitCollider != null ? hitCollider.ClosestPoint(body.position) : enemy.position;
+        float targetSize = 1f;
+        int sortingOrder = 1;
+        foreach (SpriteRenderer renderer in enemy.GetComponentsInChildren<SpriteRenderer>(true))
+        {
+            if (renderer == null) continue;
+            targetSize = Mathf.Max(targetSize, renderer.bounds.size.x, renderer.bounds.size.y);
+            sortingOrder = Mathf.Max(sortingOrder, renderer.sortingOrder + 1);
+        }
+
+        BloodHitEffect effect = Instantiate(bloodHitEffectPrefab);
+        effect.PlayAt(hitPosition, slashDirection, targetSize, sortingOrder);
     }
 
     private void OnStateChanged(PlayerStateId previous, PlayerStateId next)

@@ -47,7 +47,7 @@ public sealed class PlayerCharacterData : ScriptableObject
     [field: SerializeField] public AudioClip KillChainEndSfx { get; private set; }
     [field: Header("Attack")]
     [field: SerializeField, Min(0f)] public float NormalAttackCooldown { get; private set; } = .5f;
-    [field: SerializeField, Min(0f)] public float NormalAttackRange { get; private set; } = 1.25f;
+    [field: SerializeField, Min(0f)] public float NormalAttackRange { get; private set; } = 1.5f;
 
     private void OnValidate()
     {

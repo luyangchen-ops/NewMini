@@ -379,6 +379,7 @@ MonoBehaviour:
   visualAnimator: {fileID: 831400103}
   visualRenderer: {fileID: 831400102}
   perfectDodgeAfterimage: {fileID: 1561073513}
+  bloodHitEffectPrefab: {fileID: 8127791811110766970, guid: 34f62bd5e3ad4a499b46c9d09d7c4a5d, type: 3}
   sfxSource: {fileID: 201417214}
   bulletTimeLoopSource: {fileID: 0}
   bulletTimeLoopVolume: 0.45
@@ -4238,7 +4239,7 @@ MonoBehaviour:
   effectRenderer: {fileID: 1561073515}
   characterVisual: {fileID: 831400100}
   characterAnimator: {fileID: 831400103}
-  effectDuration: 0.5
+  effectDuration: 0.75
 --- !u!95 &1561073514
 Animator:
   serializedVersion: 7

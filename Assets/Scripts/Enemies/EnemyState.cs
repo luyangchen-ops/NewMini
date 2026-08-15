@@ -44,18 +44,18 @@ public sealed class EnemyChaseState : EnemyState
             return;
         }
 
-        Vector2 offset = (Vector2)Agent.Target.position - Agent.Body.position;
-        if (offset.sqrMagnitude <= Agent.Data.StoppingDistance * Agent.Data.StoppingDistance)
+        Vector2 moveDirection = Agent.GetMeleeFormationMoveDirection(out bool isAtFormation);
+        Vector2 targetOffset = (Vector2)Agent.Target.position - Agent.Body.position;
+        if (isAtFormation
+            && targetOffset.sqrMagnitude <= Agent.Data.StoppingDistance * Agent.Data.StoppingDistance
+            && Agent.CanMeleeAttack)
         {
             Agent.SetDesiredVelocity(Vector2.zero);
-            if (Agent.CanMeleeAttack)
-            {
-                StateMachine.ChangeState(Agent.AttackState);
-            }
+            StateMachine.ChangeState(Agent.AttackState);
             return;
         }
 
-        Agent.SetDesiredVelocity(offset.normalized * Agent.Data.MoveSpeed);
+        Agent.SetDesiredVelocity(moveDirection * Agent.Data.MoveSpeed);
     }
 }
 
@@ -106,6 +106,9 @@ public sealed class EnemyRoamState : EnemyState
 
 public sealed class EnemyAttackState : EnemyState
 {
+    private float elapsed;
+    private bool projectileReleased;
+
     public EnemyAttackState(EnemyAgent agent, EnemyStateMachine stateMachine) : base(agent, stateMachine) { }
 
     public override void Enter()
@@ -117,7 +120,129 @@ public sealed class EnemyAttackState : EnemyState
             return;
         }
 
-        Agent.FireProjectile();
-        StateMachine.ChangeState(Agent.RoamState);
+        elapsed = 0f;
+        projectileReleased = false;
+        Agent.BeginRangedAttack();
     }
+
+    public override void Tick()
+    {
+        if (Agent.Data.Archetype == EnemyArchetype.Melee) return;
+        if (!Agent.HasTarget)
+        {
+            StateMachine.ChangeState(Agent.IdleState);
+            return;
+        }
+
+        elapsed += Agent.EnemyDeltaTime;
+        Agent.SetDesiredVelocity(Vector2.zero);
+        Agent.FaceTarget();
+        if (!projectileReleased && elapsed >= Agent.Data.RangedAttackReleaseDelay)
+        {
+            projectileReleased = true;
+            Agent.FireProjectile();
+        }
+
+        if (elapsed >= Agent.Data.RangedAttackDuration)
+        {
+            StateMachine.ChangeState(Agent.RoamState);
+        }
+    }
+}
+
+public sealed class EnemyShieldGuardState : EnemyState
+{
+    public EnemyShieldGuardState(EnemyAgent agent, EnemyStateMachine stateMachine) : base(agent, stateMachine) { }
+
+    public override void Tick()
+    {
+        if (!Agent.HasTarget)
+        {
+            StateMachine.ChangeState(Agent.IdleState);
+            return;
+        }
+
+        Vector2 moveDirection = Agent.GetMeleeFormationMoveDirection(out bool isAtFormation);
+        Vector2 targetOffset = (Vector2)Agent.Target.position - Agent.Body.position;
+        if (!isAtFormation || targetOffset.sqrMagnitude > Agent.Data.StoppingDistance * Agent.Data.StoppingDistance)
+        {
+            Agent.SetDesiredVelocity(moveDirection * Agent.Data.MoveSpeed);
+            return;
+        }
+
+        Agent.SetDesiredVelocity(Vector2.zero);
+        Agent.FaceTarget();
+        if (Agent.CanMeleeAttack)
+        {
+            StateMachine.ChangeState(Agent.ShieldAttackState);
+        }
+    }
+}
+
+public sealed class EnemyShieldBlockState : EnemyState
+{
+    private float remaining;
+
+    public EnemyShieldBlockState(EnemyAgent agent, EnemyStateMachine stateMachine) : base(agent, stateMachine) { }
+
+    public override void Enter()
+    {
+        remaining = Agent.Data.ShieldBlockDuration;
+        Agent.SetDesiredVelocity(Vector2.zero);
+        Agent.FaceTarget();
+    }
+
+    public override void Tick()
+    {
+        if (!Agent.HasTarget)
+        {
+            StateMachine.ChangeState(Agent.IdleState);
+            return;
+        }
+
+        Agent.SetDesiredVelocity(Vector2.zero);
+        Agent.FaceTarget();
+        remaining -= Agent.EnemyDeltaTime;
+        if (remaining <= 0f) StateMachine.ChangeState(Agent.DefaultActiveState);
+    }
+}
+
+public sealed class EnemyShieldAttackState : EnemyState
+{
+    private float elapsed;
+    private bool dealtDamage;
+
+    public EnemyShieldAttackState(EnemyAgent agent, EnemyStateMachine stateMachine) : base(agent, stateMachine) { }
+
+    public override void Enter()
+    {
+        elapsed = 0f;
+        dealtDamage = false;
+        Agent.BeginShieldAttack();
+    }
+
+    public override void Tick()
+    {
+        if (!Agent.HasTarget)
+        {
+            StateMachine.ChangeState(Agent.IdleState);
+            return;
+        }
+
+        elapsed += Agent.EnemyDeltaTime;
+        Agent.SetDesiredVelocity(Vector2.zero);
+        Agent.FaceTarget();
+        if (!dealtDamage && elapsed >= Agent.Data.ShieldAttackWindup)
+        {
+            dealtDamage = true;
+            Agent.PerformShieldAttack();
+        }
+
+        if (elapsed >= Agent.Data.ShieldAttackDuration)
+        {
+            StateMachine.ChangeState(Agent.DefaultActiveState);
+        }
+    }
+
+    public override void Exit() => Agent.EndShieldAttack();
 }
