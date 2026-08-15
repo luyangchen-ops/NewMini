@@ -408,24 +408,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 142866958}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2236a39b89ebd943a26446cbf83ecfe, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b3f04f8e27745a6bc991cc6e7f89b0c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ExtraEnemyController
-  enemyType: 1
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAgent
+  data: {fileID: 11400000, guid: 4d93013a640c4e009275b01eeb8146bb, type: 2}
   target: {fileID: 1641396734}
   fallbackTargetName: Player
   worldCamera: {fileID: 1179551985}
   boundaryPadding: 0.5
-  meleeMoveSpeed: 2.5
-  meleeStoppingDistance: 1.2
-  rangedMoveSpeed: 1.5
-  idleChance: 0.4
-  stateDurationRange: {x: 0.5, y: 1.4}
-  projectilePrefab: {fileID: 5887521079033147050, guid: d3e97d22802b1b8418b98451095bc619, type: 3}
-  firePoint: {fileID: 0}
-  projectileSpawnOffset: 0.65
-  projectileSpeed: 7
-  fireInterval: 1.8
 --- !u!50 &142866964
 Rigidbody2D:
   serializedVersion: 5
@@ -1076,24 +1066,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1594449528}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2236a39b89ebd943a26446cbf83ecfe, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b3f04f8e27745a6bc991cc6e7f89b0c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ExtraEnemyController
-  enemyType: 1
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAgent
+  data: {fileID: 11400000, guid: 9e6d4f1acb5147638393fbb2e3e7c3c8, type: 2}
   target: {fileID: 1641396734}
   fallbackTargetName: Player
   worldCamera: {fileID: 1179551985}
   boundaryPadding: 0.5
-  meleeMoveSpeed: 2.5
-  meleeStoppingDistance: 1.2
-  rangedMoveSpeed: 1.5
-  idleChance: 0.4
-  stateDurationRange: {x: 0.5, y: 1.4}
-  projectilePrefab: {fileID: 5887521079033147050, guid: d3e97d22802b1b8418b98451095bc619, type: 3}
-  firePoint: {fileID: 0}
-  projectileSpawnOffset: 1.5
-  projectileSpeed: 7
-  fireInterval: 1.2
 --- !u!50 &1594449534
 Rigidbody2D:
   serializedVersion: 5
@@ -1457,24 +1437,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1793258039}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2236a39b89ebd943a26446cbf83ecfe, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b3f04f8e27745a6bc991cc6e7f89b0c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ExtraEnemyController
-  enemyType: 0
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAgent
+  data: {fileID: 11400000, guid: 64a4f8d7bef346f0aa5d2ecf65249850, type: 2}
   target: {fileID: 1641396734}
   fallbackTargetName: Player
   worldCamera: {fileID: 1179551985}
   boundaryPadding: 0.5
-  meleeMoveSpeed: 2.5
-  meleeStoppingDistance: 1.2
-  rangedMoveSpeed: 1.5
-  idleChance: 0.4
-  stateDurationRange: {x: 0.5, y: 1.4}
-  projectilePrefab: {fileID: 5887521079033147050, guid: d3e97d22802b1b8418b98451095bc619, type: 3}
-  firePoint: {fileID: 0}
-  projectileSpawnOffset: 0.65
-  projectileSpeed: 7
-  fireInterval: 1.8
 --- !u!50 &1793258045
 Rigidbody2D:
   serializedVersion: 5

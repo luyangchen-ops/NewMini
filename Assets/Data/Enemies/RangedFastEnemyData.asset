@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40f0e8d2adf94026aa99e5a82fa86a13, type: 3}
+  m_Name: RangedFastEnemyData
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  <Archetype>k__BackingField: 1
+  <MoveSpeed>k__BackingField: 1.5
+  <StoppingDistance>k__BackingField: 1.2
+  <StayStill>k__BackingField: 0
+  <IdleChance>k__BackingField: 0.4
+  <RoamStateDurationRange>k__BackingField: {x: 0.5, y: 1.4}
+  <ProjectilePrefab>k__BackingField: {fileID: 5887521079033147050, guid: d3e97d22802b1b8418b98451095bc619, type: 3}
+  <ProjectileSpawnOffset>k__BackingField: 1.5
+  <ProjectileSpeed>k__BackingField: 7
+  <FireInterval>k__BackingField: 1.2
