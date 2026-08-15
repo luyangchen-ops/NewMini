@@ -5,14 +5,14 @@
 ## 目录
 
 - `Source/`：Babylon 返回的原始 MP3，用于以后重新挑选片段或再次处理。
-- `Runtime/`：建议在游戏中绑定的最终 WAV，均为 44.1 kHz、16-bit PCM、单声道。
+- `Runtime/`：建议在游戏中绑定的最终 WAV，均为 44.1 kHz、16-bit PCM；除子弹时间循环为立体声外，其余为单声道。
 
 ## Runtime 资产
 
 | 文件 | 时长 | 建议触发点 |
 | --- | ---: | --- |
 | `Hero_PerfectDodge_SFX.wav` | 0.950 秒 | 完美闪避确认；锐利弹反瞬态后带短促空气抽离感 |
-| `Hero_BulletTime_Loop.wav` | 4.650 秒 | 子弹时间期间循环；低通环境层和低沉心跳，不应完全静音 |
+| `Hero_BulletTime_Loop.wav` | 4.667 秒 | 子弹时间期间循环；已替换为提高音量后的立体声版本，不应完全静音 |
 | `Hero_Dash_WindCut_SFX.wav` | 0.550 秒 | 普通闪避或攻击冲刺开始时播放 |
 | `Hero_Hit_BladeFlesh_SFX.wav` | 0.700 秒 | 确认造成伤害时播放；刀刃瞬态叠加肉感低频 |
 | `Hero_Kill_Confirm_SFX.wav` | 0.620 秒 | 击杀确认时使用独立 AudioSource 播放并按连杀数升调 |
