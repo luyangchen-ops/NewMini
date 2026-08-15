@@ -7,19 +7,30 @@ public sealed class EnemyAgent : MonoBehaviour
     [SerializeField] private Transform target;
     [SerializeField] private string fallbackTargetName = "Player";
     [SerializeField] private Camera worldCamera;
+    [SerializeField] private Animator visualAnimator;
+    [SerializeField] private SpriteRenderer visualRenderer;
     [SerializeField, Min(0f)] private float boundaryPadding = 0.5f;
 
     private Rigidbody2D body;
     private Vector2 desiredVelocity;
     private float nextTargetSearchTime;
     private float fireCooldown;
+    private float meleePerfectDodgeStartTime;
+    private float meleePerfectDodgeEndTime;
     private EnemyStateMachine stateMachine;
+
+    private static readonly int Attack = Animator.StringToHash("Attack");
 
     public EnemyData Data => data;
     public Rigidbody2D Body => body;
     public Transform Target => target;
     public bool HasTarget => target != null;
     public bool CanFire => data != null && data.ProjectilePrefab != null && fireCooldown <= 0f;
+    public bool CanMeleeAttack => data != null && data.Archetype == EnemyArchetype.Melee && fireCooldown <= 0f;
+    public bool IsMeleeAttackPerfectDodgeable => data != null
+        && data.Archetype == EnemyArchetype.Melee
+        && Time.time >= meleePerfectDodgeStartTime
+        && Time.time <= meleePerfectDodgeEndTime;
     public EnemyIdleState IdleState { get; private set; }
     public EnemyState DefaultActiveState => data.Archetype == EnemyArchetype.Melee ? chaseState : roamState;
     public EnemyRoamState RoamState => roamState;
@@ -36,6 +47,8 @@ public sealed class EnemyAgent : MonoBehaviour
         body.freezeRotation = true;
         body.interpolation = RigidbodyInterpolation2D.Interpolate;
         worldCamera ??= Camera.main;
+        visualAnimator ??= GetComponentInChildren<Animator>();
+        visualRenderer ??= GetComponentInChildren<SpriteRenderer>();
 
         stateMachine = new EnemyStateMachine();
         IdleState = new EnemyIdleState(this, stateMachine);
@@ -43,6 +56,7 @@ public sealed class EnemyAgent : MonoBehaviour
         roamState = new EnemyRoamState(this, stateMachine);
         attackState = new EnemyAttackState(this, stateMachine);
         TryFindTarget();
+        target?.GetComponentInParent<PlayerCharacterController>()?.IgnoreEnemyCollisions(this);
         fireCooldown = data != null ? Random.Range(0.1f, data.FireInterval) : 0f;
         stateMachine.ChangeState(IdleState);
     }
@@ -54,13 +68,21 @@ public sealed class EnemyAgent : MonoBehaviour
             return;
         }
 
+        if (visualAnimator != null)
+        {
+            visualAnimator.speed = PlayerCharacterController.EnemyTimeScale;
+        }
+
         if (!HasTarget && Time.time >= nextTargetSearchTime)
         {
             TryFindTarget();
         }
 
-        fireCooldown = Mathf.Max(0f, fireCooldown - Time.deltaTime * TestControl.EnemyTimeScale);
-        stateMachine.Tick();
+        fireCooldown = Mathf.Max(0f, fireCooldown - Time.deltaTime * PlayerCharacterController.EnemyTimeScale);
+        if (PlayerCharacterController.EnemyTimeScale > 0f)
+        {
+            stateMachine.Tick();
+        }
     }
 
     private void FixedUpdate()
@@ -79,11 +101,18 @@ public sealed class EnemyAgent : MonoBehaviour
         }
 
         Vector2 clampedNext = CameraBounds.Clamp(
-            worldCamera, clampedPosition + desiredVelocity * Time.fixedDeltaTime, boundaryPadding, transform.position.z);
+            worldCamera,
+            clampedPosition + desiredVelocity * (PlayerCharacterController.EnemyTimeScale * Time.fixedDeltaTime),
+            boundaryPadding,
+            transform.position.z);
         body.linearVelocity = (clampedNext - clampedPosition) / Time.fixedDeltaTime;
     }
 
-    public void SetDesiredVelocity(Vector2 velocity) => desiredVelocity = velocity * TestControl.EnemyTimeScale;
+    public void SetDesiredVelocity(Vector2 velocity)
+    {
+        desiredVelocity = velocity;
+        Face(velocity.x);
+    }
 
     public void FireProjectile()
     {
@@ -104,8 +133,35 @@ public sealed class EnemyAgent : MonoBehaviour
             data.ProjectilePrefab,
             body.position + direction * data.ProjectileSpawnOffset,
             Quaternion.Euler(0f, 0f, angle));
-        projectile.Launch(direction, data.ProjectileSpeed, gameObject);
+        projectile.Launch(direction, data.ProjectileSpeed, gameObject, data.Damage);
         fireCooldown = data.FireInterval;
+    }
+
+    public void PerformMeleeAttack()
+    {
+        if (!CanMeleeAttack)
+        {
+            return;
+        }
+
+        if (HasTarget)
+        {
+            Face(target.position.x - transform.position.x);
+        }
+
+        meleePerfectDodgeStartTime = Time.time + data.MeleePerfectDodgeDelay;
+        meleePerfectDodgeEndTime = meleePerfectDodgeStartTime + data.MeleePerfectDodgeDuration;
+        visualAnimator?.SetTrigger(Attack);
+        target?.GetComponentInParent<PlayerCharacterController>()?.TakeDamage(data.Damage);
+        fireCooldown = data.FireInterval;
+    }
+
+    private void Face(float horizontalDirection)
+    {
+        if (visualRenderer != null && Mathf.Abs(horizontalDirection) > .01f)
+        {
+            visualRenderer.flipX = horizontalDirection < 0f;
+        }
     }
 
     private void TryFindTarget()
@@ -120,12 +176,17 @@ public sealed class EnemyAgent : MonoBehaviour
         if (targetObject != null)
         {
             target = targetObject.transform;
+            target.GetComponentInParent<PlayerCharacterController>()?.IgnoreEnemyCollisions(this);
         }
     }
 
     private void OnDisable()
     {
         desiredVelocity = Vector2.zero;
+        if (visualAnimator != null)
+        {
+            visualAnimator.speed = 1f;
+        }
         if (body != null)
         {
             body.linearVelocity = Vector2.zero;

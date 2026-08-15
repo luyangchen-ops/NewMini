@@ -1,12 +1,42 @@
 fileFormatVersion: 2
-guid: 2dfc7da3bf865e048b3bbecbde6ba728
+guid: 660e85d6a6d8ad642b55df77a7d52afb
 TextureImporter:
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      213: 1971523610971834705
+    second: Hero_NormalAttack_8Frames_Transparent_0
+  - first:
+      213: -2803425331436451561
+    second: Hero_NormalAttack_8Frames_Transparent_1
+  - first:
+      213: 5704332811758314156
+    second: Hero_NormalAttack_8Frames_Transparent_2
+  - first:
+      213: 6158529966553522848
+    second: Hero_NormalAttack_8Frames_Transparent_3
+  - first:
+      213: 132031047220523063
+    second: Hero_NormalAttack_8Frames_Transparent_4
+  - first:
+      213: -6508575142784990826
+    second: Hero_NormalAttack_8Frames_Transparent_5
+  - first:
+      213: -38556851184277907
+    second: Hero_NormalAttack_8Frames_Transparent_6
+  - first:
+      213: 2585796871946551351
+    second: Hero_NormalAttack_8Frames_Transparent_7
+  - first:
+      213: 4269788351043337607
+    second: Hero_NormalAttack_8Frames_Transparent_8
+  - first:
+      213: 1655120570296302402
+    second: Hero_NormalAttack_8Frames_Transparent_9
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
     mipMapMode: 0
-    enableMipMap: 1
+    enableMipMap: 0
     sRGBTexture: 1
     linearTexture: 0
     fadeOut: 0
@@ -37,13 +67,13 @@ TextureImporter:
     filterMode: 1
     aniso: 1
     mipBias: 0
-    wrapU: 0
-    wrapV: 0
-    wrapW: 0
-  nPOTScale: 1
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 0
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -52,9 +82,9 @@ TextureImporter:
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
-  alphaIsTransparency: 0
+  alphaIsTransparency: 1
   spriteTessellationDetail: -1
-  textureType: 0
+  textureType: 8
   textureShape: 1
   singleChannelComponent: 0
   flipbookRows: 1
@@ -95,7 +125,227 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: Hero_NormalAttack_8Frames_Transparent_0
+      rect:
+        serializedVersion: 2
+        x: 282
+        y: 618
+        width: 452
+        height: 441
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 159854257424c5b10800000000000000
+      internalID: 1971523610971834705
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_NormalAttack_8Frames_Transparent_1
+      rect:
+        serializedVersion: 2
+        x: 757
+        y: 641
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7190665a38b3819d0800000000000000
+      internalID: -2803425331436451561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_NormalAttack_8Frames_Transparent_2
+      rect:
+        serializedVersion: 2
+        x: 1250
+        y: 618
+        width: 459
+        height: 430
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca2a57d287cd92f40800000000000000
+      internalID: 5704332811758314156
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_NormalAttack_8Frames_Transparent_3
+      rect:
+        serializedVersion: 2
+        x: 2239
+        y: 618
+        width: 520
+        height: 445
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a26503106e777550800000000000000
+      internalID: 6158529966553522848
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_NormalAttack_8Frames_Transparent_4
+      rect:
+        serializedVersion: 2
+        x: 3438
+        y: 618
+        width: 554
+        height: 444
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 730f6e4b98115d100800000000000000
+      internalID: 132031047220523063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_NormalAttack_8Frames_Transparent_5
+      rect:
+        serializedVersion: 2
+        x: 274
+        y: 42
+        width: 597
+        height: 438
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6910d5c3465eca5a0800000000000000
+      internalID: -6508575142784990826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_NormalAttack_8Frames_Transparent_6
+      rect:
+        serializedVersion: 2
+        x: 1310
+        y: 42
+        width: 553
+        height: 445
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d66e0858fb4077ff0800000000000000
+      internalID: -38556851184277907
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_NormalAttack_8Frames_Transparent_7
+      rect:
+        serializedVersion: 2
+        x: 2311
+        y: 42
+        width: 447
+        height: 444
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 730c0bd0e8892e320800000000000000
+      internalID: 2585796871946551351
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_NormalAttack_8Frames_Transparent_8
+      rect:
+        serializedVersion: 2
+        x: 3354
+        y: 42
+        width: 452
+        height: 441
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 78df90a02e5514b30800000000000000
+      internalID: 4269788351043337607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hero_NormalAttack_8Frames_Transparent_9
+      rect:
+        serializedVersion: 2
+        x: 3829
+        y: 65
+        width: 6
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 24bf3f4b36b28f610800000000000000
+      internalID: 1655120570296302402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -109,7 +359,17 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Hero_NormalAttack_8Frames_Transparent_0: 1971523610971834705
+      Hero_NormalAttack_8Frames_Transparent_1: -2803425331436451561
+      Hero_NormalAttack_8Frames_Transparent_2: 5704332811758314156
+      Hero_NormalAttack_8Frames_Transparent_3: 6158529966553522848
+      Hero_NormalAttack_8Frames_Transparent_4: 132031047220523063
+      Hero_NormalAttack_8Frames_Transparent_5: -6508575142784990826
+      Hero_NormalAttack_8Frames_Transparent_6: -38556851184277907
+      Hero_NormalAttack_8Frames_Transparent_7: 2585796871946551351
+      Hero_NormalAttack_8Frames_Transparent_8: 4269788351043337607
+      Hero_NormalAttack_8Frames_Transparent_9: 1655120570296302402
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -28,8 +28,31 @@ public static class CameraBounds
         return position.x < minimum.x || position.x > maximum.x || position.y < minimum.y || position.y > maximum.y;
     }
 
+    public static Vector3 ClampCameraPosition(Camera camera, Vector3 position)
+    {
+        if (camera == null || !PlayAreaBounds.TryGetWorldBounds(out Bounds worldBounds)) return position;
+
+        float halfHeight = camera.orthographicSize;
+        float halfWidth = halfHeight * camera.aspect;
+        float minimumX = worldBounds.min.x + halfWidth;
+        float maximumX = worldBounds.max.x - halfWidth;
+        float minimumY = worldBounds.min.y + halfHeight;
+        float maximumY = worldBounds.max.y - halfHeight;
+
+        float x = minimumX <= maximumX ? Mathf.Clamp(position.x, minimumX, maximumX) : worldBounds.center.x;
+        float y = minimumY <= maximumY ? Mathf.Clamp(position.y, minimumY, maximumY) : worldBounds.center.y;
+        return new Vector3(x, y, position.z);
+    }
+
     private static void GetMinMax(Camera camera, float worldZ, out Vector2 minimum, out Vector2 maximum)
     {
+        if (PlayAreaBounds.TryGetWorldBounds(out Bounds worldBounds))
+        {
+            minimum = worldBounds.min;
+            maximum = worldBounds.max;
+            return;
+        }
+
         if (camera == null)
         {
             minimum = new Vector2(float.NegativeInfinity, float.NegativeInfinity);

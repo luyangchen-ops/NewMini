@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f9faec6d3eda3af498ceb4b719968b38
+guid: f8e63ea47e10e724e95ae0425bc7a132
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -32,6 +32,75 @@ TextureImporter:
   - first:
       213: -8845257156513114933
     second: PerfectDodgeAfterimage_06_9
+  - first:
+      213: 1288859730749362547
+    second: PerfectDodgeAfterimage_06_10
+  - first:
+      213: -2872884795834311714
+    second: PerfectDodgeAfterimage_06_11
+  - first:
+      213: 5194030890676365976
+    second: PerfectDodgeAfterimage_06_12
+  - first:
+      213: -5160244148192525648
+    second: PerfectDodgeAfterimage_06_13
+  - first:
+      213: 2280544588967117780
+    second: PerfectDodgeAfterimage_06_14
+  - first:
+      213: -5290078989961162393
+    second: PerfectDodgeAfterimage_06_15
+  - first:
+      213: 2184463776130024333
+    second: PerfectDodgeAfterimage_06_16
+  - first:
+      213: 7129630487733512360
+    second: PerfectDodgeAfterimage_06_17
+  - first:
+      213: -2685136251969833649
+    second: PerfectDodgeAfterimage_06_18
+  - first:
+      213: -6867772060189916192
+    second: PerfectDodgeAfterimage_06_19
+  - first:
+      213: -3635581040591465120
+    second: PerfectDodgeAfterimage_06_20
+  - first:
+      213: 4348010251370738009
+    second: PerfectDodgeAfterimage_06_21
+  - first:
+      213: -7102600872877041146
+    second: PerfectDodgeAfterimage_06_22
+  - first:
+      213: -7505335539669500368
+    second: PerfectDodgeAfterimage_06_23
+  - first:
+      213: -1169654037440264732
+    second: PerfectDodgeAfterimage_06_24
+  - first:
+      213: 7754316981883857733
+    second: PerfectDodgeAfterimage_06_25
+  - first:
+      213: 4818889391409261274
+    second: PerfectDodgeAfterimage_06_26
+  - first:
+      213: -5380142296423902377
+    second: PerfectDodgeAfterimage_06_27
+  - first:
+      213: -5460577843286791769
+    second: PerfectDodgeAfterimage_06_28
+  - first:
+      213: -4858038382605036304
+    second: PerfectDodgeAfterimage_06_29
+  - first:
+      213: -5203959530476589876
+    second: PerfectDodgeAfterimage_06_30
+  - first:
+      213: 4548969959978069605
+    second: PerfectDodgeAfterimage_06_31
+  - first:
+      213: -485491448515272415
+    second: PerfectDodgeAfterimage_06_32
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -73,11 +142,11 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 9
-  spritePivot: {x: 0.5, y: 0.05}
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
@@ -99,10 +168,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 1024
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -130,10 +199,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_06_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 173
-        width: 387
-        height: 279
+        x: 50
+        y: 416
+        width: 11
+        height: 11
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -152,10 +221,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_06_1
       rect:
         serializedVersion: 2
-        x: 479
-        y: 398
-        width: 33
-        height: 73
+        x: 68
+        y: 179
+        width: 358
+        height: 246
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -174,10 +243,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_06_2
       rect:
         serializedVersion: 2
-        x: 447
-        y: 359
-        width: 16
-        height: 14
+        x: 78
+        y: 408
+        width: 10
+        height: 10
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -196,10 +265,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_06_3
       rect:
         serializedVersion: 2
-        x: 465
-        y: 359
-        width: 47
-        height: 38
+        x: 115
+        y: 407
+        width: 11
+        height: 11
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -218,10 +287,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_06_4
       rect:
         serializedVersion: 2
-        x: 426
-        y: 282
+        x: 24
+        y: 392
         width: 19
-        height: 15
+        height: 14
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -240,10 +309,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_06_5
       rect:
         serializedVersion: 2
-        x: 430
-        y: 213
-        width: 82
-        height: 135
+        x: 65
+        y: 397
+        width: 7
+        height: 10
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -262,10 +331,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_06_6
       rect:
         serializedVersion: 2
-        x: 480
-        y: 176
-        width: 18
-        height: 18
+        x: 170
+        y: 387
+        width: 43
+        height: 17
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -284,10 +353,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_06_7
       rect:
         serializedVersion: 2
-        x: 495
-        y: 190
-        width: 15
-        height: 13
+        x: 206
+        y: 403
+        width: 12
+        height: 11
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -306,10 +375,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_06_8
       rect:
         serializedVersion: 2
-        x: 501
-        y: 183
-        width: 10
-        height: 8
+        x: 65
+        y: 387
+        width: 9
+        height: 9
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -328,10 +397,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_06_9
       rect:
         serializedVersion: 2
-        x: 501
-        y: 174
-        width: 11
-        height: 11
+        x: 32
+        y: 332
+        width: 32
+        height: 40
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -346,11 +415,517 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_10
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 355
+        width: 11
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3711f90b813f2e110800000000000000
+      internalID: 1288859730749362547
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_11
+      rect:
+        serializedVersion: 2
+        x: 485
+        y: 359
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: edbdca7df767128d0800000000000000
+      internalID: -2872884795834311714
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_12
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 306
+        width: 11
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89aab2f6397e41840800000000000000
+      internalID: 5194030890676365976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_13
+      rect:
+        serializedVersion: 2
+        x: 58
+        y: 298
+        width: 35
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b242b099412368b0800000000000000
+      internalID: -5160244148192525648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_14
+      rect:
+        serializedVersion: 2
+        x: 465
+        y: 287
+        width: 27
+        height: 19
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d303d7883f16af10800000000000000
+      internalID: 2280544588967117780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_15
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 277
+        width: 28
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7619b99cf2dd596b0800000000000000
+      internalID: -5290078989961162393
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_16
+      rect:
+        serializedVersion: 2
+        x: 17
+        y: 294
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8340f80b36c05e10800000000000000
+      internalID: 2184463776130024333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_17
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 283
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8a8a629772981f260800000000000000
+      internalID: 7129630487733512360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_18
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 260
+        width: 18
+        height: 23
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4570d72eca7cbad0800000000000000
+      internalID: -2685136251969833649
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_19
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 255
+        width: 26
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e30702c2b5c0b0a0800000000000000
+      internalID: -6867772060189916192
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_20
+      rect:
+        serializedVersion: 2
+        x: 453
+        y: 250
+        width: 25
+        height: 33
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06596634e42db8dc0800000000000000
+      internalID: -3635581040591465120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_21
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 276
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 951b5b0794c375c30800000000000000
+      internalID: 4348010251370738009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_22
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 264
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60ad8c6232e7e6d90800000000000000
+      internalID: -7102600872877041146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_23
+      rect:
+        serializedVersion: 2
+        x: 502
+        y: 245
+        width: 10
+        height: 31
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 03e72e57711b7d790800000000000000
+      internalID: -7505335539669500368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_24
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 221
+        width: 36
+        height: 40
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e5854c99dd84cfe0800000000000000
+      internalID: -1169654037440264732
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_25
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 260
+        width: 17
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54b67fcf53edc9b60800000000000000
+      internalID: 7754316981883857733
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_26
+      rect:
+        serializedVersion: 2
+        x: 479
+        y: 261
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: adae8d2be5220e240800000000000000
+      internalID: 4818889391409261274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_27
+      rect:
+        serializedVersion: 2
+        x: 484
+        y: 251
+        width: 22
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 753599c2615e555b0800000000000000
+      internalID: -5380142296423902377
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_28
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 235
+        width: 16
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a9a58602612834b0800000000000000
+      internalID: -5460577843286791769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_29
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 238
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f41d9b74d7c49cb0800000000000000
+      internalID: -4858038382605036304
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_30
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 222
+        width: 6
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccc2f68f062d7c7b0800000000000000
+      internalID: -5203959530476589876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_31
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 222
+        width: 10
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56e6a6eb310312f30800000000000000
+      internalID: 4548969959978069605
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_06_32
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 186
+        width: 46
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 121e1cd89103349f0800000000000000
+      internalID: -485491448515272415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -362,8 +937,31 @@ TextureImporter:
     nameFileIdTable:
       PerfectDodgeAfterimage_06_0: 7185980750640627214
       PerfectDodgeAfterimage_06_1: -6850188148413995340
+      PerfectDodgeAfterimage_06_10: 1288859730749362547
+      PerfectDodgeAfterimage_06_11: -2872884795834311714
+      PerfectDodgeAfterimage_06_12: 5194030890676365976
+      PerfectDodgeAfterimage_06_13: -5160244148192525648
+      PerfectDodgeAfterimage_06_14: 2280544588967117780
+      PerfectDodgeAfterimage_06_15: -5290078989961162393
+      PerfectDodgeAfterimage_06_16: 2184463776130024333
+      PerfectDodgeAfterimage_06_17: 7129630487733512360
+      PerfectDodgeAfterimage_06_18: -2685136251969833649
+      PerfectDodgeAfterimage_06_19: -6867772060189916192
       PerfectDodgeAfterimage_06_2: 8686961607611301100
+      PerfectDodgeAfterimage_06_20: -3635581040591465120
+      PerfectDodgeAfterimage_06_21: 4348010251370738009
+      PerfectDodgeAfterimage_06_22: -7102600872877041146
+      PerfectDodgeAfterimage_06_23: -7505335539669500368
+      PerfectDodgeAfterimage_06_24: -1169654037440264732
+      PerfectDodgeAfterimage_06_25: 7754316981883857733
+      PerfectDodgeAfterimage_06_26: 4818889391409261274
+      PerfectDodgeAfterimage_06_27: -5380142296423902377
+      PerfectDodgeAfterimage_06_28: -5460577843286791769
+      PerfectDodgeAfterimage_06_29: -4858038382605036304
       PerfectDodgeAfterimage_06_3: 4006884219412407139
+      PerfectDodgeAfterimage_06_30: -5203959530476589876
+      PerfectDodgeAfterimage_06_31: 4548969959978069605
+      PerfectDodgeAfterimage_06_32: -485491448515272415
       PerfectDodgeAfterimage_06_4: -46146837938131708
       PerfectDodgeAfterimage_06_5: -2668726458155581652
       PerfectDodgeAfterimage_06_6: -7463173528569803263

@@ -468,9 +468,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 201417206}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21d984e20db3e02439943eeabb0662bd, type: 3}
+  m_Script: {fileID: 11500000, guid: 0c6f4025a7e849eea960d3b1719cb021, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TestControl
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCharacterController
+  characterData: {fileID: 11400000, guid: a7092b7e4fb34d34a9dec326a25ed071, type: 2}
   moveSpeed: 5
   boundaryPadding: 0.7
   worldCamera: {fileID: 0}
@@ -1163,6 +1164,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 433389917}
+  - component: {fileID: 930000001}
   m_Layer: 0
   m_Name: Player Dash Arrow
   m_TagString: Untagged
@@ -3787,3 +3789,26 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1853529722}
+--- !u!212 &930000001
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 433389916}
+  m_Enabled: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 8ebca35a53634c8bbcf1a0f2d8291a91, type: 2}
+  m_SortingLayerID: 0
+  m_SortingOrder: 1000
+  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_SpriteSortPoint: 0
+  m_BlendShapeWeights: []

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 01759975632de6145a283c02e7200436
+guid: f23e445c4f22dee40813f224f1c2c492
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -14,6 +14,9 @@ TextureImporter:
   - first:
       213: -2597793450694163708
     second: PerfectDodgeAfterimage_04_3
+  - first:
+      213: -8926835711468027308
+    second: PerfectDodgeAfterimage_04_4
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -55,11 +58,11 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 9
-  spritePivot: {x: 0.5, y: 0.05}
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
@@ -81,10 +84,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 1024
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -112,10 +115,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_04_0
       rect:
         serializedVersion: 2
-        x: 55
-        y: 370
-        width: 13
-        height: 10
+        x: 47
+        y: 180
+        width: 465
+        height: 291
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -134,10 +137,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_04_1
       rect:
         serializedVersion: 2
-        x: 65
-        y: 176
-        width: 393
-        height: 335
+        x: 342
+        y: 471
+        width: 12
+        height: 11
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -156,10 +159,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_04_2
       rect:
         serializedVersion: 2
-        x: 60
-        y: 262
-        width: 12
-        height: 12
+        x: 366
+        y: 463
+        width: 18
+        height: 10
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -178,10 +181,10 @@ TextureImporter:
       name: PerfectDodgeAfterimage_04_3
       rect:
         serializedVersion: 2
-        x: 498
-        y: 271
-        width: 14
-        height: 21
+        x: 383
+        y: 459
+        width: 9
+        height: 7
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -196,11 +199,33 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: PerfectDodgeAfterimage_04_4
+      rect:
+        serializedVersion: 2
+        x: 493
+        y: 257
+        width: 8
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4524da187328d1480800000000000000
+      internalID: -8926835711468027308
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -214,6 +239,7 @@ TextureImporter:
       PerfectDodgeAfterimage_04_1: -2279096509638510410
       PerfectDodgeAfterimage_04_2: -5955691131849179907
       PerfectDodgeAfterimage_04_3: -2597793450694163708
+      PerfectDodgeAfterimage_04_4: -8926835711468027308
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

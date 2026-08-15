@@ -167,9 +167,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 3052938771483210112}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d063edd0838e554ea16c471f3b59831, type: 3}
+  m_Script: {fileID: 11500000, guid: 9aa9204b651e382478f5db9bca56a667, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyProjectile
-  damage: 10
+  damage: 0
   lifetime: 4
   worldCamera: {fileID: 0}

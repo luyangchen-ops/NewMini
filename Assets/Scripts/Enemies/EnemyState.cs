@@ -45,9 +45,17 @@ public sealed class EnemyChaseState : EnemyState
         }
 
         Vector2 offset = (Vector2)Agent.Target.position - Agent.Body.position;
-        Agent.SetDesiredVelocity(offset.sqrMagnitude > Agent.Data.StoppingDistance * Agent.Data.StoppingDistance
-            ? offset.normalized * Agent.Data.MoveSpeed
-            : Vector2.zero);
+        if (offset.sqrMagnitude <= Agent.Data.StoppingDistance * Agent.Data.StoppingDistance)
+        {
+            Agent.SetDesiredVelocity(Vector2.zero);
+            if (Agent.CanMeleeAttack)
+            {
+                StateMachine.ChangeState(Agent.AttackState);
+            }
+            return;
+        }
+
+        Agent.SetDesiredVelocity(offset.normalized * Agent.Data.MoveSpeed);
     }
 }
 
@@ -102,6 +110,13 @@ public sealed class EnemyAttackState : EnemyState
 
     public override void Enter()
     {
+        if (Agent.Data.Archetype == EnemyArchetype.Melee)
+        {
+            Agent.PerformMeleeAttack();
+            StateMachine.ChangeState(Agent.DefaultActiveState);
+            return;
+        }
+
         Agent.FireProjectile();
         StateMachine.ChangeState(Agent.RoamState);
     }

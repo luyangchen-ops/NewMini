@@ -892,6 +892,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1331282476}
+  - component: {fileID: 920000001}
   m_Layer: 0
   m_Name: Player Dash Arrow
   m_TagString: Untagged
@@ -1205,9 +1206,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1641396732}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21d984e20db3e02439943eeabb0662bd, type: 3}
+  m_Script: {fileID: 11500000, guid: 0c6f4025a7e849eea960d3b1719cb021, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TestControl
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCharacterController
+  characterData: {fileID: 11400000, guid: a7092b7e4fb34d34a9dec326a25ed071, type: 2}
   moveSpeed: 5
   boundaryPadding: 0.7
   worldCamera: {fileID: 1179551985}
@@ -1221,6 +1223,7 @@ MonoBehaviour:
   bulletTimeEnemyScale: 0.1
   enemyNamePrefix: Enemy
   arrowRoot: {fileID: 1331282475}
+  killChainRangeOverlay: {fileID: 920000001}
   arrowLine: {fileID: 727600406}
   arrowHead: {fileID: 908587777}
 --- !u!70 &1641396736
@@ -1951,3 +1954,26 @@ CanvasRenderer:
   m_ObjectHideFlags: 0
   m_GameObject: {fileID: 2000070}
   m_CullTransparentMesh: 1
+--- !u!212 &920000001
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1331282475}
+  m_Enabled: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 8ebca35a53634c8bbcf1a0f2d8291a91, type: 2}
+  m_SortingLayerID: 0
+  m_SortingOrder: 1000
+  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_SpriteSortPoint: 0
+  m_BlendShapeWeights: []

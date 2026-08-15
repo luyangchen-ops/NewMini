@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public sealed class EnemyProjectile : MonoBehaviour
 {
-    [SerializeField, Min(0f)] private float damage = 10f;
+    [SerializeField, Min(0f)] private float damage = 0f;
     [Tooltip("Safety fallback used only when no Main Camera is available.")]
     [SerializeField, Min(0.05f)] private float lifetime = 4f;
     [SerializeField] private Camera worldCamera;
@@ -12,6 +12,7 @@ public sealed class EnemyProjectile : MonoBehaviour
     private GameObject owner;
     private float destroyTime;
     private bool hasHit;
+    private bool isLaunched;
     private Vector2 travelDirection;
     private float travelSpeed;
 
@@ -27,11 +28,19 @@ public sealed class EnemyProjectile : MonoBehaviour
     private void OnEnable()
     {
         hasHit = false;
-        destroyTime = Time.time + lifetime;
+        isLaunched = false;
+        destroyTime = float.PositiveInfinity;
     }
 
     private void Update()
     {
+        // Instantiate invokes Awake/OnEnable before EnemyAgent can call Launch.
+        // Do not allow an uninitialised clone to destroy itself during that window.
+        if (!isLaunched)
+        {
+            return;
+        }
+
         if (worldCamera != null && CameraBounds.IsOutside(worldCamera, body.position, transform.position.z))
         {
             Destroy(gameObject);
@@ -42,14 +51,22 @@ public sealed class EnemyProjectile : MonoBehaviour
         }
     }
 
-    private void FixedUpdate() => body.linearVelocity = travelDirection * (travelSpeed * TestControl.EnemyTimeScale);
+    private void FixedUpdate() => body.linearVelocity = travelDirection * (travelSpeed * PlayerCharacterController.EnemyTimeScale);
 
-    public void Launch(Vector2 direction, float speed, GameObject projectileOwner)
+    public void Launch(Vector2 direction, float speed, GameObject projectileOwner, float attackDamage = 0f)
     {
+        if (body == null)
+        {
+            body = GetComponent<Rigidbody2D>();
+        }
+
         owner = projectileOwner;
         travelDirection = direction.sqrMagnitude > 0f ? direction.normalized : Vector2.right;
         travelSpeed = Mathf.Max(0f, speed);
-        body.linearVelocity = travelDirection * (travelSpeed * TestControl.EnemyTimeScale);
+        damage = Mathf.Max(0f, attackDamage);
+        destroyTime = Time.time + lifetime;
+        isLaunched = true;
+        body.linearVelocity = travelDirection * (travelSpeed * PlayerCharacterController.EnemyTimeScale);
         transform.right = travelDirection;
         IgnoreOwnerCollisions();
     }
@@ -60,7 +77,7 @@ public sealed class EnemyProjectile : MonoBehaviour
     private void HandleHit(Collider2D other)
     {
         if (hasHit || other == null || BelongsToOwner(other.transform)) return;
-        TestControl player = other.GetComponentInParent<TestControl>();
+        PlayerCharacterController player = other.GetComponentInParent<PlayerCharacterController>();
         if (player == null) return;
         if (player.IsDodging)
         {
@@ -69,11 +86,14 @@ public sealed class EnemyProjectile : MonoBehaviour
             return;
         }
 
+        if (player.IsInvulnerable) return;
+
         hasHit = true;
+        player.TakeDamage(damage);
         Destroy(gameObject);
     }
 
-    public void IgnorePlayerCollisions(TestControl player)
+    public void IgnorePlayerCollisions(PlayerCharacterController player)
     {
         if (player == null) return;
         IgnoreCollisions(GetComponentsInChildren<Collider2D>(), player.GetComponentsInChildren<Collider2D>());

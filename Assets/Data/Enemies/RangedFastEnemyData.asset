@@ -15,6 +15,7 @@ MonoBehaviour:
   <Archetype>k__BackingField: 1
   <MoveSpeed>k__BackingField: 1.5
   <StoppingDistance>k__BackingField: 1.2
+  <Damage>k__BackingField: 0
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4
   <RoamStateDurationRange>k__BackingField: {x: 0.5, y: 1.4}
