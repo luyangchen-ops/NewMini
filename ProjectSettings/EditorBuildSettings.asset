@@ -11,5 +11,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Extra.unity
     guid: f9053e5a4bb2f6e41a55eade3c1f8584
+  - enabled: 1
+    path: Assets/Scenes/Level_01_BambooCourtyard.unity
+    guid: 86dc7d38b431cf149bc8f2ad5908f992
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

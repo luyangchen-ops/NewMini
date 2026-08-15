@@ -10,7 +10,7 @@ using UnityEngine.UI;
 /// </summary>
 public sealed class BeginMenuController : MonoBehaviour
 {
-    private const string GameplayScene = "Extra";
+    private const string GameplayScene = "Level_01_BambooCourtyard";
 
     [Header("State Groups")]
     [SerializeField] private GameObject panelMainMenu;
