@@ -28,9 +28,8 @@ MonoBehaviour:
   <BulletTimeEnterDuration>k__BackingField: 0.12
   <BulletTimeExitDuration>k__BackingField: 0.18
   <PerfectDodgeFreezeDuration>k__BackingField: 0.05
-  <KillChainInitialWindow>k__BackingField: 0.8
-  <KillChainMaximumWindow>k__BackingField: 1.2
-  <KillChainTimeRestorePerKill>k__BackingField: 0.35
+  <KillChainInitialWindow>k__BackingField: 1.5
+  <KillChainTimeRestorePerKill>k__BackingField: 1.5
   <KillImpactFreezeDuration>k__BackingField: 0.055
   <KillChainInputBufferDuration>k__BackingField: 0.12
   <KillChainExitProtection>k__BackingField: 0.2
@@ -48,5 +47,7 @@ MonoBehaviour:
   <HitBladeFleshSfx>k__BackingField: {fileID: 8300000, guid: f0bdb1cfaf3c49638c44afdb2a23b249, type: 3}
   <KillConfirmSfx>k__BackingField: {fileID: 8300000, guid: 6465becbd55741ecac0a8cfc0f434e5f, type: 3}
   <KillChainEndSfx>k__BackingField: {fileID: 8300000, guid: 00f8e63296fa4bf68a0324d43605cd8e, type: 3}
+  <NormalKillHealthRestore>k__BackingField: 5
+  <KillChainHealthRestore>k__BackingField: 15
   <NormalAttackCooldown>k__BackingField: 0.5
   <NormalAttackRange>k__BackingField: 1.5

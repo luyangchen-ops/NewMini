@@ -57,11 +57,13 @@ public sealed class EnemyData : ScriptableObject
     [field: SerializeField] public Vector2 RoamStateDurationRange { get; private set; } = new Vector2(0.5f, 1.4f);
 
     [field: Header("Ranged Attack")]
+    [field: Tooltip("Maximum distance at which a ranged enemy can begin and release an attack.")]
+    [field: SerializeField, Min(0f)] public float RangedAttackRange { get; private set; } = 6f;
     [field: SerializeField] public EnemyProjectile ProjectilePrefab { get; private set; }
     [field: SerializeField, Min(0f)] public float ProjectileSpawnOffset { get; private set; } = 0.65f;
     [field: SerializeField, Min(0f)] public float ProjectileSpeed { get; private set; } = 7f;
-    [field: Tooltip("Downward acceleration applied to arrows. Higher values create a more pronounced arc.")]
-    [field: SerializeField, Min(0f)] public float ProjectileGravity { get; private set; } = 9.81f;
+    [field: Tooltip("Distance travelled in a straight line before the projectile is destroyed.")]
+    [field: SerializeField, Min(.1f)] public float ProjectileMaxDistance { get; private set; } = 8f;
     [field: SerializeField, Min(0.05f)] public float FireInterval { get; private set; } = 1.2f;
     [field: SerializeField, Min(0f)] public float RangedAttackReleaseDelay { get; private set; } = .25f;
     [field: SerializeField, Min(.05f)] public float RangedAttackDuration { get; private set; } = .34f;
@@ -143,7 +145,8 @@ public sealed class EnemyData : ScriptableObject
         ShieldAttackDuration = Mathf.Max(ShieldAttackWindup, ShieldAttackDuration);
         ShieldAttackInterval = Mathf.Max(.1f, ShieldAttackInterval);
         ShieldPerfectDodgeWindowDuration = Mathf.Max(.01f, ShieldPerfectDodgeWindowDuration);
-        ProjectileGravity = Mathf.Max(0f, ProjectileGravity);
+        RangedAttackRange = Mathf.Max(0f, RangedAttackRange);
+        ProjectileMaxDistance = Mathf.Max(.1f, ProjectileMaxDistance);
         RangedAttackReleaseDelay = Mathf.Max(0f, RangedAttackReleaseDelay);
         RangedAttackDuration = Mathf.Max(RangedAttackReleaseDelay, RangedAttackDuration);
     }

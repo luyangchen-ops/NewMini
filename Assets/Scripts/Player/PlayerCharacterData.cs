@@ -22,9 +22,8 @@ public sealed class PlayerCharacterData : ScriptableObject
     [field: SerializeField, Min(.01f)] public float BulletTimeEnterDuration { get; private set; } = .12f;
     [field: SerializeField, Min(.01f)] public float BulletTimeExitDuration { get; private set; } = .18f;
     [field: SerializeField, Min(0f)] public float PerfectDodgeFreezeDuration { get; private set; } = .05f;
-    [field: SerializeField, Min(.05f)] public float KillChainInitialWindow { get; private set; } = .8f;
-    [field: SerializeField, Min(.05f)] public float KillChainMaximumWindow { get; private set; } = 1.2f;
-    [field: SerializeField, Min(0f)] public float KillChainTimeRestorePerKill { get; private set; } = .35f;
+    [field: SerializeField, Min(.05f)] public float KillChainInitialWindow { get; private set; } = 1.5f;
+    [field: SerializeField, Min(.05f)] public float KillChainTimeRestorePerKill { get; private set; } = 1.5f;
     [field: SerializeField, Min(0f)] public float KillImpactFreezeDuration { get; private set; } = .055f;
     [field: SerializeField, Min(0f)] public float KillChainInputBufferDuration { get; private set; } = .12f;
     [field: SerializeField, Min(0f)] public float KillChainExitProtection { get; private set; } = .2f;
@@ -45,12 +44,10 @@ public sealed class PlayerCharacterData : ScriptableObject
     [field: SerializeField] public AudioClip HitBladeFleshSfx { get; private set; }
     [field: SerializeField] public AudioClip KillConfirmSfx { get; private set; }
     [field: SerializeField] public AudioClip KillChainEndSfx { get; private set; }
+    [field: Header("Health Recovery")]
+    [field: SerializeField, Min(0f)] public float NormalKillHealthRestore { get; private set; } = 5f;
+    [field: SerializeField, Min(0f)] public float KillChainHealthRestore { get; private set; } = 15f;
     [field: Header("Attack")]
     [field: SerializeField, Min(0f)] public float NormalAttackCooldown { get; private set; } = .5f;
     [field: SerializeField, Min(0f)] public float NormalAttackRange { get; private set; } = 1.5f;
-
-    private void OnValidate()
-    {
-        KillChainMaximumWindow = Mathf.Max(KillChainInitialWindow, KillChainMaximumWindow);
-    }
 }

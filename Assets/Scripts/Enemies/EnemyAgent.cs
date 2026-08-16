@@ -62,7 +62,11 @@ public sealed class EnemyAgent : MonoBehaviour
     public Rigidbody2D Body => body;
     public Transform Target => target;
     public bool HasTarget => target != null;
-    public bool CanFire => !IsDead && data != null && data.ProjectilePrefab != null && fireCooldown <= 0f;
+    public bool CanFire => !IsDead
+        && data != null
+        && data.ProjectilePrefab != null
+        && fireCooldown <= 0f
+        && IsWithinRangedAttackRange();
     public bool CanMeleeAttack => !IsDead && data != null && data.Archetype == EnemyArchetype.Melee && fireCooldown <= 0f;
     public bool CanSpearAttack => !IsDead && data != null && data.Archetype == EnemyArchetype.Spearman && fireCooldown <= 0f;
     public bool IsMeleeCombatant => data != null && (data.Archetype == EnemyArchetype.Melee || data.Archetype == EnemyArchetype.Spearman);
@@ -213,6 +217,15 @@ public sealed class EnemyAgent : MonoBehaviour
         Vector2 ownCenter = body.position + GetOwnBodyCenterOffset();
         Vector2 targetOffset = GetTargetBodyCenter() - ownCenter;
         return targetOffset.sqrMagnitude <= data.StoppingDistance * data.StoppingDistance;
+    }
+
+    private bool IsWithinRangedAttackRange()
+    {
+        if (!HasTarget || data == null) return false;
+
+        Vector2 ownCenter = body.position + GetOwnBodyCenterOffset();
+        Vector2 targetOffset = GetTargetBodyCenter() - ownCenter;
+        return targetOffset.sqrMagnitude <= data.RangedAttackRange * data.RangedAttackRange;
     }
 
     public Vector2 GetMeleeWaitingRoamDirection()
@@ -416,7 +429,7 @@ public sealed class EnemyAgent : MonoBehaviour
             data.ProjectilePrefab,
             projectileOrigin + direction * data.ProjectileSpawnOffset,
             Quaternion.Euler(0f, 0f, angle));
-        projectile.Launch(target.position, data.ProjectileSpeed, data.ProjectileGravity, gameObject, data.Damage);
+        projectile.Launch(target.position, data.ProjectileSpeed, data.ProjectileMaxDistance, gameObject, data.Damage);
         PlayAttackSfx();
         fireCooldown = data.FireInterval;
     }

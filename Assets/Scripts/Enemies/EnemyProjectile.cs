@@ -4,17 +4,17 @@ using UnityEngine;
 public sealed class EnemyProjectile : MonoBehaviour
 {
     [SerializeField, Min(0f)] private float damage = 0f;
-    [Tooltip("Safety fallback used only when no Main Camera is available.")]
+    [Tooltip("Safety fallback in case the projectile cannot cover its configured distance.")]
     [SerializeField, Min(0.05f)] private float lifetime = 4f;
-    [SerializeField] private Camera worldCamera;
 
     private Rigidbody2D body;
     private GameObject owner;
+    private Vector2 launchPosition;
+    private float maximumTravelDistance;
     private float destroyTime;
     private bool hasHit;
     private bool isLaunched;
     private Vector2 velocity;
-    private float gravity;
 
     private void Awake()
     {
@@ -22,13 +22,14 @@ public sealed class EnemyProjectile : MonoBehaviour
         body.gravityScale = 0f;
         body.freezeRotation = true;
         body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        worldCamera ??= Camera.main;
     }
 
     private void OnEnable()
     {
         hasHit = false;
         isLaunched = false;
+        launchPosition = Vector2.zero;
+        maximumTravelDistance = 0f;
         destroyTime = float.PositiveInfinity;
     }
 
@@ -41,11 +42,9 @@ public sealed class EnemyProjectile : MonoBehaviour
             return;
         }
 
-        if (worldCamera != null && CameraBounds.IsOutside(worldCamera, body.position, transform.position.z))
-        {
-            Destroy(gameObject);
-        }
-        else if (worldCamera == null && Time.time >= destroyTime)
+        float travelledDistanceSqr = (body.position - launchPosition).sqrMagnitude;
+        if (travelledDistanceSqr >= maximumTravelDistance * maximumTravelDistance
+            || Time.time >= destroyTime)
         {
             Destroy(gameObject);
         }
@@ -59,15 +58,10 @@ public sealed class EnemyProjectile : MonoBehaviour
         }
 
         float timeScale = PlayerCharacterController.EnemyTimeScale;
-        velocity += Vector2.down * (gravity * timeScale * Time.fixedDeltaTime);
         body.linearVelocity = velocity * timeScale;
-        if (velocity.sqrMagnitude > .0001f)
-        {
-            transform.right = velocity;
-        }
     }
 
-    public void Launch(Vector2 targetPosition, float speed, float projectileGravity, GameObject projectileOwner, float attackDamage = 0f)
+    public void Launch(Vector2 targetPosition, float speed, float maxTravelDistance, GameObject projectileOwner, float attackDamage = 0f)
     {
         if (body == null)
         {
@@ -76,13 +70,11 @@ public sealed class EnemyProjectile : MonoBehaviour
 
         owner = projectileOwner;
         float launchSpeed = Mathf.Max(0.01f, speed);
-        gravity = Mathf.Max(0f, projectileGravity);
         Vector2 toTarget = targetPosition - (Vector2)transform.position;
-        float travelTime = Mathf.Max(.02f, toTarget.magnitude / launchSpeed);
-
-        // Solve v = displacement / time - 1/2 * acceleration * time.
-        // This retains the current aim point while introducing a visible gravity arc.
-        velocity = toTarget / travelTime + Vector2.up * (.5f * gravity * travelTime);
+        Vector2 direction = toTarget.sqrMagnitude > .0001f ? toTarget.normalized : (Vector2)transform.right;
+        velocity = direction * launchSpeed;
+        launchPosition = body.position;
+        maximumTravelDistance = Mathf.Max(.1f, maxTravelDistance);
         damage = Mathf.Max(0f, attackDamage);
         destroyTime = Time.time + lifetime;
         isLaunched = true;

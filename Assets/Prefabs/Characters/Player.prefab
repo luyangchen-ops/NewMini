@@ -407,9 +407,9 @@ MonoBehaviour:
   onInvalidKillChainTarget:
     m_PersistentCalls:
       m_Calls: []
-  arrowRoot: {fileID: 0}
-  arrowLine: {fileID: 0}
-  arrowHead: {fileID: 0}
+  arrowRoot: {fileID: 6287507317972642017}
+  arrowLine: {fileID: 7081396847299163213}
+  arrowHead: {fileID: 6953705883988390633}
 --- !u!82 &6547794758119955933
 AudioSource:
   m_ObjectHideFlags: 0

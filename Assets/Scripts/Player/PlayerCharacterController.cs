@@ -116,6 +116,7 @@ public class PlayerCharacterController : MonoBehaviour
     private float normalAttackReadyTime;
     private float stateTimer;
     private float chainWindowRemaining;
+    private float chainWindowDuration;
     private float bufferedTargetUntil;
     private float exitProtectionUntil;
     private float animatorBaseSpeed = 1f;
@@ -174,7 +175,9 @@ public class PlayerCharacterController : MonoBehaviour
         : Mathf.Clamp01((dashReadyTime - Time.time) / DodgeCooldown);
     public bool CanUseUltimate => currentMomentum >= maximumMomentum && State == PlayerStateId.Locomotion;
     public Transform CurrentKillChainTarget => currentTarget != null ? currentTarget : lockedDashTarget;
-    public float KillChainWindowNormalized => Mathf.Clamp01(chainWindowRemaining / KillChainMaximumWindow);
+    public float KillChainWindowNormalized => chainWindowDuration <= 0f
+        ? 0f
+        : Mathf.Clamp01(chainWindowRemaining / chainWindowDuration);
 
     public event Action<int> KillChainKillConfirmed;
     public event Action<int> KillChainFinished;
@@ -198,14 +201,15 @@ public class PlayerCharacterController : MonoBehaviour
     private float BulletTimeScale => characterData != null ? characterData.BulletTimeEnemyScale : bulletTimeEnemyScale;
     private float AttackCooldown => characterData != null ? characterData.NormalAttackCooldown : normalAttackCooldown;
     private float NormalAttackRange => characterData != null ? characterData.NormalAttackRange : normalAttackRange;
+    private float NormalKillHealthRestore => characterData != null ? characterData.NormalKillHealthRestore : 5f;
+    private float KillChainHealthRestore => characterData != null ? characterData.KillChainHealthRestore : 15f;
     private float AttackDashOvershoot => characterData != null ? characterData.AttackDashOvershoot : .3f;
     private float DashEnemyTimeScale => characterData != null ? characterData.DashEnemyTimeScale : .35f;
     private float BulletTimeEnterDuration => characterData != null ? characterData.BulletTimeEnterDuration : .12f;
     private float BulletTimeExitDuration => characterData != null ? characterData.BulletTimeExitDuration : .18f;
     private float PerfectDodgeFreezeDuration => characterData != null ? characterData.PerfectDodgeFreezeDuration : .05f;
-    private float KillChainInitialWindow => characterData != null ? characterData.KillChainInitialWindow : .8f;
-    private float KillChainMaximumWindow => characterData != null ? characterData.KillChainMaximumWindow : 1.2f;
-    private float KillChainTimeRestore => characterData != null ? characterData.KillChainTimeRestorePerKill : .35f;
+    private float KillChainInitialWindow => characterData != null ? characterData.KillChainInitialWindow : 1.5f;
+    private float KillChainTimeRestore => characterData != null ? characterData.KillChainTimeRestorePerKill : 1.5f;
     private float KillImpactFreezeDuration => characterData != null ? characterData.KillImpactFreezeDuration : .055f;
     private float KillChainInputBufferDuration => characterData != null ? characterData.KillChainInputBufferDuration : .12f;
     private float KillChainExitProtection => characterData != null ? characterData.KillChainExitProtection : .2f;
@@ -395,7 +399,7 @@ public class PlayerCharacterController : MonoBehaviour
 
         body.linearVelocity = Vector2.zero;
         killChainCount = 0;
-        chainWindowRemaining = Mathf.Min(KillChainInitialWindow, KillChainMaximumWindow);
+        ResetKillChainWindow(KillChainInitialWindow);
         currentTarget = lockedDashTarget = bufferedTarget = lastKilledTarget = null;
         bufferedTargetUntil = 0f;
         stateTimer = PerfectDodgeFreezeDuration;
@@ -582,10 +586,11 @@ public class PlayerCharacterController : MonoBehaviour
         PlayBloodHitEffect(enemy, killDashDirection);
         SpecialItemDropSpawner.TryDropFromEnemy(enemy.position);
         KillEnemy(enemy);
+        RestoreHealth(KillChainHealthRestore);
         lockedDashTarget = null;
         killChainCount++;
         AwardMomentum(killChainCount);
-        chainWindowRemaining = Mathf.Min(KillChainMaximumWindow, chainWindowRemaining + KillChainTimeRestore);
+        ResetKillChainWindow(KillChainTimeRestore);
         dashReadyTime = 0f;
         PlayKillSfx();
         cameraController.AddKillImpact(killDashDirection, KillCameraShake, killChainCount);
@@ -631,6 +636,7 @@ public class PlayerCharacterController : MonoBehaviour
         SetCurrentTarget(null);
         lockedDashTarget = bufferedTarget = lastKilledTarget = null;
         chainWindowRemaining = 0f;
+        chainWindowDuration = 0f;
         exitProtectionUntil = Time.unscaledTime + KillChainExitProtection;
         cameraController.EndKillChain();
         perfectDodgeAfterimage?.StopAndRestore();
@@ -639,6 +645,12 @@ public class PlayerCharacterController : MonoBehaviour
         stateMachine.Change(PlayerStateId.Locomotion);
         onKillChainEnded?.Invoke(completedKills);
         KillChainFinished?.Invoke(completedKills);
+    }
+
+    private void ResetKillChainWindow(float duration)
+    {
+        chainWindowDuration = Mathf.Max(.05f, duration);
+        chainWindowRemaining = chainWindowDuration;
     }
 
     private Transform FindBestTarget(Transform excludedTarget)
@@ -775,6 +787,7 @@ public class PlayerCharacterController : MonoBehaviour
         PlayBloodHitEffect(closestTarget, direction);
         SpecialItemDropSpawner.TryDropFromEnemy(closestTarget.position);
         KillEnemy(closestTarget);
+        RestoreHealth(NormalKillHealthRestore);
         AwardMomentum(0);
         PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
         PlaySfx(killSfx);
@@ -993,6 +1006,7 @@ public class PlayerCharacterController : MonoBehaviour
         PlayBloodHitEffect(target, slashDirection);
         SpecialItemDropSpawner.TryDropFromEnemy(target.position);
         KillEnemy(target);
+        RestoreHealth(NormalKillHealthRestore);
         ultimateExecutedKills++;
 
         cameraController.AddKillImpact(slashDirection, MaximumCameraShake, ultimateExecutedKills);
@@ -1480,6 +1494,8 @@ public class PlayerCharacterController : MonoBehaviour
         ultimateTrailPoints.Clear();
         EnemyTimeScale = 1f;
         enemyTimeScaleTarget = 1f;
+        chainWindowRemaining = 0f;
+        chainWindowDuration = 0f;
         if (stateMachine != null) stateMachine.Change(PlayerStateId.Locomotion);
         if (visualAnimator != null) visualAnimator.speed = animatorBaseSpeed;
         SetArrowVisible(false);
