@@ -1308,7 +1308,7 @@ public class PlayerCharacterController : MonoBehaviour
         if (bulletTimeLoopSource.clip != BulletTimeLoopSfx) bulletTimeLoopSource.clip = BulletTimeLoopSfx;
         float slowRange = Mathf.Max(.01f, 1f - BulletTimeScale);
         bulletTimeLoopEnvelope = Mathf.Clamp01((1f - EnemyTimeScale) / slowRange);
-        bulletTimeLoopSource.volume = bulletTimeLoopEnvelope * bulletTimeLoopVolume * GameAudioSettings.SfxVolume;
+        bulletTimeLoopSource.volume = bulletTimeLoopEnvelope * bulletTimeLoopVolume * GetSfxChannelVolume();
 
         if (bulletTimeLoopEnvelope > .001f)
         {
@@ -1327,6 +1327,11 @@ public class PlayerCharacterController : MonoBehaviour
         sfxSource.PlayOneShot(clip, Mathf.Clamp01(volumeScale));
     }
 
+    private static float GetSfxChannelVolume()
+    {
+        return GameAudioSettings.GetChannelVolume(GameAudioChannel.SoundEffects);
+    }
+
     private void PlaySheathePresentation()
     {
         visualAnimator?.SetTrigger(Sheathe);
@@ -1337,16 +1342,16 @@ public class PlayerCharacterController : MonoBehaviour
     {
         if (sfxSource == null) return;
         sfxSource.pitch = 1f + Mathf.Min(Mathf.Max(0, killChainCount - 1), 4) * .035f;
-        if (HitBladeFleshSfx != null) sfxSource.PlayOneShot(HitBladeFleshSfx, hitBladeFleshVolume);
+        PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume, false);
         AudioClip confirmation = KillConfirmSfx != null ? KillConfirmSfx : killSfx;
-        if (confirmation != null) sfxSource.PlayOneShot(confirmation, killConfirmVolume);
+        PlaySfx(confirmation, killConfirmVolume, false);
     }
 
     private void ApplySfxVolume()
     {
-        if (sfxSource != null) sfxSource.volume = GameAudioSettings.SfxVolume;
+        if (sfxSource != null) sfxSource.volume = GetSfxChannelVolume();
         if (bulletTimeLoopSource != null)
-            bulletTimeLoopSource.volume = bulletTimeLoopEnvelope * bulletTimeLoopVolume * GameAudioSettings.SfxVolume;
+            bulletTimeLoopSource.volume = bulletTimeLoopEnvelope * bulletTimeLoopVolume * GetSfxChannelVolume();
     }
 
     private void OnDisable()
