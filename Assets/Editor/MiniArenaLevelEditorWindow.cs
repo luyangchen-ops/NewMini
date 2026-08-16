@@ -18,6 +18,10 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
     [SerializeField] private GameObject archerPrefab;
     [SerializeField] private GameObject shieldBearerPrefab;
     [SerializeField] private GameObject spearmanPrefab;
+    [SerializeField] private bool showAllCombatZones = true;
+    [SerializeField] private bool showCombatZoneLabels = true;
+    [SerializeField] private bool showAllEnemySpawnPoints = true;
+    [SerializeField] private bool showSpawnPointLabels = true;
     private bool isPlacingEnemy;
 
     private static readonly string[] EnemyTypeLabels = { "刀兵", "弓兵", "盾兵", "枪兵" };
@@ -28,14 +32,22 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
     private void OnEnable()
     {
         SceneView.duringSceneGui += DrawSceneAreaSelector;
+        Undo.undoRedoPerformed += RepaintSceneVisualization;
+        EditorApplication.hierarchyChanged += RepaintSceneVisualization;
+        showAllCombatZones = true;
+        showAllEnemySpawnPoints = true;
         TryAssignKnownEnemyPrefabs();
         TryUseSpawnerFromSelection();
+        SceneView.RepaintAll();
     }
 
     private void OnDisable()
     {
         SceneView.duringSceneGui -= DrawSceneAreaSelector;
+        Undo.undoRedoPerformed -= RepaintSceneVisualization;
+        EditorApplication.hierarchyChanged -= RepaintSceneVisualization;
         isPlacingEnemy = false;
+        SceneView.RepaintAll();
     }
 
     private void OnSelectionChange()
@@ -48,6 +60,7 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
     {
         EditorGUILayout.LabelField("箱庭关卡编辑器", EditorStyles.boldLabel);
         EditorGUILayout.HelpBox("点击“开始框选”后，在 Scene 视图左键拖拽出战区。区域会直接贴合地图坐标，所有节点仍保存在当前场景中。按 Esc 可取消。", MessageType.Info);
+        DrawCombatZoneDisplayControls();
         arenaName = EditorGUILayout.TextField("区域名称", arenaName);
         gateThickness = EditorGUILayout.Slider("边界厚度", gateThickness, .1f, 1f);
 
@@ -97,6 +110,7 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
     {
         EditorGUILayout.Space(12f);
         EditorGUILayout.LabelField("Scene 点选布怪", EditorStyles.boldLabel);
+        DrawSpawnPointDisplayControls();
 
         EditorGUI.BeginChangeCheck();
         ArenaWaveSpawner assignedSpawner = EditorGUILayout.ObjectField(
@@ -220,7 +234,8 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
         int controlId = GUIUtility.GetControlID("NewMiniEnemyPlacement".GetHashCode(), FocusType.Passive);
         if (current.type == EventType.Layout) HandleUtility.AddDefaultControl(controlId);
 
-        DrawWaveSpawnPoints(selectedWave);
+        if (!showAllEnemySpawnPoints)
+            DrawWaveSpawnPoints(selectedWave, selectedWaveIndex);
         Vector3 worldPosition = GetMouseWorldPosition(current.mousePosition, targetWaveSpawner.transform.position.z);
         Color typeColor = GetEnemyTypeColor(placementEnemyType);
         float markerSize = HandleUtility.GetHandleSize(worldPosition) * .12f;
@@ -307,7 +322,161 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
         Undo.CollapseUndoOperations(undoGroup);
     }
 
-    private void DrawWaveSpawnPoints(SerializedProperty wave)
+    private void DrawCombatZoneDisplayControls()
+    {
+        EditorGUI.BeginChangeCheck();
+        showAllCombatZones = EditorGUILayout.ToggleLeft(
+            "打开工具时在 Scene 显示全部交战区域",
+            showAllCombatZones);
+        using (new EditorGUI.DisabledScope(!showAllCombatZones))
+        {
+            showCombatZoneLabels = EditorGUILayout.ToggleLeft("显示战区名称与尺寸", showCombatZoneLabels);
+        }
+
+        if (EditorGUI.EndChangeCheck()) SceneView.RepaintAll();
+    }
+
+    private void DrawAllCombatZones()
+    {
+        if (!showAllCombatZones || Event.current.type != EventType.Repaint) return;
+
+        ArenaCombatZone[] zones = Object.FindObjectsByType<ArenaCombatZone>(FindObjectsInactive.Include);
+        UnityEngine.Rendering.CompareFunction previousZTest = Handles.zTest;
+        Handles.zTest = UnityEngine.Rendering.CompareFunction.Always;
+
+        try
+        {
+            foreach (ArenaCombatZone zone in zones)
+            {
+                if (zone == null
+                    || EditorUtility.IsPersistent(zone)
+                    || !zone.gameObject.scene.IsValid()
+                    || !zone.gameObject.scene.isLoaded)
+                    continue;
+
+                Collider2D area = zone.ZoneCollider != null ? zone.ZoneCollider : zone.GetComponent<Collider2D>();
+                if (area == null || !area.enabled) continue;
+
+                Color outline = zone.IsActive
+                    ? new Color(1f, .42f, .12f, 1f)
+                    : new Color(.1f, .8f, 1f, 1f);
+                Color fill = new(outline.r, outline.g, outline.b, zone.IsActive ? .16f : .09f);
+                DrawCombatZoneCollider(area, fill, outline);
+
+                if (!showCombatZoneLabels) continue;
+                Bounds bounds = area.bounds;
+                GUIStyle labelStyle = new(EditorStyles.boldLabel);
+                labelStyle.normal.textColor = outline;
+                Handles.Label(
+                    new Vector3(bounds.center.x, bounds.max.y, zone.transform.position.z),
+                    $"{GetCombatZoneDisplayName(zone)}\n{bounds.size.x:F1} × {bounds.size.y:F1}",
+                    labelStyle);
+            }
+        }
+        finally
+        {
+            Handles.zTest = previousZTest;
+        }
+    }
+
+    private static void DrawCombatZoneCollider(Collider2D area, Color fill, Color outline)
+    {
+        if (area is BoxCollider2D box)
+        {
+            Vector2 halfSize = box.size * .5f;
+            Vector2 offset = box.offset;
+            Vector3[] corners =
+            {
+                box.transform.TransformPoint(offset + new Vector2(-halfSize.x, -halfSize.y)),
+                box.transform.TransformPoint(offset + new Vector2(-halfSize.x, halfSize.y)),
+                box.transform.TransformPoint(offset + new Vector2(halfSize.x, halfSize.y)),
+                box.transform.TransformPoint(offset + new Vector2(halfSize.x, -halfSize.y))
+            };
+            Handles.DrawSolidRectangleWithOutline(corners, fill, outline);
+            return;
+        }
+
+        if (area is CircleCollider2D circle)
+        {
+            Vector3 center = circle.transform.TransformPoint(circle.offset);
+            Vector3 scale = circle.transform.lossyScale;
+            float radius = circle.radius * Mathf.Max(Mathf.Abs(scale.x), Mathf.Abs(scale.y));
+            Handles.color = fill;
+            Handles.DrawSolidDisc(center, Vector3.forward, radius);
+            Handles.color = outline;
+            Handles.DrawWireDisc(center, Vector3.forward, radius);
+            return;
+        }
+
+        Bounds bounds = area.bounds;
+        Vector3[] boundsCorners =
+        {
+            new(bounds.min.x, bounds.min.y, area.transform.position.z),
+            new(bounds.min.x, bounds.max.y, area.transform.position.z),
+            new(bounds.max.x, bounds.max.y, area.transform.position.z),
+            new(bounds.max.x, bounds.min.y, area.transform.position.z)
+        };
+        Handles.DrawSolidRectangleWithOutline(boundsCorners, fill, outline);
+    }
+
+    private static string GetCombatZoneDisplayName(ArenaCombatZone zone)
+    {
+        Transform parent = zone.transform.parent;
+        return parent != null && parent.name.StartsWith("Root_") ? parent.name : zone.name;
+    }
+
+    private void DrawSpawnPointDisplayControls()
+    {
+        EditorGUI.BeginChangeCheck();
+        showAllEnemySpawnPoints = EditorGUILayout.ToggleLeft(
+            "打开工具时在 Scene 显示全部已布置点位",
+            showAllEnemySpawnPoints);
+        using (new EditorGUI.DisabledScope(!showAllEnemySpawnPoints))
+        {
+            showSpawnPointLabels = EditorGUILayout.ToggleLeft("显示 Wave / 兵种 / 序号标签", showSpawnPointLabels);
+        }
+
+        if (EditorGUI.EndChangeCheck()) SceneView.RepaintAll();
+
+        EditorGUILayout.LabelField(
+            "颜色：刀兵=红　弓兵=绿　盾兵=蓝　枪兵=紫",
+            EditorStyles.miniLabel);
+    }
+
+    private void DrawAllSceneSpawnPoints()
+    {
+        if (!showAllEnemySpawnPoints || Event.current.type != EventType.Repaint) return;
+
+        ArenaWaveSpawner[] spawners = Object.FindObjectsByType<ArenaWaveSpawner>(FindObjectsInactive.Include);
+        UnityEngine.Rendering.CompareFunction previousZTest = Handles.zTest;
+        Handles.zTest = UnityEngine.Rendering.CompareFunction.Always;
+
+        try
+        {
+            foreach (ArenaWaveSpawner spawner in spawners)
+            {
+                if (spawner == null
+                    || EditorUtility.IsPersistent(spawner)
+                    || !spawner.gameObject.scene.IsValid()
+                    || !spawner.gameObject.scene.isLoaded)
+                    continue;
+
+                SerializedObject serializedSpawner = new(spawner);
+                serializedSpawner.UpdateIfRequiredOrScript();
+                SerializedProperty waves = serializedSpawner.FindProperty("waves");
+                if (waves == null) continue;
+
+                for (int waveIndex = 0; waveIndex < waves.arraySize; waveIndex++)
+                    DrawWaveSpawnPoints(waves.GetArrayElementAtIndex(waveIndex), waveIndex);
+            }
+        }
+        finally
+        {
+            Handles.zTest = previousZTest;
+        }
+    }
+
+    private void DrawWaveSpawnPoints(SerializedProperty wave, int waveIndex)
     {
         SerializedProperty spawns = wave.FindPropertyRelative("spawns");
         if (spawns == null) return;
@@ -322,16 +491,45 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
             SerializedProperty spawnPoints = entry.FindPropertyRelative("spawnPoints");
             if (spawnPoints == null) continue;
 
-            Handles.color = GetEnemyTypeColor(type);
+            Color typeColor = GetEnemyTypeColor(type);
+            GUIStyle labelStyle = new(EditorStyles.miniBoldLabel)
+            {
+                alignment = TextAnchor.LowerCenter
+            };
+            labelStyle.normal.textColor = typeColor;
+
             for (int pointIndex = 0; pointIndex < spawnPoints.arraySize; pointIndex++)
             {
                 Transform point = spawnPoints.GetArrayElementAtIndex(pointIndex).objectReferenceValue as Transform;
                 if (point == null) continue;
-                float size = HandleUtility.GetHandleSize(point.position) * .08f;
+
+                float size = HandleUtility.GetHandleSize(point.position) * .09f;
+                Handles.color = new Color(typeColor.r, typeColor.g, typeColor.b, .28f);
                 Handles.DrawSolidDisc(point.position, Vector3.forward, size);
-                Handles.Label(point.position + Vector3.up * size, $"{GetEnemyTypeName(type)} {pointIndex + 1}");
+                Handles.color = typeColor;
+                Handles.DrawWireDisc(point.position, Vector3.forward, size);
+                Handles.DrawLine(
+                    point.position + Vector3.left * size * .65f,
+                    point.position + Vector3.right * size * .65f);
+                Handles.DrawLine(
+                    point.position + Vector3.down * size * .65f,
+                    point.position + Vector3.up * size * .65f);
+
+                if (showSpawnPointLabels)
+                {
+                    Handles.Label(
+                        point.position + Vector3.up * size * 1.25f,
+                        $"W{waveIndex + 1:00} · {GetEnemyTypeName(type)} {pointIndex + 1:00}",
+                        labelStyle);
+                }
             }
         }
+    }
+
+    private void RepaintSceneVisualization()
+    {
+        Repaint();
+        SceneView.RepaintAll();
     }
 
     private static int FindSpawnEntryIndex(SerializedProperty spawns, EnemySpawner.EnemyType type)
@@ -530,6 +728,9 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
 
     private void DrawSceneAreaSelector(SceneView sceneView)
     {
+        DrawAllCombatZones();
+        DrawAllSceneSpawnPoints();
+
         if (isPlacingEnemy)
         {
             DrawEnemyPlacement(sceneView);
