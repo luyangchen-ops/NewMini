@@ -30,11 +30,13 @@ public sealed class EnemyAgent : MonoBehaviour
     private EnemyStateMachine stateMachine;
 
     private static readonly int Attack = Animator.StringToHash("Attack");
+    private static readonly int Death = Animator.StringToHash("Death");
     private static readonly int Shoot = Animator.StringToHash("Shoot");
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
     private static readonly int IsRunning = Animator.StringToHash("IsRunning");
 
     private bool supportsAttack;
+    private bool supportsDeath;
     private bool supportsShoot;
     private bool supportsIsMoving;
     private bool supportsIsRunning;
@@ -43,8 +45,9 @@ public sealed class EnemyAgent : MonoBehaviour
     public Rigidbody2D Body => body;
     public Transform Target => target;
     public bool HasTarget => target != null;
-    public bool CanFire => data != null && data.ProjectilePrefab != null && fireCooldown <= 0f;
-    public bool CanMeleeAttack => data != null && data.Archetype == EnemyArchetype.Melee && fireCooldown <= 0f;
+    public bool CanFire => !IsDead && data != null && data.ProjectilePrefab != null && fireCooldown <= 0f;
+    public bool CanMeleeAttack => !IsDead && data != null && data.Archetype == EnemyArchetype.Melee && fireCooldown <= 0f;
+    public bool IsDead { get; private set; }
     public bool IsShieldBearer => GetVisualStyle() == EnemyVisualStyle.ShieldBearer;
     public bool IsShieldAttackExposed { get; private set; }
     public bool IsMeleeAttackPerfectDodgeable => data != null
@@ -101,8 +104,10 @@ public sealed class EnemyAgent : MonoBehaviour
 
         if (visualAnimator != null)
         {
-            visualAnimator.speed = PlayerCharacterController.EnemyTimeScale;
+            visualAnimator.speed = IsDead ? 1f : PlayerCharacterController.EnemyTimeScale;
         }
+
+        if (IsDead) return;
 
         if (!HasTarget && Time.time >= nextTargetSearchTime)
         {
@@ -118,7 +123,7 @@ public sealed class EnemyAgent : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (data == null)
+        if (data == null || IsDead)
         {
             return;
         }
@@ -141,6 +146,8 @@ public sealed class EnemyAgent : MonoBehaviour
 
     public void SetDesiredVelocity(Vector2 velocity)
     {
+        if (IsDead) return;
+
         desiredVelocity = velocity;
         Face(velocity.x);
         SetMovementAnimation(velocity.sqrMagnitude > .0001f);
@@ -276,6 +283,8 @@ public sealed class EnemyAgent : MonoBehaviour
 
     public bool CanBeKilledBy(Vector2 attackerPosition, bool bypassShield)
     {
+        if (IsDead) return false;
+
         if (!IsShieldBearer || bypassShield || IsShieldAttackExposed)
         {
             return true;
@@ -319,6 +328,36 @@ public sealed class EnemyAgent : MonoBehaviour
 
     public float EnemyDeltaTime => Time.deltaTime * PlayerCharacterController.EnemyTimeScale;
 
+    public void Die()
+    {
+        if (IsDead) return;
+
+        IsDead = true;
+        desiredVelocity = Vector2.zero;
+        meleePerfectDodgeStartTime = 0f;
+        meleePerfectDodgeEndTime = 0f;
+        SetMovementAnimation(false);
+
+        if (body != null)
+        {
+            body.linearVelocity = Vector2.zero;
+            body.simulated = false;
+        }
+
+        foreach (Collider2D hitbox in GetComponentsInChildren<Collider2D>())
+        {
+            hitbox.enabled = false;
+        }
+
+        if (visualAnimator != null && supportsDeath)
+        {
+            visualAnimator.ResetTrigger(Attack);
+            visualAnimator.SetTrigger(Death);
+        }
+
+        Destroy(gameObject, .9f);
+    }
+
     private void Face(float horizontalDirection)
     {
         if (visualRenderer != null && Mathf.Abs(horizontalDirection) > .01f)
@@ -343,7 +382,7 @@ public sealed class EnemyAgent : MonoBehaviour
         {
             EnemyVisualStyle.Archer => "Animation/弓兵/弓兵",
             EnemyVisualStyle.ShieldBearer => "Animation/盾兵/WarriorWalk/盾兵_行走",
-            _ => "Animation/刀兵/刀兵_跑步/刀兵_跑步"
+            _ => "Animation/SwordBandit/SwordBandit"
         };
         RuntimeAnimatorController controller = Resources.Load<RuntimeAnimatorController>(controllerPath);
         if (controller != null)
@@ -376,6 +415,7 @@ public sealed class EnemyAgent : MonoBehaviour
         foreach (AnimatorControllerParameter parameter in visualAnimator.parameters)
         {
             if (parameter.nameHash == Attack) supportsAttack = parameter.type == AnimatorControllerParameterType.Trigger;
+            else if (parameter.nameHash == Death) supportsDeath = parameter.type == AnimatorControllerParameterType.Trigger;
             else if (parameter.nameHash == Shoot) supportsShoot = parameter.type == AnimatorControllerParameterType.Trigger;
             else if (parameter.nameHash == IsMoving) supportsIsMoving = parameter.type == AnimatorControllerParameterType.Bool;
             else if (parameter.nameHash == IsRunning) supportsIsRunning = parameter.type == AnimatorControllerParameterType.Bool;
