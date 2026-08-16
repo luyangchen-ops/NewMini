@@ -513,7 +513,7 @@ public class PlayerCharacterController : MonoBehaviour
         if (bufferedTarget == enemy) bufferedTarget = null;
         PlayBloodHitEffect(enemy, killDashDirection);
         SpecialItemDropSpawner.TryDropFromEnemy(enemy.position);
-        Destroy(enemy.gameObject);
+        KillEnemy(enemy);
         lockedDashTarget = null;
         killChainCount++;
         AwardMomentum(killChainCount);
@@ -691,7 +691,7 @@ public class PlayerCharacterController : MonoBehaviour
         }
         PlayBloodHitEffect(closestEnemy, direction);
         SpecialItemDropSpawner.TryDropFromEnemy(closestEnemy.position);
-        Destroy(closestEnemy.gameObject);
+        KillEnemy(closestEnemy);
         AwardMomentum(0);
         PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
         PlaySfx(killSfx);
@@ -895,7 +895,7 @@ public class PlayerCharacterController : MonoBehaviour
         RestoreUltimateTargetColor(target);
         PlayBloodHitEffect(target, slashDirection);
         SpecialItemDropSpawner.TryDropFromEnemy(target.position);
-        Destroy(target.gameObject);
+        KillEnemy(target);
         ultimateExecutedKills++;
 
         cameraController.AddKillImpact(slashDirection, MaximumCameraShake, ultimateExecutedKills);
@@ -1069,9 +1069,28 @@ public class PlayerCharacterController : MonoBehaviour
         return null;
     }
 
+    private static void KillEnemy(Transform enemy)
+    {
+        if (enemy == null) return;
+
+        EnemyAgent agent = enemy.GetComponentInParent<EnemyAgent>();
+        if (agent != null)
+        {
+            agent.Die();
+            return;
+        }
+
+        Destroy(enemy.gameObject);
+    }
+
     private static bool HasNoActiveEnemies()
     {
-        return FindObjectsByType<EnemyAgent>(FindObjectsInactive.Exclude).Length == 0;
+        foreach (EnemyAgent enemy in FindObjectsByType<EnemyAgent>(FindObjectsInactive.Exclude))
+        {
+            if (!enemy.IsDead) return false;
+        }
+
+        return true;
     }
 
     private void PlayBloodHitEffect(Transform enemy, Vector2 slashDirection)
