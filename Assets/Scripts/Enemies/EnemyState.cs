@@ -48,7 +48,7 @@ public sealed class EnemyChaseState : EnemyState
         Vector2 targetOffset = (Vector2)Agent.Target.position - Agent.Body.position;
         if (isAtFormation
             && targetOffset.sqrMagnitude <= Agent.Data.StoppingDistance * Agent.Data.StoppingDistance
-            && Agent.CanMeleeAttack)
+            && (Agent.CanMeleeAttack || Agent.CanSpearAttack))
         {
             Agent.SetDesiredVelocity(Vector2.zero);
             StateMachine.ChangeState(Agent.AttackState);
@@ -108,6 +108,9 @@ public sealed class EnemyAttackState : EnemyState
 {
     private float elapsed;
     private bool projectileReleased;
+    private bool spearThrustStarted;
+    private bool spearDamageDealt;
+    private Vector2 spearDirection;
 
     public EnemyAttackState(EnemyAgent agent, EnemyStateMachine stateMachine) : base(agent, stateMachine) { }
 
@@ -117,6 +120,18 @@ public sealed class EnemyAttackState : EnemyState
         {
             Agent.PerformMeleeAttack();
             StateMachine.ChangeState(Agent.DefaultActiveState);
+            return;
+        }
+
+        if (Agent.Data.Archetype == EnemyArchetype.Spearman)
+        {
+            elapsed = 0f;
+            spearThrustStarted = false;
+            spearDamageDealt = false;
+            spearDirection = Agent.HasTarget
+                ? ((Vector2)Agent.Target.position - Agent.Body.position).normalized
+                : Vector2.right;
+            Agent.BeginSpearAttack();
             return;
         }
 
@@ -135,6 +150,38 @@ public sealed class EnemyAttackState : EnemyState
         }
 
         elapsed += Agent.EnemyDeltaTime;
+
+        if (Agent.Data.Archetype == EnemyArchetype.Spearman)
+        {
+            if (!spearThrustStarted && elapsed >= Agent.Data.SpearWindupDuration)
+            {
+                spearThrustStarted = true;
+                Agent.BeginSpearThrust(spearDirection);
+            }
+
+            if (spearThrustStarted)
+            {
+                Agent.SetDesiredVelocity(spearDirection * Agent.Data.SpearThrustSpeed);
+                if (!spearDamageDealt)
+                {
+                    spearDamageDealt = true;
+                    Agent.TryHitWithSpear(spearDirection);
+                }
+            }
+            else
+            {
+                Agent.SetDesiredVelocity(Vector2.zero);
+                Agent.FaceTarget();
+            }
+
+            if (elapsed >= Agent.Data.SpearWindupDuration + Agent.Data.SpearThrustDuration)
+            {
+                Agent.CompleteSpearAttack();
+                StateMachine.ChangeState(Agent.DefaultActiveState);
+            }
+            return;
+        }
+
         Agent.SetDesiredVelocity(Vector2.zero);
         Agent.FaceTarget();
         if (!projectileReleased && elapsed >= Agent.Data.RangedAttackReleaseDelay)

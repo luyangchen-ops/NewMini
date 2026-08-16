@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Rigidbody2D), typeof(PlayerSpecialItemInventory))]
 public class PlayerCharacterController : MonoBehaviour
 {
     public static float EnemyTimeScale { get; private set; } = 1f;
@@ -122,6 +122,7 @@ public class PlayerCharacterController : MonoBehaviour
     private float bulletTimeLoopEnvelope;
     private int killChainCount;
     private float currentHealth;
+    private bool isDead;
     private int currentMomentum;
     private int ultimateExecutionIndex;
     private int ultimateExecutedKills;
@@ -138,12 +139,14 @@ public class PlayerCharacterController : MonoBehaviour
     private Transform lockedDashTarget;
     private Transform bufferedTarget;
     private Transform lastKilledTarget;
+    private PlayerSpecialItemInventory specialItems;
 
     private static readonly int Speed = Animator.StringToHash("Speed");
+    private static readonly int VerticalDirection = Animator.StringToHash("VerticalDirection");
     private static readonly int NormalAttack = Animator.StringToHash("NormalAttack");
     private static readonly int DashAttack = Animator.StringToHash("DashAttack");
     private static readonly int Roll = Animator.StringToHash("Roll");
-    private static readonly int IsDead = Animator.StringToHash("IsDead");
+    private static readonly int IsDeadAnimatorParam = Animator.StringToHash("IsDead");
     private static readonly int ChainWindow01 = Shader.PropertyToID("_ChainWindow01");
     private static readonly int RangeRadius01 = Shader.PropertyToID("_RangeRadius01");
     private static readonly int EffectStrength = Shader.PropertyToID("_EffectStrength");
@@ -157,9 +160,13 @@ public class PlayerCharacterController : MonoBehaviour
     public float MaximumHealth => maximumHealth;
     public float CurrentHealth => currentHealth;
     public float HealthNormalized => maximumHealth <= 0f ? 0f : currentHealth / maximumHealth;
+    public bool IsDead => isDead;
     public int MaximumMomentum => maximumMomentum;
     public int CurrentMomentum => currentMomentum;
     public bool IsMomentumFull => currentMomentum >= maximumMomentum;
+    public float DodgeCooldownNormalized => DodgeCooldown <= 0f
+        ? 0f
+        : Mathf.Clamp01((dashReadyTime - Time.time) / DodgeCooldown);
     public bool CanUseUltimate => currentMomentum >= maximumMomentum && State == PlayerStateId.Locomotion;
     public Transform CurrentKillChainTarget => currentTarget != null ? currentTarget : lockedDashTarget;
     public float KillChainWindowNormalized => Mathf.Clamp01(chainWindowRemaining / KillChainMaximumWindow);
@@ -167,6 +174,7 @@ public class PlayerCharacterController : MonoBehaviour
     public event Action<int> KillChainKillConfirmed;
     public event Action<int> KillChainFinished;
     public event Action<float, float> HealthChanged;
+    public event Action Died;
     public event Action<int, int> MomentumChanged;
     public event Action UltimateStarted;
     public event Action<Transform, int> UltimateTargetMarked;
@@ -215,6 +223,11 @@ public class PlayerCharacterController : MonoBehaviour
     {
         feedbackProperties = new MaterialPropertyBlock();
         body = GetComponent<Rigidbody2D>();
+        specialItems = GetComponent<PlayerSpecialItemInventory>();
+        if (specialItems == null)
+        {
+            specialItems = gameObject.AddComponent<PlayerSpecialItemInventory>();
+        }
         currentHealth = maximumHealth;
         currentMomentum = Mathf.Clamp(startingMomentum, 0, maximumMomentum);
         playerColliders = GetComponentsInChildren<Collider2D>(true);
@@ -232,7 +245,7 @@ public class PlayerCharacterController : MonoBehaviour
         if (visualAnimator != null)
         {
             animatorBaseSpeed = visualAnimator.speed;
-            visualAnimator.SetBool(IsDead, false);
+            visualAnimator.SetBool(IsDeadAnimatorParam, false);
         }
 
         stateMachine.Changed += OnStateChanged;
@@ -252,6 +265,7 @@ public class PlayerCharacterController : MonoBehaviour
     private void Update()
     {
         input.Tick();
+        if (isDead) return;
 
         switch (State)
         {
@@ -297,6 +311,7 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isDead) return;
         if (IsUltimateActive) return;
 
         if (State == PlayerStateId.Dodge)
@@ -318,7 +333,7 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void HandleLocomotionInput()
     {
-        if (Mathf.Abs(input.Move.x) > .01f) Face(input.Move.x);
+        UpdateFacing(input.Move);
         if (input.UltimatePressed && CanUseUltimate)
         {
             StartUltimate();
@@ -340,7 +355,7 @@ public class PlayerCharacterController : MonoBehaviour
         else
             attackDirection.Normalize();
 
-        Face(attackDirection.x);
+        UpdateFacing(attackDirection);
         visualAnimator?.SetTrigger(NormalAttack);
         PlaySfx(normalAttackSfx);
         normalAttackReadyTime = Time.time + AttackCooldown;
@@ -354,7 +369,7 @@ public class PlayerCharacterController : MonoBehaviour
         dashElapsed = 0f;
         activeDashDuration = Mathf.Max(.01f, DodgeDuration);
         stateMachine.Change(PlayerStateId.Dodge);
-        Face(direction.x);
+        UpdateFacing(direction);
         visualAnimator?.SetTrigger(Roll);
         PlaySfx(rollSfx);
         dashReadyTime = Time.time + DodgeCooldown;
@@ -441,7 +456,7 @@ public class PlayerCharacterController : MonoBehaviour
         dashElapsed = -AttackDashWindupDuration;
         activeDashDuration = Mathf.Max(.01f, AttackDashDuration);
         stateMachine.Change(PlayerStateId.KillChainDash);
-        Face(killDashDirection.x);
+        UpdateFacing(killDashDirection);
         visualAnimator?.SetTrigger(DashAttack);
         PlaySfx(dashAttackSfx);
         PlaySfx(DashWindCutSfx, dashWindCutVolume, false);
@@ -496,6 +511,7 @@ public class PlayerCharacterController : MonoBehaviour
         lastKilledTarget = enemy;
         if (bufferedTarget == enemy) bufferedTarget = null;
         PlayBloodHitEffect(enemy, killDashDirection);
+        SpecialItemDropSpawner.TryDropFromEnemy(enemy.position);
         Destroy(enemy.gameObject);
         lockedDashTarget = null;
         killChainCount++;
@@ -673,6 +689,7 @@ public class PlayerCharacterController : MonoBehaviour
             return;
         }
         PlayBloodHitEffect(closestEnemy, direction);
+        SpecialItemDropSpawner.TryDropFromEnemy(closestEnemy.position);
         Destroy(closestEnemy.gameObject);
         AwardMomentum(0);
         PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
@@ -682,8 +699,37 @@ public class PlayerCharacterController : MonoBehaviour
     /// <summary>Receives damage from an enemy. Enemy data currently supplies zero damage.</summary>
     public void TakeDamage(float damage)
     {
-        if (damage <= 0f || IsInvulnerable) return;
+        if (damage <= 0f || isDead || IsInvulnerable) return;
+        if (specialItems != null && specialItems.TryBlockAttack()) return;
         currentHealth = Mathf.Max(0f, currentHealth - damage);
+        HealthChanged?.Invoke(currentHealth, maximumHealth);
+        if (currentHealth > 0f) return;
+
+        isDead = true;
+        body.linearVelocity = Vector2.zero;
+        visualAnimator?.SetBool(IsDeadAnimatorParam, true);
+        Died?.Invoke();
+    }
+
+    public void RespawnAt(Vector3 position)
+    {
+        isDead = false;
+        transform.position = position;
+        body.position = position;
+        body.linearVelocity = Vector2.zero;
+        currentHealth = maximumHealth;
+        HealthChanged?.Invoke(currentHealth, maximumHealth);
+        visualAnimator?.SetBool(IsDeadAnimatorParam, false);
+        if (stateMachine != null) stateMachine.Change(PlayerStateId.Locomotion);
+        EnemyTimeScale = 1f;
+        enemyTimeScaleTarget = 1f;
+        cameraController?.RestoreImmediately();
+    }
+
+    public void RestoreHealth(float amount)
+    {
+        if (amount <= 0f) return;
+        currentHealth = Mathf.Min(maximumHealth, currentHealth + amount);
         HealthChanged?.Invoke(currentHealth, maximumHealth);
     }
 
@@ -837,7 +883,7 @@ public class PlayerCharacterController : MonoBehaviour
         if (slashDirection.sqrMagnitude <= Mathf.Epsilon) slashDirection = Vector2.right;
         else slashDirection.Normalize();
 
-        Face(slashDirection.x);
+        UpdateFacing(slashDirection);
         visualAnimator?.SetTrigger(DashAttack);
         perfectDodgeAfterimage?.Play(visualRenderer != null && visualRenderer.flipX);
         body.position = cameraController.Clamp(
@@ -847,6 +893,7 @@ public class PlayerCharacterController : MonoBehaviour
         body.linearVelocity = Vector2.zero;
         RestoreUltimateTargetColor(target);
         PlayBloodHitEffect(target, slashDirection);
+        SpecialItemDropSpawner.TryDropFromEnemy(target.position);
         Destroy(target.gameObject);
         ultimateExecutedKills++;
 
@@ -1090,8 +1137,8 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void UpdateVisuals()
     {
-        if (visualAnimator != null)
-            visualAnimator.SetFloat(Speed, State == PlayerStateId.Locomotion ? input.Move.magnitude : 0f);
+        if (visualAnimator == null) return;
+        visualAnimator.SetFloat(Speed, State == PlayerStateId.Locomotion ? input.Move.magnitude : 0f);
     }
 
     private void UpdateTargetPresentation()
@@ -1135,6 +1182,22 @@ public class PlayerCharacterController : MonoBehaviour
     private void Face(float x)
     {
         if (visualRenderer != null && Mathf.Abs(x) > .01f) visualRenderer.flipX = x < 0f;
+    }
+
+    private void UpdateFacing(Vector2 direction)
+    {
+        if (direction.sqrMagnitude <= .0001f) return;
+
+        // Vertical art is selected only when the vertical input is dominant. Horizontal
+        // movement retains the existing flip-X presentation and horizontal clips.
+        if (Mathf.Abs(direction.y) > Mathf.Abs(direction.x))
+        {
+            visualAnimator?.SetInteger(VerticalDirection, direction.y > 0f ? 1 : -1);
+            return;
+        }
+
+        visualAnimator?.SetInteger(VerticalDirection, 0);
+        Face(direction.x);
     }
 
     private Vector2 PointerWorld() => cameraController.ScreenToWorld(

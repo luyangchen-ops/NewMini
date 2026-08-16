@@ -1795,6 +1795,7 @@ Transform:
   - {fileID: 340800051}
   - {fileID: 1951968446}
   - {fileID: 1218341654}
+  - {fileID: 70000002}
   m_Father: {fileID: 1853529722}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1054957882
@@ -3784,6 +3785,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1204214820}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &70000001
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1011162849}
+    m_Modifications:
+    - target: {fileID: 6644081618371095733, guid: e20f28a1c3457514e807502e23fbb579, type: 3}
+      propertyPath: m_Name
+      value: Enemy_ShieldWarrior_Run
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779136621785634307, guid: e20f28a1c3457514e807502e23fbb579, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 3.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779136621785634307, guid: e20f28a1c3457514e807502e23fbb579, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.8
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779136621785634307, guid: e20f28a1c3457514e807502e23fbb579, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779136621785634307, guid: e20f28a1c3457514e807502e23fbb579, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6706
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779136621785634307, guid: e20f28a1c3457514e807502e23fbb579, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6257
+      objectReference: {fileID: 0}
+    - target: {fileID: 8779136621785634307, guid: e20f28a1c3457514e807502e23fbb579, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e20f28a1c3457514e807502e23fbb579, type: 3}
+--- !u!4 &70000002 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8779136621785634307, guid: e20f28a1c3457514e807502e23fbb579, type: 3}
+  m_PrefabInstance: {fileID: 70000001}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
