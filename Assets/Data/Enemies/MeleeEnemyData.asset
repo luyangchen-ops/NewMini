@@ -25,7 +25,11 @@ MonoBehaviour:
   <MeleeAttackPreparationDelayRange>k__BackingField: {x: 0.12, y: 0.48}
   <MeleeAttackIntervalVariance>k__BackingField: 0.2
   <MeleeAttackRecoveryDelayRange>k__BackingField: {x: 0.2, y: 0.55}
+  <MeleeAttackHitDelay>k__BackingField: 0.62
+  <MeleeAttackDuration>k__BackingField: 1.15
   <Damage>k__BackingField: 12
+  <AttackSfx>k__BackingField: {fileID: 8300000, guid: 8f83b3e8067f5c144b711f5d72ffb1e5, type: 3}
+  <AttackSfxVolume>k__BackingField: 0.65
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4
   <RoamStateDurationRange>k__BackingField: {x: 0.5, y: 1.4}
@@ -33,8 +37,8 @@ MonoBehaviour:
   <ProjectileSpawnOffset>k__BackingField: 0.65
   <ProjectileSpeed>k__BackingField: 7
   <FireInterval>k__BackingField: 1.2
-  <MeleePerfectDodgeDelay>k__BackingField: 0.35
-  <MeleePerfectDodgeDuration>k__BackingField: 0.18
+  <MeleePerfectDodgeDelay>k__BackingField: 0.38
+  <MeleePerfectDodgeDuration>k__BackingField: 0.7
   <ShieldRearKillHalfAngle>k__BackingField: 55
   <ShieldBlockDuration>k__BackingField: 0.55
   <ShieldAttackWindup>k__BackingField: 0.6

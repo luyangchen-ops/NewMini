@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -23,9 +24,11 @@ public sealed class EnemyAgent : MonoBehaviour
     [SerializeField] private Camera worldCamera;
     [SerializeField] private Animator visualAnimator;
     [SerializeField] private SpriteRenderer visualRenderer;
+    [SerializeField] private AudioSource attackSfxSource;
     [SerializeField, Min(0f)] private float boundaryPadding = 0.5f;
 
     private Rigidbody2D body;
+    private Collider2D[] bodyColliders;
     private Vector2 desiredVelocity;
     private float nextTargetSearchTime;
     private float fireCooldown;
@@ -89,6 +92,7 @@ public sealed class EnemyAgent : MonoBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
+        bodyColliders = GetComponentsInChildren<Collider2D>(true);
         body.gravityScale = 0f;
         body.freezeRotation = true;
         body.interpolation = RigidbodyInterpolation2D.Interpolate;
@@ -97,6 +101,7 @@ public sealed class EnemyAgent : MonoBehaviour
         visualRenderer ??= GetComponentInChildren<SpriteRenderer>();
         EnsureVisualAnimator();
         CacheAnimatorParameters();
+        IgnoreExistingEnemyCollisions();
 
         stateMachine = new EnemyStateMachine();
         IdleState = new EnemyIdleState(this, stateMachine);
@@ -161,9 +166,21 @@ public sealed class EnemyAgent : MonoBehaviour
             body.position = clampedPosition;
         }
 
+        Vector2 movementVelocity = desiredVelocity;
+        if (IsMeleeCombatant)
+        {
+            // Keep melee bodies apart even while they are waiting, attacking, or recovering.
+            // This is applied here instead of through SetDesiredVelocity so attack facing stays locked.
+            Vector2 separation = CalculateMeleeSeparation() * data.MeleeSeparationStrength;
+            movementVelocity += separation * data.MoveSpeed;
+            movementVelocity = Vector2.ClampMagnitude(
+                movementVelocity,
+                Mathf.Max(data.MoveSpeed, desiredVelocity.magnitude));
+        }
+
         Vector2 clampedNext = CameraBounds.Clamp(
             worldCamera,
-            clampedPosition + desiredVelocity * (PlayerCharacterController.EnemyTimeScale * Time.fixedDeltaTime),
+            clampedPosition + movementVelocity * (PlayerCharacterController.EnemyTimeScale * Time.fixedDeltaTime),
             boundaryPadding,
             transform.position.z);
         body.linearVelocity = (clampedNext - clampedPosition) / Time.fixedDeltaTime;
@@ -181,6 +198,15 @@ public sealed class EnemyAgent : MonoBehaviour
     public Vector2 GetMeleeFormationMoveDirection(out bool isAtFormation)
     {
         return GetMeleeRingMoveDirection(data.MeleeFormationRadius, out isAtFormation);
+    }
+
+    public bool IsWithinMeleeAttackDistance()
+    {
+        if (!HasTarget || data == null) return false;
+
+        Vector2 ownCenter = body.position + GetOwnBodyCenterOffset();
+        Vector2 targetOffset = GetTargetBodyCenter() - ownCenter;
+        return targetOffset.sqrMagnitude <= data.StoppingDistance * data.StoppingDistance;
     }
 
     public Vector2 GetMeleeWaitingRoamDirection()
@@ -225,23 +251,55 @@ public sealed class EnemyAgent : MonoBehaviour
         isAtRing = false;
         if (!HasTarget || data == null || !IsMeleeCombatant) return Vector2.zero;
 
-        int formationCount = 0;
-        int formationIndex = 0;
-        EntityId ownEntityId = GetEntityId();
+        List<EnemyAgent> combatants = new();
         foreach (EnemyAgent other in FindObjectsByType<EnemyAgent>(FindObjectsInactive.Exclude))
         {
             if (other == null || other.data == null || !other.IsMeleeCombatant
                 || other.target != target) continue;
 
-            formationCount++;
-            if (other.GetEntityId() < ownEntityId) formationIndex++;
+            combatants.Add(other);
         }
 
-        if (formationCount == 0) return Vector2.zero;
+        if (combatants.Count == 0) return Vector2.zero;
 
-        float angle = formationIndex * Mathf.PI * 2f / formationCount;
-        Vector2 formationPosition = (Vector2)target.position
+        combatants.Sort((left, right) =>
+        {
+            if (left.GetEntityId() < right.GetEntityId()) return -1;
+            return right.GetEntityId() < left.GetEntityId() ? 1 : 0;
+        });
+        List<int> availableSlots = new(combatants.Count);
+        for (int slot = 0; slot < combatants.Count; slot++) availableSlots.Add(slot);
+
+        Vector2 targetCenter = GetTargetBodyCenter();
+        int ownSlot = 0;
+        foreach (EnemyAgent combatant in combatants)
+        {
+            int nearestAvailableIndex = 0;
+            float nearestDistanceSquared = float.PositiveInfinity;
+            Vector2 combatantCenter = combatant.Body.position + combatant.GetOwnBodyCenterOffset();
+            for (int availableIndex = 0; availableIndex < availableSlots.Count; availableIndex++)
+            {
+                int slot = availableSlots[availableIndex];
+                float slotAngle = slot * Mathf.PI * 2f / combatants.Count;
+                Vector2 slotPosition = targetCenter
+                    + new Vector2(Mathf.Cos(slotAngle), Mathf.Sin(slotAngle)) * ringRadius;
+                float distanceSquared = (combatantCenter - slotPosition).sqrMagnitude;
+                if (distanceSquared < nearestDistanceSquared)
+                {
+                    nearestDistanceSquared = distanceSquared;
+                    nearestAvailableIndex = availableIndex;
+                }
+            }
+
+            int assignedSlot = availableSlots[nearestAvailableIndex];
+            if (combatant == this) ownSlot = assignedSlot;
+            availableSlots.RemoveAt(nearestAvailableIndex);
+        }
+
+        float angle = ownSlot * Mathf.PI * 2f / combatants.Count;
+        Vector2 formationPosition = targetCenter
             + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * ringRadius;
+        formationPosition -= GetOwnBodyCenterOffset();
         Vector2 toFormation = formationPosition - body.position;
         isAtRing = toFormation.sqrMagnitude
             <= data.MeleeFormationArrivalDistance * data.MeleeFormationArrivalDistance;
@@ -252,22 +310,40 @@ public sealed class EnemyAgent : MonoBehaviour
         return steering.sqrMagnitude > .0001f ? steering.normalized : Vector2.zero;
     }
 
+    private Vector2 GetTargetBodyCenter()
+    {
+        Collider2D targetCollider = target != null ? target.GetComponent<Collider2D>() : null;
+        return targetCollider != null ? targetCollider.bounds.center : (Vector2)target.position;
+    }
+
+    private Vector2 GetOwnBodyCenterOffset()
+    {
+        Collider2D ownCollider = GetComponentInChildren<Collider2D>();
+        return ownCollider != null ? (Vector2)ownCollider.bounds.center - body.position : Vector2.zero;
+    }
+
     private Vector2 CalculateMeleeSeparation()
     {
         float radius = data.MeleeSeparationRadius;
         Vector2 separation = Vector2.zero;
-        foreach (Collider2D hit in Physics2D.OverlapCircleAll(body.position, radius))
+        Vector2 ownCenter = body.position + GetOwnBodyCenterOffset();
+        foreach (Collider2D hit in Physics2D.OverlapCircleAll(ownCenter, radius))
         {
             EnemyAgent other = hit.GetComponentInParent<EnemyAgent>();
             if (other == null || other == this || other.data == null
                 || !other.IsMeleeCombatant || other.target != target) continue;
 
-            Vector2 offset = body.position - other.body.position;
+            Vector2 otherCenter = other.body.position + other.GetOwnBodyCenterOffset();
+            Vector2 offset = ownCenter - otherCenter;
             float distance = offset.magnitude;
             if (distance <= .0001f)
             {
-                float angle = unchecked((uint)GetEntityId().GetHashCode()) / (float)uint.MaxValue * Mathf.PI * 2f;
-                separation += new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+                EntityId ownId = GetEntityId();
+                EntityId otherId = other.GetEntityId();
+                uint pairHash = unchecked((uint)(ownId.GetHashCode() ^ otherId.GetHashCode()));
+                float angle = pairHash / (float)uint.MaxValue * Mathf.PI * 2f;
+                Vector2 splitDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+                separation += ownId < otherId ? splitDirection : -splitDirection;
                 continue;
             }
 
@@ -275,6 +351,26 @@ public sealed class EnemyAgent : MonoBehaviour
         }
 
         return separation;
+    }
+
+    private void IgnoreExistingEnemyCollisions()
+    {
+        if (bodyColliders == null || bodyColliders.Length == 0) return;
+
+        foreach (EnemyAgent other in FindObjectsByType<EnemyAgent>(FindObjectsInactive.Include))
+        {
+            if (other == null || other == this) continue;
+            Collider2D[] otherColliders = other.GetComponentsInChildren<Collider2D>(true);
+            foreach (Collider2D ownCollider in bodyColliders)
+            {
+                if (ownCollider == null) continue;
+                foreach (Collider2D otherCollider in otherColliders)
+                {
+                    if (otherCollider != null)
+                        Physics2D.IgnoreCollision(ownCollider, otherCollider, true);
+                }
+            }
+        }
     }
 
     public void FireProjectile()
@@ -298,10 +394,11 @@ public sealed class EnemyAgent : MonoBehaviour
             body.position + direction * data.ProjectileSpawnOffset,
             Quaternion.Euler(0f, 0f, angle));
         projectile.Launch(target.position, data.ProjectileSpeed, data.ProjectileGravity, gameObject, data.Damage);
+        PlayAttackSfx();
         fireCooldown = data.FireInterval;
     }
 
-    public void PerformMeleeAttack()
+    public void BeginMeleeAttack()
     {
         if (!CanMeleeAttack)
         {
@@ -313,17 +410,31 @@ public sealed class EnemyAgent : MonoBehaviour
             Face(target.position.x - transform.position.x);
         }
 
+        SetDesiredVelocity(Vector2.zero);
+        SetAnimationState(EnemyAnimationState.Attack);
         meleePerfectDodgeStartTime = Time.time + data.MeleePerfectDodgeDelay;
         meleePerfectDodgeEndTime = meleePerfectDodgeStartTime + data.MeleePerfectDodgeDuration;
         if (supportsAttack)
         {
+            visualAnimator.ResetTrigger(Attack);
             visualAnimator.SetTrigger(Attack);
         }
-        target?.GetComponentInParent<PlayerCharacterController>()?.TakeDamage(data.Damage);
+        PlayAttackSfx();
+    }
+
+    public void PerformMeleeAttack()
+    {
+        if (!CanMeleeAttack)
+        {
+            return;
+        }
+
+        TryDamageTarget();
         fireCooldown = data.GetMeleeAttackCooldown(data.FireInterval);
         lastMeleeAttackTime = Time.time;
-        StartMeleeAttackRecovery();
     }
+
+    public void CompleteMeleeAttack() => StartMeleeAttackRecovery();
 
     public void BeginSpearAttack()
     {
@@ -335,6 +446,7 @@ public sealed class EnemyAgent : MonoBehaviour
             visualAnimator.ResetTrigger(Attack);
             visualAnimator.SetTrigger(Attack);
         }
+        PlayAttackSfx();
     }
 
     public void BeginSpearThrust(Vector2 direction)
@@ -357,7 +469,7 @@ public sealed class EnemyAgent : MonoBehaviour
             + Vector2.Perpendicular(direction.normalized).y * toTarget.y);
         if (lateralDistance > data.SpearHitRadius) return;
 
-        target.GetComponentInParent<PlayerCharacterController>()?.TakeDamage(data.Damage);
+        TryDamageTarget();
     }
 
     public void CompleteSpearAttack()
@@ -386,10 +498,9 @@ public sealed class EnemyAgent : MonoBehaviour
             return;
         }
 
-        FaceTarget();
         meleePerfectDodgeStartTime = Time.time + data.MeleePerfectDodgeDelay;
         meleePerfectDodgeEndTime = meleePerfectDodgeStartTime + data.MeleePerfectDodgeDuration;
-        target.GetComponentInParent<PlayerCharacterController>()?.TakeDamage(data.Damage);
+        TryDamageTarget();
         fireCooldown = data.GetMeleeAttackCooldown(data.ShieldAttackInterval);
     }
 
@@ -459,6 +570,7 @@ public sealed class EnemyAgent : MonoBehaviour
         IsShieldAttackExposed = true;
         SetDesiredVelocity(Vector2.zero);
         FaceTarget();
+        PlayAttackSfx();
     }
 
     public void EndShieldAttack()
@@ -503,9 +615,40 @@ public sealed class EnemyAgent : MonoBehaviour
         {
             visualAnimator.ResetTrigger(Attack);
             visualAnimator.SetTrigger(Death);
+            StartCoroutine(DestroyAfterDeathAnimation(GetDeathAnimationDuration()));
+            return;
         }
 
-        Destroy(gameObject, .9f);
+        Destroy(gameObject);
+    }
+
+    private System.Collections.IEnumerator DestroyAfterDeathAnimation(float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += EnemyDeltaTime;
+            yield return null;
+        }
+
+        Destroy(gameObject);
+    }
+
+    private float GetDeathAnimationDuration()
+    {
+        if (visualAnimator?.runtimeAnimatorController == null) return .9f;
+
+        float duration = 0f;
+        foreach (AnimationClip clip in visualAnimator.runtimeAnimatorController.animationClips)
+        {
+            if (clip != null && clip.name.IndexOf("death", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                duration = Mathf.Max(duration, clip.length);
+            }
+        }
+
+        // Covers the controller transition before the death clip begins.
+        return Mathf.Max(.05f, duration > 0f ? duration + .05f : .9f);
     }
 
     private void Face(float horizontalDirection)
@@ -514,6 +657,45 @@ public sealed class EnemyAgent : MonoBehaviour
         {
             visualRenderer.flipX = horizontalDirection < 0f;
         }
+    }
+
+    private void PlayAttackSfx()
+    {
+        AudioClip clip = data != null ? data.AttackSfx : null;
+        if (clip == null) return;
+
+        attackSfxSource ??= GetComponent<AudioSource>();
+        if (attackSfxSource == null)
+        {
+            attackSfxSource = gameObject.AddComponent<AudioSource>();
+            attackSfxSource.playOnAwake = false;
+            attackSfxSource.loop = false;
+            attackSfxSource.spatialBlend = 0f;
+        }
+
+        attackSfxSource.volume = GameAudioSettings.GetChannelVolume(GameAudioChannel.SoundEffects);
+        attackSfxSource.PlayOneShot(clip, data.AttackSfxVolume);
+    }
+
+    private void TryDamageTarget()
+    {
+        PlayerCharacterController player = target != null
+            ? target.GetComponentInParent<PlayerCharacterController>()
+            : null;
+        if (player == null) return;
+
+        // Resolve the perfect-dodge window before any invulnerability or damage checks.
+        // Dodging itself is invulnerable, so checking IsInvulnerable first would skip
+        // this branch and prevent a valid perfect dodge at the hit boundary.
+        if (player.IsDodging && IsMeleeAttackPerfectDodgeable
+            && player.TryTriggerPerfectDodge(transform.position))
+        {
+            return;
+        }
+
+        if (player.IsInvulnerable) return;
+
+        player.TakeDamage(data.Damage);
     }
 
     private void EnsureVisualAnimator()

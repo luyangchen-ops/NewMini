@@ -146,6 +146,7 @@ public class PlayerCharacterController : MonoBehaviour
     private static readonly int NormalAttack = Animator.StringToHash("NormalAttack");
     private static readonly int DashAttack = Animator.StringToHash("DashAttack");
     private static readonly int Roll = Animator.StringToHash("Roll");
+    private static readonly int Hurt = Animator.StringToHash("Hurt");
     private static readonly int Sheathe = Animator.StringToHash("Sheathe");
     private static readonly int IsDeadAnimatorParam = Animator.StringToHash("IsDead");
     private static readonly int ChainWindow01 = Shader.PropertyToID("_ChainWindow01");
@@ -704,7 +705,11 @@ public class PlayerCharacterController : MonoBehaviour
         if (specialItems != null && specialItems.TryBlockAttack()) return;
         currentHealth = Mathf.Max(0f, currentHealth - damage);
         HealthChanged?.Invoke(currentHealth, maximumHealth);
-        if (currentHealth > 0f) return;
+        if (currentHealth > 0f)
+        {
+            visualAnimator?.SetTrigger(Hurt);
+            return;
+        }
 
         isDead = true;
         body.linearVelocity = Vector2.zero;

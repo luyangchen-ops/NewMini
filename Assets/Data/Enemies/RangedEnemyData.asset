@@ -16,6 +16,8 @@ MonoBehaviour:
   <MoveSpeed>k__BackingField: 1.5
   <StoppingDistance>k__BackingField: 1.2
   <Damage>k__BackingField: 10
+  <AttackSfx>k__BackingField: {fileID: 0}
+  <AttackSfxVolume>k__BackingField: 0.8
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4
   <RoamStateDurationRange>k__BackingField: {x: 0.5, y: 1.4}

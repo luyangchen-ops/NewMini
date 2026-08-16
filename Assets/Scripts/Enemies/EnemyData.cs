@@ -37,10 +37,19 @@ public sealed class EnemyData : ScriptableObject
     [field: SerializeField, Range(0f, .9f)] public float MeleeAttackIntervalVariance { get; private set; } = .2f;
     [field: Tooltip("Random time a melee unit remains still after finishing an attack.")]
     [field: SerializeField] public Vector2 MeleeAttackRecoveryDelayRange { get; private set; } = new Vector2(.15f, .4f);
+    [field: Tooltip("Time from starting a melee swing until the weapon reaches its damaging downward strike.")]
+    [field: SerializeField, Min(0f)] public float MeleeAttackHitDelay { get; private set; } = .55f;
+    [field: Tooltip("Total time a melee unit remains committed to its swing before it can move again.")]
+    [field: SerializeField, Min(.05f)] public float MeleeAttackDuration { get; private set; } = 1.15f;
 
     [field: Header("Combat")]
     [field: Tooltip("Temporarily set to zero for every enemy.")]
     [field: SerializeField, Min(0f)] public float Damage { get; private set; } = 0f;
+
+    [field: Header("Attack Audio")]
+    [field: Tooltip("Played once when this enemy starts its melee or spear attack, or when a ranged projectile is released.")]
+    [field: SerializeField] public AudioClip AttackSfx { get; private set; }
+    [field: SerializeField, Range(0f, 1f)] public float AttackSfxVolume { get; private set; } = .8f;
 
     [field: Header("Ranged Movement")]
     [field: SerializeField] public bool StayStill { get; private set; }
@@ -99,6 +108,9 @@ public sealed class EnemyData : ScriptableObject
         meleeRecoveryRange.x = Mathf.Max(0f, meleeRecoveryRange.x);
         meleeRecoveryRange.y = Mathf.Max(meleeRecoveryRange.x, meleeRecoveryRange.y);
         MeleeAttackRecoveryDelayRange = meleeRecoveryRange;
+        MeleeAttackHitDelay = Mathf.Max(0f, MeleeAttackHitDelay);
+        MeleeAttackDuration = Mathf.Max(MeleeAttackHitDelay, MeleeAttackDuration);
+        AttackSfxVolume = Mathf.Clamp01(AttackSfxVolume);
 
         Vector2 durationRange = RoamStateDurationRange;
         durationRange.x = Mathf.Max(0.05f, durationRange.x);

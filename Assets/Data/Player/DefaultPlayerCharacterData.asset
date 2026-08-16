@@ -16,7 +16,7 @@ MonoBehaviour:
   <BoundaryPadding>k__BackingField: 0.7
   <DodgeDistance>k__BackingField: 2.5
   <DodgeDuration>k__BackingField: 0.25
-  <PerfectDodgeDistanceRatio>k__BackingField: 0.3
+  <PerfectDodgeDistanceRatio>k__BackingField: 0.5
   <DodgeCooldown>k__BackingField: 1
   <MaximumAimDistance>k__BackingField: 5
   <AttackDashDistance>k__BackingField: 5
