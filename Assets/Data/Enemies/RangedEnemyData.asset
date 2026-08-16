@@ -15,16 +15,27 @@ MonoBehaviour:
   <Archetype>k__BackingField: 1
   <MoveSpeed>k__BackingField: 1.5
   <StoppingDistance>k__BackingField: 1.2
-  <Damage>k__BackingField: 10
+  <MeleeFormationRadius>k__BackingField: 1.05
+  <MeleeFormationArrivalDistance>k__BackingField: 0.18
+  <MeleeSeparationRadius>k__BackingField: 0.8
+  <MeleeSeparationStrength>k__BackingField: 0.9
+  <Damage>k__BackingField: 0
   <AttackSfx>k__BackingField: {fileID: 0}
   <AttackSfxVolume>k__BackingField: 0.8
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4
   <RoamStateDurationRange>k__BackingField: {x: 0.5, y: 1.4}
-  <ProjectilePrefab>k__BackingField: {fileID: 5887521079033147050, guid: d3e97d22802b1b8418b98451095bc619, type: 3}
-  <ProjectileSpawnOffset>k__BackingField: 0.65
-  <ProjectileSpeed>k__BackingField: 5.5
+  <ProjectilePrefab>k__BackingField: {fileID: 6033503310737838817, guid: eb8274a1b7f06a84c9a453491087d128, type: 3}
+  <ProjectileSpawnOffset>k__BackingField: 0
+  <ProjectileSpeed>k__BackingField: 7
   <ProjectileGravity>k__BackingField: 4
   <FireInterval>k__BackingField: 1.8
-  <RangedAttackReleaseDelay>k__BackingField: 0.25
-  <RangedAttackDuration>k__BackingField: 0.34
+  <RangedAttackReleaseDelay>k__BackingField: 0.34
+  <RangedAttackDuration>k__BackingField: 0.6
+  <MeleePerfectDodgeDelay>k__BackingField: 0.35
+  <MeleePerfectDodgeDuration>k__BackingField: 0.18
+  <ShieldRearKillHalfAngle>k__BackingField: 55
+  <ShieldBlockDuration>k__BackingField: 0.55
+  <ShieldAttackWindup>k__BackingField: 0.6
+  <ShieldAttackDuration>k__BackingField: 0.95
+  <ShieldAttackInterval>k__BackingField: 2.8

@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 483e8842906ff05458dfed0f40e1ff58
+guid: 9b60bb0b909ef6a4fbaeeb652ac5718b
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 1578184809478118342
-    second: frame-02_0
+      213: -8380403922248651223
+    second: Archer_Arrow_0
+  - first:
+      213: -1300483762799135597
+    second: Archer_Arrow_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,11 +49,11 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
-  alignment: 7
-  spritePivot: {x: 0.5, y: 0}
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
@@ -126,13 +129,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: frame-02_0
+      name: Archer_Arrow_0
       rect:
         serializedVersion: 2
-        x: 135
-        y: 98
-        width: 863
-        height: 1326
+        x: 344
+        y: 618
+        width: 89
+        height: 28
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +144,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6cb5cdef8b6d6e510800000000000000
-      internalID: 1578184809478118342
+      spriteID: 92e2414b803d2bb80800000000000000
+      internalID: -8380403922248651223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Archer_Arrow_1
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 168
+        width: 2019
+        height: 429
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 394b13278e0c3fde0800000000000000
+      internalID: -1300483762799135597
       vertices: []
       indices: 
       edges: []
@@ -151,7 +176,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +186,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      frame-02_0: 1578184809478118342
+      Archer_Arrow_0: -8380403922248651223
+      Archer_Arrow_1: -1300483762799135597
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
