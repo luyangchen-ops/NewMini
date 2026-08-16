@@ -54,6 +54,8 @@ public static class GameStateUiSceneBuilder
 
     private static void Build(Scene scene)
     {
+        EnsureEventSystem(scene);
+
         GameObject root = NewUi(RootName, null, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster), typeof(GameStateUIController));
         Canvas canvas = root.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 200;
         CanvasScaler scaler = root.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1920f, 1080f); scaler.matchWidthOrHeight = .5f;
@@ -64,14 +66,46 @@ public static class GameStateUiSceneBuilder
         Button pauseHelp = ButtonNode("Btn_PauseHelp", pause.transform, new Vector2(0f, -45f), "帮助 / 操作说明");
         Button pauseMenu = ButtonNode("Btn_PauseMainMenu", pause.transform, new Vector2(0f, -165f), "返回主菜单");
 
-        GameObject help = ScreenPanel("Panel_Help", root.transform, new Color(.01f, .015f, .025f, .96f));
+        GameObject help = ScreenPanel("Panel_Help", root.transform, new Color(.01f, .015f, .025f, 1f));
         TextNode("Txt_HelpTitle", help.transform, new Vector2(0f, 450f), new Vector2(1000f, 80f), "操作说明", 52, Color.white);
         GameObject pagesRoot = NewUi("Group_HelpPages", help.transform);
         RectTransform pagesRect = pagesRoot.GetComponent<RectTransform>(); pagesRect.anchorMin = pagesRect.anchorMax = new Vector2(.5f, .5f); pagesRect.anchoredPosition = new Vector2(0f, 25f); pagesRect.sizeDelta = new Vector2(1320f, 760f);
-        GameObject[] pages = { HelpPage(pagesRoot.transform, "Page_01_Movement", "移动与瞄准", "WASD：控制角色移动\n移动鼠标：调整朝向与攻击方向", "图文说明占位图 01"), HelpPage(pagesRoot.transform, "Page_02_Attack", "挥剑攻击", "鼠标左键：向光标方向挥剑攻击\n靠近敌人后发起斩击", "图文说明占位图 02"), HelpPage(pagesRoot.transform, "Page_03_Dodge", "闪避与完美闪避", "Space：向光标方向闪避\n在敌人攻击命中的瞬间闪避，可触发完美闪避", "图文说明占位图 03"), HelpPage(pagesRoot.transform, "Page_04_KillChain", "连续处决", "完美闪避后，将鼠标移向范围内敌人\n鼠标左键：发动连斩；鼠标右键：取消", "图文说明占位图 04"), HelpPage(pagesRoot.transform, "Page_05_Ultimate", "终极技能", "R：进入终极标记\n按住鼠标左键拖拽划过敌人，松开后执行连斩；鼠标右键：取消", "图文说明占位图 05") };
+        GameObject[] pages =
+        {
+            HelpPage(
+                pagesRoot.transform,
+                "Page_01_MovementAim",
+                "Assets/Resources/UI/Tutorial/Artwork/Tutorial_Page01_MovementAim.png",
+                "移动与瞄准",
+                "WASD：控制移动\n移动鼠标：调整朝向与攻击方向"),
+            HelpPage(
+                pagesRoot.transform,
+                "Page_02_NormalAttack",
+                "Assets/Resources/UI/Tutorial/Artwork/Tutorial_Page02_NormalAttack.png",
+                "挥剑攻击",
+                "鼠标左键：向光标方向挥剑攻击\n靠近敌人后发起斩击"),
+            HelpPage(
+                pagesRoot.transform,
+                "Page_03_DodgePerfectDodge",
+                "Assets/Resources/UI/Tutorial/Artwork/Tutorial_Page03_DodgePerfectDodge.png",
+                "闪避，抓住反击时机",
+                "Space：向光标方向闪避\n贴近敌人攻击瞬间闪避，可触发完美闪避"),
+            HelpPage(
+                pagesRoot.transform,
+                "Page_04_KillChain",
+                "Assets/Resources/UI/Tutorial/Artwork/Tutorial_Page04_KillChain.png",
+                "完美闪避后：连续处决",
+                "将鼠标移向范围内敌人，左键发动连斩\n连续选择下一个目标；右键可取消"),
+            HelpPage(
+                pagesRoot.transform,
+                "Page_05_Ultimate",
+                "Assets/Resources/UI/Tutorial/Artwork/Tutorial_Page05_Ultimate.png",
+                "终极：划出必杀之路",
+                "R：进入终极标记\n按住鼠标左键拖拽划过敌人，松开后执行连斩；右键取消")
+        };
         Button previous = ButtonNode("Btn_HelpPrevious", help.transform, new Vector2(-520f, -445f), "〈 上一页", new Vector2(230f, 70f), 24);
         Button next = ButtonNode("Btn_HelpNext", help.transform, new Vector2(520f, -445f), "下一页 〉", new Vector2(230f, 70f), 24);
-        Text pageIndicator = TextNode("Txt_HelpPageIndicator", help.transform, new Vector2(0f, -445f), new Vector2(280f, 70f), "1 / 5", 28, new Color(.85f, .85f, .85f, 1f));
+        Text pageIndicator = TextNode("Txt_HelpPageIndicator", help.transform, new Vector2(535f, -282f), new Vector2(150f, 50f), "1 / 5", 24, new Color(1f, .84f, .48f, 1f));
         Button helpBack = ButtonNode("Btn_HelpBack", help.transform, new Vector2(0f, -520f), "返回暂停菜单", new Vector2(300f, 62f), 22);
 
         GameObject death = ScreenPanel("Panel_Death", root.transform, new Color(.035f, .005f, .008f, .93f));
@@ -89,12 +123,36 @@ public static class GameStateUiSceneBuilder
         pause.SetActive(false); help.SetActive(false); death.SetActive(false); EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene); AssetDatabase.SaveAssets();
     }
 
-    private static GameObject HelpPage(Transform parent, string name, string title, string description, string placeholderLabel)
+    private static void EnsureEventSystem(Scene scene)
+    {
+        if (Object.FindAnyObjectByType<UnityEngine.EventSystems.EventSystem>() != null) return;
+
+        GameObject eventSystem = new GameObject(
+            "Root_EventSystem",
+            typeof(UnityEngine.EventSystems.EventSystem),
+            typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule));
+        SceneManager.MoveGameObjectToScene(eventSystem, scene);
+    }
+
+    private static GameObject HelpPage(Transform parent, string name, string artworkPath, string title, string description)
     {
         GameObject page = NewUi(name, parent); Stretch(page.GetComponent<RectTransform>());
-        TextNode("Txt_PageTitle", page.transform, new Vector2(0f, 315f), new Vector2(1100f, 70f), title, 40, new Color(1f, .9f, .78f, 1f));
-        GameObject image = NewUi("Img_InstructionPlaceholder", page.transform, typeof(CanvasRenderer), typeof(Image)); RectTransform imageRect = image.GetComponent<RectTransform>(); imageRect.anchorMin = imageRect.anchorMax = new Vector2(.5f, .5f); imageRect.anchoredPosition = new Vector2(0f, 30f); imageRect.sizeDelta = new Vector2(920f, 480f); image.GetComponent<Image>().color = Color.white;
-        TextNode("Txt_Placeholder", image.transform, Vector2.zero, Vector2.zero, placeholderLabel, 28, new Color(.2f, .2f, .2f, 1f), true); TextNode("Txt_PageDescription", page.transform, new Vector2(0f, -285f), new Vector2(1160f, 105f), description, 28, Color.white); return page;
+        GameObject artwork = NewUi("Img_TutorialArtwork", page.transform, typeof(CanvasRenderer), typeof(Image));
+        RectTransform artworkRect = artwork.GetComponent<RectTransform>();
+        artworkRect.anchorMin = artworkRect.anchorMax = new Vector2(.5f, .5f);
+        artworkRect.anchoredPosition = Vector2.zero;
+        artworkRect.sizeDelta = new Vector2(1280f, 720f);
+        Image artworkImage = artwork.GetComponent<Image>();
+        artworkImage.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(artworkPath);
+        artworkImage.color = Color.white;
+        artworkImage.preserveAspect = true;
+        artworkImage.raycastTarget = false;
+        if (artworkImage.sprite == null) Debug.LogError($"Missing tutorial artwork: {artworkPath}");
+
+        Text pageTitle = TextNode("Txt_PageTitle", page.transform, new Vector2(0f, 315f), new Vector2(1060f, 64f), title, 38, new Color(1f, .88f, .6f, 1f));
+        pageTitle.fontStyle = FontStyle.Bold;
+        TextNode("Txt_PageDescription", page.transform, new Vector2(0f, -302f), new Vector2(1080f, 86f), description, 25, new Color(.95f, .96f, 1f, 1f));
+        return page;
     }
 
     private static GameObject ScreenPanel(string name, Transform parent, Color color) { GameObject panel = NewUi(name, parent, typeof(CanvasRenderer), typeof(Image)); Stretch(panel.GetComponent<RectTransform>()); Image image = panel.GetComponent<Image>(); image.color = color; image.raycastTarget = true; return panel; }
