@@ -132,14 +132,14 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
         root.transform.position = new Vector3(center.x, center.y, 0f);
 
         GameObject zoneObject = new("Group_CombatZone");
-        zoneObject.transform.SetParent(root.transform);
+        zoneObject.transform.SetParent(root.transform, false);
         BoxCollider2D zoneCollider = zoneObject.AddComponent<BoxCollider2D>();
         zoneCollider.size = size;
         zoneCollider.isTrigger = true;
         ArenaCombatZone zone = zoneObject.AddComponent<ArenaCombatZone>();
 
         GameObject gatesGroup = new("Group_BoundaryGates");
-        gatesGroup.transform.SetParent(root.transform);
+        gatesGroup.transform.SetParent(root.transform, false);
         ArenaBoundaryGate[] gates =
         {
             CreateGate("Gate_North", gatesGroup.transform, new Vector2(0f, size.y * .5f), new Vector2(size.x + gateThickness * 2f, gateThickness)),
@@ -149,7 +149,7 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
         };
 
         GameObject respawnObject = new("Group_RespawnPoint");
-        respawnObject.transform.SetParent(root.transform);
+        respawnObject.transform.SetParent(root.transform, false);
         respawnObject.transform.localPosition = new Vector3(0f, -size.y * .35f, 0f);
         CircleCollider2D respawnCollider = respawnObject.AddComponent<CircleCollider2D>();
         respawnCollider.isTrigger = true;
@@ -176,18 +176,18 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
     {
         GameObject spawnerObject = new("Group_WaveSpawner");
         Undo.RegisterCreatedObjectUndo(spawnerObject, "Create Arena Wave Spawner");
-        spawnerObject.transform.SetParent(zone.transform.parent != null ? zone.transform.parent : zone.transform);
+        spawnerObject.transform.SetParent(zone.transform.parent != null ? zone.transform.parent : zone.transform, false);
         spawnerObject.transform.position = zone.transform.position;
         ArenaWaveSpawner spawner = spawnerObject.AddComponent<ArenaWaveSpawner>();
 
         GameObject pointsGroup = new("Group_SpawnPoints");
-        pointsGroup.transform.SetParent(spawnerObject.transform);
+        pointsGroup.transform.SetParent(spawnerObject.transform, false);
         GameObject pointObject = new("Group_SpawnPoint_01");
-        pointObject.transform.SetParent(pointsGroup.transform);
+        pointObject.transform.SetParent(pointsGroup.transform, false);
         pointObject.transform.position = zone.transform.position;
 
         GameObject enemiesGroup = new("Group_SpawnedEnemies");
-        enemiesGroup.transform.SetParent(spawnerObject.transform);
+        enemiesGroup.transform.SetParent(spawnerObject.transform, false);
 
         SerializedObject serializedSpawner = new(spawner);
         serializedSpawner.FindProperty("spawnedEnemyParent").objectReferenceValue = enemiesGroup.transform;
@@ -218,7 +218,7 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
     private static ArenaBoundaryGate CreateGate(string name, Transform parent, Vector2 position, Vector2 size)
     {
         GameObject gateObject = new(name);
-        gateObject.transform.SetParent(parent);
+        gateObject.transform.SetParent(parent, false);
         gateObject.transform.localPosition = position;
         BoxCollider2D collider = gateObject.AddComponent<BoxCollider2D>();
         collider.size = size;

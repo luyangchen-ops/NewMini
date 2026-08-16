@@ -15,6 +15,7 @@ public class PlayerCharacterController : MonoBehaviour
     [SerializeField, Min(0f)] private float moveSpeed = 5f;
     [SerializeField, Min(0f)] private float boundaryPadding = .7f;
     [SerializeField] private Camera worldCamera;
+    [Tooltip("Viewport dead-zone ratio. Lower values make the camera start following while the player is closer to screen center.")]
     [SerializeField, Range(.1f, 1f)] private float cameraFollowDeadZone = .65f;
     [SerializeField, Min(.01f)] private float maximumDragDistance = 3f;
     [SerializeField, Min(0f)] private float dodgeDistance = 2.5f;
@@ -724,6 +725,16 @@ public class PlayerCharacterController : MonoBehaviour
         EnemyTimeScale = 1f;
         enemyTimeScaleTarget = 1f;
         cameraController?.RestoreImmediately();
+    }
+
+    public void EnterCameraZoomZone(UnityEngine.Object source, float targetOrthographicSize, float blendSpeed, int priority = 0)
+    {
+        cameraController?.EnterAreaZoom(source, targetOrthographicSize, blendSpeed, priority);
+    }
+
+    public void ExitCameraZoomZone(UnityEngine.Object source, float blendSpeed)
+    {
+        cameraController?.ExitAreaZoom(source, blendSpeed);
     }
 
     public void RestoreHealth(float amount)

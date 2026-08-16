@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public sealed class PlayerCameraController
@@ -7,6 +8,7 @@ public sealed class PlayerCameraController
     private readonly Vector3 baseLocalPosition;
     private readonly float baseOrthographicSize;
     private readonly float followDeadZoneRatio;
+    private readonly List<AreaZoomRequest> areaZoomRequests = new List<AreaZoomRequest>();
 
     private bool killChainActive;
     private float zoomFactor = 1f;
@@ -20,6 +22,16 @@ public sealed class PlayerCameraController
     private bool hasFollowTarget;
     private Vector3 desiredFollowPosition;
     private Vector3 currentFollowPosition;
+    private float areaZoomResponse = 6f;
+    private int areaZoomSequence;
+
+    private sealed class AreaZoomRequest
+    {
+        public Object Source;
+        public float OrthographicSize;
+        public int Priority;
+        public int Sequence;
+    }
 
     public PlayerCameraController(Camera camera, float followDeadZoneRatio = .65f)
     {
@@ -82,6 +94,42 @@ public sealed class PlayerCameraController
         desiredOffset = Vector2.zero;
     }
 
+    public void EnterAreaZoom(Object source, float targetOrthographicSize, float blendSpeed, int priority)
+    {
+        if (source == null) return;
+
+        AreaZoomRequest request = null;
+        foreach (AreaZoomRequest candidate in areaZoomRequests)
+        {
+            if (candidate.Source != source) continue;
+            request = candidate;
+            break;
+        }
+
+        if (request == null)
+        {
+            request = new AreaZoomRequest { Source = source };
+            areaZoomRequests.Add(request);
+        }
+
+        request.OrthographicSize = Mathf.Max(.1f, targetOrthographicSize);
+        request.Priority = priority;
+        request.Sequence = ++areaZoomSequence;
+        areaZoomResponse = Mathf.Max(.01f, blendSpeed);
+    }
+
+    public void ExitAreaZoom(Object source, float blendSpeed)
+    {
+        if (source == null) return;
+
+        for (int i = areaZoomRequests.Count - 1; i >= 0; i--)
+        {
+            if (areaZoomRequests[i].Source == source) areaZoomRequests.RemoveAt(i);
+        }
+
+        areaZoomResponse = Mathf.Max(.01f, blendSpeed);
+    }
+
     public void Tick(float unscaledDeltaTime)
     {
         if (Camera == null || cameraTransform == null) return;
@@ -96,8 +144,11 @@ public sealed class PlayerCameraController
             blend);
         currentOffset = Vector2.Lerp(currentOffset, killChainActive ? desiredOffset : Vector2.zero, blend);
 
-        float targetSize = baseOrthographicSize * (killChainActive ? zoomFactor : 1f);
-        Camera.orthographicSize = Mathf.Lerp(Camera.orthographicSize, targetSize, blend);
+        float areaTargetSize = GetAreaTargetOrthographicSize();
+        float targetSize = areaTargetSize * (killChainActive ? zoomFactor : 1f);
+        float zoomResponse = killChainActive ? response : areaZoomResponse;
+        float zoomBlend = 1f - Mathf.Exp(-zoomResponse * Mathf.Max(0f, unscaledDeltaTime));
+        Camera.orthographicSize = Mathf.Lerp(Camera.orthographicSize, targetSize, zoomBlend);
 
         Vector2 shake = Vector2.zero;
         if (shakeRemaining > 0f)
@@ -119,7 +170,7 @@ public sealed class PlayerCameraController
         killChainActive = false;
         currentOffset = desiredOffset = Vector2.zero;
         shakeAmplitude = shakeRemaining = 0f;
-        Camera.orthographicSize = baseOrthographicSize;
+        Camera.orthographicSize = GetAreaTargetOrthographicSize();
         currentFollowPosition = CameraBounds.ClampCameraPosition(
             Camera,
             hasFollowTarget ? desiredFollowPosition : baseLocalPosition);
@@ -157,5 +208,28 @@ public sealed class PlayerCameraController
         float activeAmplitude = shakeRemaining > 0f ? shakeAmplitude : 0f;
         shakeAmplitude = Mathf.Min(maximumShake, Mathf.Max(activeAmplitude, Mathf.Max(0f, amplitude)));
         shakeRemaining = Mathf.Max(shakeRemaining, duration);
+    }
+
+    private float GetAreaTargetOrthographicSize()
+    {
+        AreaZoomRequest activeRequest = null;
+        for (int i = areaZoomRequests.Count - 1; i >= 0; i--)
+        {
+            AreaZoomRequest request = areaZoomRequests[i];
+            if (request.Source == null)
+            {
+                areaZoomRequests.RemoveAt(i);
+                continue;
+            }
+
+            if (activeRequest == null
+                || request.Priority > activeRequest.Priority
+                || request.Priority == activeRequest.Priority && request.Sequence > activeRequest.Sequence)
+            {
+                activeRequest = request;
+            }
+        }
+
+        return activeRequest != null ? activeRequest.OrthographicSize : baseOrthographicSize;
     }
 }
