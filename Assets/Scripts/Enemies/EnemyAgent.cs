@@ -46,12 +46,14 @@ public sealed class EnemyAgent : MonoBehaviour
     private static readonly int Attack = Animator.StringToHash("Attack");
     private static readonly int Death = Animator.StringToHash("Death");
     private static readonly int Shoot = Animator.StringToHash("Shoot");
+    private static readonly int Block = Animator.StringToHash("Block");
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
     private static readonly int IsRunning = Animator.StringToHash("IsRunning");
 
     private bool supportsAttack;
     private bool supportsDeath;
     private bool supportsShoot;
+    private bool supportsBlock;
     private bool supportsIsMoving;
     private bool supportsIsRunning;
 
@@ -568,11 +570,28 @@ public sealed class EnemyAgent : MonoBehaviour
         }
     }
 
+    public void BeginShieldBlock()
+    {
+        SetDesiredVelocity(Vector2.zero);
+        FaceTarget();
+        if (supportsBlock)
+        {
+            visualAnimator.ResetTrigger(Block);
+            visualAnimator.SetTrigger(Block);
+        }
+    }
+
     public void BeginShieldAttack()
     {
         IsShieldAttackExposed = true;
         SetDesiredVelocity(Vector2.zero);
         FaceTarget();
+        SetAnimationState(EnemyAnimationState.Attack);
+        if (supportsAttack)
+        {
+            visualAnimator.ResetTrigger(Attack);
+            visualAnimator.SetTrigger(Attack);
+        }
         PlayAttackSfx();
     }
 
@@ -716,9 +735,8 @@ public sealed class EnemyAgent : MonoBehaviour
         string controllerPath = GetVisualStyle() switch
         {
             EnemyVisualStyle.Archer => "Animation/弓兵/弓兵",
-            EnemyVisualStyle.ShieldBearer => "Animation/盾兵/WarriorWalk/盾兵_行走",
-            // The spear soldier controller will be assigned once its animation clips are authored.
-            EnemyVisualStyle.Spearman => string.Empty,
+            EnemyVisualStyle.ShieldBearer => "Animation/盾兵/ShieldWarrior",
+            EnemyVisualStyle.Spearman => "Animation/Spearman/BanditSpearman",
             _ => "Animation/SwordBandit/SwordBandit"
         };
         if (string.IsNullOrEmpty(controllerPath))
@@ -762,6 +780,7 @@ public sealed class EnemyAgent : MonoBehaviour
             if (parameter.nameHash == Attack) supportsAttack = parameter.type == AnimatorControllerParameterType.Trigger;
             else if (parameter.nameHash == Death) supportsDeath = parameter.type == AnimatorControllerParameterType.Trigger;
             else if (parameter.nameHash == Shoot) supportsShoot = parameter.type == AnimatorControllerParameterType.Trigger;
+            else if (parameter.nameHash == Block) supportsBlock = parameter.type == AnimatorControllerParameterType.Trigger;
             else if (parameter.nameHash == IsMoving) supportsIsMoving = parameter.type == AnimatorControllerParameterType.Bool;
             else if (parameter.nameHash == IsRunning) supportsIsRunning = parameter.type == AnimatorControllerParameterType.Bool;
         }
