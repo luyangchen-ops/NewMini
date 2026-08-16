@@ -10,6 +10,8 @@ using UnityEngine.UI;
 public sealed class ClickDialogueSystem : MonoBehaviour
 {
     public bool IsDialoguePlaying => isDialoguePlaying;
+    public event Action DialogueStarted;
+    public event Action DialogueFinished;
 
     [Serializable]
     public sealed class LegacyDialogueLine
@@ -57,6 +59,9 @@ public sealed class ClickDialogueSystem : MonoBehaviour
     [SerializeField] private Vector2 characterOffset = new Vector2(1.05f, 1.45f);
     [SerializeField] private Vector2 soldierOffset = new Vector2(-1.05f, 1.45f);
     [SerializeField] private Vector2 systemPosition = new Vector2(0f, 310f);
+    [SerializeField, Min(0f)] private float minimumLineReadTime = 1.8f;
+    [SerializeField, Min(0f)] private float secondsPerCharacter = .055f;
+    [SerializeField, Min(0f)] private float maximumLineReadTime = 4.5f;
 
     private readonly List<DialogueLine> dialogueLines = new List<DialogueLine>();
     private readonly List<Behaviour> pausedBehaviours = new List<Behaviour>();
@@ -68,6 +73,7 @@ public sealed class ClickDialogueSystem : MonoBehaviour
     private bool isTransitioning;
     private bool gameplayHudWasActive;
     private Coroutine bubbleAnimation;
+    private float lineAutoAdvanceAt = float.PositiveInfinity;
     private Vector2 topShownPosition;
     private Vector2 bottomShownPosition;
     private RectTransform TopLetterboxRect => topLetterbox != null ? topLetterbox.transform as RectTransform : null;
@@ -85,7 +91,7 @@ public sealed class ClickDialogueSystem : MonoBehaviour
 
     private void Start()
     {
-        if (playFirstLineOnStart) StartCoroutine(BeginDialogue());
+        if (playFirstLineOnStart) StartDialogue();
     }
 
     private void Update()
@@ -93,20 +99,48 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         if (!isDialoguePlaying)
         {
             if (!isTransitioning && Keyboard.current?.lKey.wasPressedThisFrame == true)
-                StartCoroutine(BeginDialogue());
+                StartDialogue();
             return;
         }
 
         bool advance = Mouse.current?.leftButton.wasPressedThisFrame == true
             || Keyboard.current?.spaceKey.wasPressedThisFrame == true
             || Keyboard.current?.enterKey.wasPressedThisFrame == true;
-        if (advance && !isTransitioning) AdvanceDialogue();
+        if (!isTransitioning && (advance || Time.unscaledTime >= lineAutoAdvanceAt))
+            AdvanceDialogue();
     }
 
     private void LateUpdate()
     {
         if (activeBubble != null && activeSpeaker != null && bubbleAnimation == null)
             PositionWorldBubble(activeBubble, activeSpeaker, activeWorldOffset);
+    }
+
+    /// <summary>Starts the authored dialogue sequence from a persistent scene event or cinematic controller.</summary>
+    public bool StartDialogue()
+    {
+        if (isDialoguePlaying || isTransitioning || dialogueLines.Count == 0)
+        {
+            return false;
+        }
+
+        StartCoroutine(BeginDialogue());
+        return true;
+    }
+
+    /// <summary>
+    /// Reuses the authored dialogue presentation for a different story sequence.
+    /// Speaker transforms remain explicit scene references supplied by the caller.
+    /// </summary>
+    public bool StartDialogue(TextAsset csv, Transform characterSpeaker, Transform npcSpeaker)
+    {
+        if (isDialoguePlaying || isTransitioning || csv == null) return false;
+
+        dialogueCsv = csv;
+        if (characterSpeaker != null) character = characterSpeaker;
+        if (npcSpeaker != null) soldier = npcSpeaker;
+        ParseDialogue();
+        return StartDialogue();
     }
 
     private IEnumerator BeginDialogue()
@@ -119,9 +153,11 @@ public sealed class ClickDialogueSystem : MonoBehaviour
 
         isTransitioning = true;
         isDialoguePlaying = true;
+        DialogueStarted?.Invoke();
         if (advanceInputLayer != null) advanceInputLayer.SetActive(true);
         HideGameplayHud();
         currentLine = -1;
+        lineAutoAdvanceAt = float.PositiveInfinity;
         PauseGameplay();
         yield return AnimateLetterbox(true);
         isTransitioning = false;
@@ -134,6 +170,7 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         if (!isDialoguePlaying || isTransitioning) return;
         if (++currentLine >= dialogueLines.Count)
         {
+            lineAutoAdvanceAt = float.PositiveInfinity;
             StartCoroutine(EndDialogue());
             return;
         }
@@ -142,6 +179,13 @@ public sealed class ClickDialogueSystem : MonoBehaviour
 
     private void ShowLine(DialogueLine line)
     {
+        float maximum = Mathf.Max(minimumLineReadTime, maximumLineReadTime);
+        float readTime = Mathf.Clamp(
+            minimumLineReadTime + line.Content.Length * secondsPerCharacter,
+            minimumLineReadTime,
+            maximum);
+        lineAutoAdvanceAt = Time.unscaledTime + readTime;
+
         if (activeBubble != null) Destroy(activeBubble.gameObject);
         if (bubbleTemplate == null || bubbleContainer == null) return;
 
@@ -176,8 +220,10 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         RestoreGameplayHud();
         ResumeGameplay();
         currentLine = -1;
+        lineAutoAdvanceAt = float.PositiveInfinity;
         isDialoguePlaying = false;
         isTransitioning = false;
+        DialogueFinished?.Invoke();
     }
 
     private IEnumerator AnimateBubble(Vector2 start, Vector2 target)
@@ -298,7 +344,9 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         {
             if (rows[i].Count < 2 || string.IsNullOrWhiteSpace(rows[i][1])) continue;
             string speaker = rows[i][0].Trim();
-            SpeakerKind kind = speaker == "系统" ? SpeakerKind.System : speaker == "刀兵" ? SpeakerKind.Soldier : SpeakerKind.Character;
+            SpeakerKind kind = speaker == "系统"
+                ? SpeakerKind.System
+                : speaker == "角色" ? SpeakerKind.Character : SpeakerKind.Soldier;
             dialogueLines.Add(new DialogueLine(kind, rows[i][1].Trim()));
         }
     }

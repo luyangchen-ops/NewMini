@@ -43,6 +43,7 @@ public sealed class ArenaWaveSpawner : MonoBehaviour
     public bool HasCompletedAllWaves { get; private set; }
     public int CurrentWaveIndex { get; private set; } = -1;
     public int CurrentAliveCount => CountAliveEnemies();
+    public UnityEvent AllWavesClearedEvent => onAllWavesCleared;
 
     private readonly List<GameObject> spawnedEnemies = new();
     private Coroutine waveRoutine;

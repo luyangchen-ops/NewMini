@@ -10,8 +10,8 @@ using UnityEngine.SceneManagement;
 public sealed class SceneFlowController : MonoBehaviour
 {
     [Header("Scenes")]
-    [SerializeField] private string mainMenuSceneName = "Begin";
-    [SerializeField] private string gameplaySceneName = "Level_01_BambooCourtyard";
+    [SerializeField] private string mainMenuSceneName = "Level_LD";
+    [SerializeField] private string gameplaySceneName = "Level_LD";
 
     [Header("Authored Transition UI (Optional)")]
     [Tooltip("Assign the CanvasGroup on the authored full-screen Layer_Fade object.")]

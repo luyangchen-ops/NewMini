@@ -88,6 +88,7 @@ public sealed class EnemyAgent : MonoBehaviour
     public EnemyAttackState AttackState => attackState;
     public EnemyShieldAttackState ShieldAttackState => shieldAttackState;
     public event System.Action<EnemyAnimationState> AnimationStateChanged;
+    public event System.Action<EnemyAgent> Died;
 
     private EnemyChaseState chaseState;
     private EnemyRoamState roamState;
@@ -119,7 +120,8 @@ public sealed class EnemyAgent : MonoBehaviour
         shieldBlockState = new EnemyShieldBlockState(this, stateMachine);
         shieldAttackState = new EnemyShieldAttackState(this, stateMachine);
         TryFindTarget();
-        target?.GetComponentInParent<PlayerCharacterController>()?.IgnoreEnemyCollisions(this);
+        if (target != null)
+            target.GetComponentInParent<PlayerCharacterController>()?.IgnoreEnemyCollisions(this);
         fireCooldown = data != null ? Random.Range(0.1f, data.FireInterval) : 0f;
         if (data != null && IsMeleeCombatant)
         {
@@ -653,7 +655,11 @@ public sealed class EnemyAgent : MonoBehaviour
     {
         if (IsDead) return;
 
+        BorrowedLifeBossController borrowedLife = GetComponent<BorrowedLifeBossController>();
+        if (borrowedLife != null && borrowedLife.TryAbsorbLethalHit()) return;
+
         IsDead = true;
+        Died?.Invoke(this);
         isSpearWindupAnimating = false;
         desiredVelocity = Vector2.zero;
         meleePerfectDodgeStartTime = 0f;
@@ -849,10 +855,13 @@ public sealed class EnemyAgent : MonoBehaviour
         }
 
         GameObject targetObject = GameObject.Find(fallbackTargetName);
-        if (targetObject != null)
+        PlayerCharacterController player = targetObject != null
+            ? targetObject.GetComponentInParent<PlayerCharacterController>()
+            : FindAnyObjectByType<PlayerCharacterController>(FindObjectsInactive.Include);
+        if (player != null)
         {
-            target = targetObject.transform;
-            target.GetComponentInParent<PlayerCharacterController>()?.IgnoreEnemyCollisions(this);
+            target = player.transform;
+            player.IgnoreEnemyCollisions(this);
         }
     }
 

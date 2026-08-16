@@ -29,6 +29,7 @@ public sealed class GameStateUIController : MonoBehaviour
     private bool isHelpShown;
     private bool isDeathShown;
     private bool hudWasActive;
+    private bool returnToPauseAfterHelp;
     private int helpPageIndex;
 
     private void Awake()
@@ -67,13 +68,39 @@ public sealed class GameStateUIController : MonoBehaviour
     public void ShowHelp()
     {
         if (!isPauseShown) return;
+        returnToPauseAfterHelp = true;
         isHelpShown = true; helpPageIndex = 0; panelPause?.SetActive(false); panelHelp?.SetActive(true); RefreshHelpPages(); Select(helpNextButton);
+    }
+
+    /// <summary>Opens the tutorial directly from gameplay, for example after the prologue enemy is defeated.</summary>
+    public void ShowHelpFromGameplay()
+    {
+        if (isPauseShown || isHelpShown || isDeathShown) return;
+        returnToPauseAfterHelp = false;
+        isHelpShown = true;
+        helpPageIndex = 0;
+        EnterFrozenUiState();
+        panelPause?.SetActive(false);
+        panelHelp?.SetActive(true);
+        RefreshHelpPages();
+        Select(helpNextButton);
     }
 
     public void CloseHelp()
     {
         if (!isHelpShown) return;
-        isHelpShown = false; panelHelp?.SetActive(false); panelPause?.SetActive(true); Select(pauseContinueButton);
+        isHelpShown = false;
+        panelHelp?.SetActive(false);
+        if (returnToPauseAfterHelp)
+        {
+            panelPause?.SetActive(true);
+            Select(pauseContinueButton);
+        }
+        else
+        {
+            RestoreTimeAndHud();
+            EventSystem.current?.SetSelectedGameObject(null);
+        }
     }
 
     public void PreviousHelpPage() { if (!isHelpShown || helpPages == null || helpPages.Length == 0) return; helpPageIndex = Mathf.Max(0, helpPageIndex - 1); RefreshHelpPages(); }
@@ -83,7 +110,7 @@ public sealed class GameStateUIController : MonoBehaviour
     {
         Vector3 position = RespawnPoint.TryGetActivePosition(out Vector3 checkpoint) ? checkpoint : levelStartPosition;
         panelPause?.SetActive(false); panelHelp?.SetActive(false); panelDeath?.SetActive(false);
-        isPauseShown = false; isHelpShown = false; isDeathShown = false; RestoreTimeAndHud(); player?.RespawnAt(position); EventSystem.current?.SetSelectedGameObject(null);
+        isPauseShown = false; isHelpShown = false; isDeathShown = false; returnToPauseAfterHelp = false; RestoreTimeAndHud(); player?.RespawnAt(position); EventSystem.current?.SetSelectedGameObject(null);
     }
 
     public void ReturnToMainMenu()
