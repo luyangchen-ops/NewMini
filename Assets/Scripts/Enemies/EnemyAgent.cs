@@ -226,9 +226,12 @@ public sealed class EnemyAgent : MonoBehaviour
         direction.Normalize();
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Face(direction.x);
+        Vector2 projectileOrigin = visualRenderer != null
+            ? visualRenderer.bounds.center
+            : body.position;
         EnemyProjectile projectile = Instantiate(
             data.ProjectilePrefab,
-            body.position + direction * data.ProjectileSpawnOffset,
+            projectileOrigin + direction * data.ProjectileSpawnOffset,
             Quaternion.Euler(0f, 0f, angle));
         projectile.Launch(direction, data.ProjectileSpeed, gameObject, data.Damage);
         fireCooldown = data.FireInterval;
