@@ -15802,16 +15802,16 @@ MonoBehaviour:
       - {fileID: 1145403363}
       count: 6
     - enemyType: 1
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 1000, guid: ac76861895f1dac48981520d119d1d0e, type: 3}
       spawnPoints:
       - {fileID: 544804673}
       - {fileID: 838930004}
       count: 2
   - waveName: Wave 2
-    delayBeforeWave: 0
+    delayBeforeWave: 1
     spawns:
     - enemyType: 3
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 3000, guid: 94645a7045925d448ba94f8f187219fb, type: 3}
       spawnPoints:
       - {fileID: 243506495}
       - {fileID: 1070987636}
@@ -15821,30 +15821,30 @@ MonoBehaviour:
       - {fileID: 1901527432}
       count: 6
     - enemyType: 1
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 1000, guid: ac76861895f1dac48981520d119d1d0e, type: 3}
       spawnPoints:
       - {fileID: 384309199}
       - {fileID: 1594978829}
       count: 2
   - waveName: Wave 3
-    delayBeforeWave: 0
+    delayBeforeWave: 3
     spawns:
     - enemyType: 2
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 2000, guid: d8ffcc6e514f86047ac9f88b26e9d13b, type: 3}
       spawnPoints:
       - {fileID: 1354972783}
       - {fileID: 75404348}
       - {fileID: 656094933}
       count: 3
     - enemyType: 3
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 3000, guid: 94645a7045925d448ba94f8f187219fb, type: 3}
       spawnPoints:
       - {fileID: 2083855242}
       - {fileID: 197460077}
       - {fileID: 1376226682}
       count: 3
     - enemyType: 1
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 1000, guid: ac76861895f1dac48981520d119d1d0e, type: 3}
       spawnPoints:
       - {fileID: 267324689}
       - {fileID: 935187658}
@@ -16030,13 +16030,13 @@ MonoBehaviour:
       - {fileID: 1538775146}
       count: 3
     - enemyType: 1
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 1000, guid: ac76861895f1dac48981520d119d1d0e, type: 3}
       spawnPoints:
       - {fileID: 1842973816}
       - {fileID: 616419857}
       count: 2
     - enemyType: 3
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 3000, guid: 94645a7045925d448ba94f8f187219fb, type: 3}
       spawnPoints:
       - {fileID: 818860795}
       count: 1
@@ -23250,7 +23250,7 @@ MonoBehaviour:
     delayBeforeWave: 0
     spawns:
     - enemyType: 1
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 1000, guid: ac76861895f1dac48981520d119d1d0e, type: 3}
       spawnPoints:
       - {fileID: 1634280830}
       - {fileID: 1109149995}
@@ -31749,7 +31749,7 @@ MonoBehaviour:
       - {fileID: 378218844}
       count: 2
     - enemyType: 1
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 1000, guid: ac76861895f1dac48981520d119d1d0e, type: 3}
       spawnPoints:
       - {fileID: 1707204459}
       - {fileID: 275716040}
@@ -31763,12 +31763,12 @@ MonoBehaviour:
       - {fileID: 603478469}
       count: 10
     - enemyType: 2
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 2000, guid: d8ffcc6e514f86047ac9f88b26e9d13b, type: 3}
       spawnPoints:
       - {fileID: 1505667488}
       count: 1
     - enemyType: 3
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 3000, guid: 94645a7045925d448ba94f8f187219fb, type: 3}
       spawnPoints:
       - {fileID: 710938318}
       - {fileID: 317216864}
@@ -32821,14 +32821,14 @@ MonoBehaviour:
       - {fileID: 1739024151}
       count: 4
     - enemyType: 3
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 3000, guid: 94645a7045925d448ba94f8f187219fb, type: 3}
       spawnPoints:
       - {fileID: 287966378}
       - {fileID: 2129698361}
       - {fileID: 1933534067}
       count: 3
     - enemyType: 1
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 1000, guid: ac76861895f1dac48981520d119d1d0e, type: 3}
       spawnPoints:
       - {fileID: 2104641792}
       - {fileID: 2144227741}
@@ -32836,7 +32836,7 @@ MonoBehaviour:
       - {fileID: 483975503}
       count: 4
     - enemyType: 2
-      enemyPrefab: {fileID: 0}
+      enemyPrefab: {fileID: 2000, guid: d8ffcc6e514f86047ac9f88b26e9d13b, type: 3}
       spawnPoints:
       - {fileID: 2116937404}
       count: 1
