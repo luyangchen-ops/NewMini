@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>Authors the pause, help, and death UI directly into Extra.unity.</summary>
 [InitializeOnLoad]
 public static class GameStateUiSceneBuilder
 {
@@ -14,9 +15,10 @@ public static class GameStateUiSceneBuilder
     static GameStateUiSceneBuilder()
     {
         EditorApplication.delayCall += EnsureExtraScene;
+        EditorSceneManager.sceneOpened += OnSceneOpened;
     }
 
-    [MenuItem("NewMini/UI/Rebuild Pause And Death UI In Extra")]
+    [MenuItem("NewMini/UI/Rebuild Pause, Help And Death UI In Extra")]
     public static void RebuildExtraScene()
     {
         Scene scene = EditorSceneManager.OpenScene(ExtraScenePath, OpenSceneMode.Single);
@@ -28,126 +30,76 @@ public static class GameStateUiSceneBuilder
     private static void EnsureExtraScene()
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode) return;
-        Scene scene = SceneManager.GetActiveScene();
-        if (scene.path != ExtraScenePath || GameObject.Find(RootName) != null) return;
+        EnsureExtraScene(SceneManager.GetActiveScene());
+    }
+
+    private static void OnSceneOpened(Scene scene, OpenSceneMode mode)
+    {
+        if (scene.path != ExtraScenePath) return;
+        EditorApplication.delayCall += () => EnsureExtraScene(scene);
+    }
+
+    private static void EnsureExtraScene(Scene scene)
+    {
+        if (EditorApplication.isPlayingOrWillChangePlaymode || !scene.IsValid() || !scene.isLoaded) return;
+        if (scene.path != ExtraScenePath) return;
+        GameObject existing = GameObject.Find(RootName);
+        if (existing != null)
+        {
+            if (existing.transform.Find("Panel_Help") != null) return;
+            Object.DestroyImmediate(existing);
+        }
         Build(scene);
     }
 
     private static void Build(Scene scene)
     {
         GameObject root = NewUi(RootName, null, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster), typeof(GameStateUIController));
-        Canvas canvas = root.GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 200;
-        CanvasScaler scaler = root.GetComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.matchWidthOrHeight = .5f;
+        Canvas canvas = root.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 200;
+        CanvasScaler scaler = root.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1920f, 1080f); scaler.matchWidthOrHeight = .5f;
 
-        GameObject pause = ScreenPanel("Panel_暂停界面", root.transform, new Color(.015f, .02f, .03f, .88f));
-        TextNode("Txt_暂停标题", pause.transform, new Vector2(0f, 190f), new Vector2(700f, 110f), "游戏暂停", 58, Color.white);
-        Button pauseContinue = ButtonNode("Btn_暂停_从存档点继续", pause.transform, new Vector2(0f, 25f), "从上个存档点继续");
-        Button pauseMenu = ButtonNode("Btn_暂停_返回主菜单", pause.transform, new Vector2(0f, -105f), "返回主菜单");
+        GameObject pause = ScreenPanel("Panel_Pause", root.transform, new Color(.015f, .02f, .03f, .88f));
+        TextNode("Txt_PauseTitle", pause.transform, new Vector2(0f, 235f), new Vector2(700f, 110f), "游戏暂停", 58, Color.white);
+        Button pauseContinue = ButtonNode("Btn_PauseContinue", pause.transform, new Vector2(0f, 75f), "从上一个存档点继续");
+        Button pauseHelp = ButtonNode("Btn_PauseHelp", pause.transform, new Vector2(0f, -45f), "帮助 / 操作说明");
+        Button pauseMenu = ButtonNode("Btn_PauseMainMenu", pause.transform, new Vector2(0f, -165f), "返回主菜单");
 
-        GameObject death = ScreenPanel("Panel_死亡界面", root.transform, new Color(.035f, .005f, .008f, .93f));
-        Text deathMark = TextNode("Txt_死亡卒字", death.transform, new Vector2(0f, 250f), new Vector2(520f, 300f), "卒", 220, new Color(.78f, .015f, .02f, 1f));
-        deathMark.fontStyle = FontStyle.Bold;
-        TextNode("Txt_死亡标题", death.transform, new Vector2(0f, 75f), new Vector2(700f, 80f), "此身已殁", 42, new Color(.92f, .82f, .78f, 1f));
-        Button deathContinue = ButtonNode("Btn_死亡_从存档点继续", death.transform, new Vector2(0f, -75f), "从上个存档点继续");
-        Button deathMenu = ButtonNode("Btn_死亡_返回主菜单", death.transform, new Vector2(0f, -205f), "返回主菜单");
+        GameObject help = ScreenPanel("Panel_Help", root.transform, new Color(.01f, .015f, .025f, .96f));
+        TextNode("Txt_HelpTitle", help.transform, new Vector2(0f, 450f), new Vector2(1000f, 80f), "操作说明", 52, Color.white);
+        GameObject pagesRoot = NewUi("Group_HelpPages", help.transform);
+        RectTransform pagesRect = pagesRoot.GetComponent<RectTransform>(); pagesRect.anchorMin = pagesRect.anchorMax = new Vector2(.5f, .5f); pagesRect.anchoredPosition = new Vector2(0f, 25f); pagesRect.sizeDelta = new Vector2(1320f, 760f);
+        GameObject[] pages = { HelpPage(pagesRoot.transform, "Page_01_Movement", "移动与瞄准", "WASD：控制角色移动\n移动鼠标：调整朝向与攻击方向", "图文说明占位图 01"), HelpPage(pagesRoot.transform, "Page_02_Attack", "挥剑攻击", "鼠标左键：向光标方向挥剑攻击\n靠近敌人后发起斩击", "图文说明占位图 02"), HelpPage(pagesRoot.transform, "Page_03_Dodge", "闪避与完美闪避", "Space：向光标方向闪避\n在敌人攻击命中的瞬间闪避，可触发完美闪避", "图文说明占位图 03"), HelpPage(pagesRoot.transform, "Page_04_KillChain", "连续处决", "完美闪避后，将鼠标移向范围内敌人\n鼠标左键：发动连斩；鼠标右键：取消", "图文说明占位图 04"), HelpPage(pagesRoot.transform, "Page_05_Ultimate", "终极技能", "R：进入终极标记\n按住鼠标左键拖拽划过敌人，松开后执行连斩；鼠标右键：取消", "图文说明占位图 05") };
+        Button previous = ButtonNode("Btn_HelpPrevious", help.transform, new Vector2(-520f, -445f), "〈 上一页", new Vector2(230f, 70f), 24);
+        Button next = ButtonNode("Btn_HelpNext", help.transform, new Vector2(520f, -445f), "下一页 〉", new Vector2(230f, 70f), 24);
+        Text pageIndicator = TextNode("Txt_HelpPageIndicator", help.transform, new Vector2(0f, -445f), new Vector2(280f, 70f), "1 / 5", 28, new Color(.85f, .85f, .85f, 1f));
+        Button helpBack = ButtonNode("Btn_HelpBack", help.transform, new Vector2(0f, -520f), "返回暂停菜单", new Vector2(300f, 62f), 22);
+
+        GameObject death = ScreenPanel("Panel_Death", root.transform, new Color(.035f, .005f, .008f, .93f));
+        Text deathMark = TextNode("Txt_DeathMark", death.transform, new Vector2(0f, 250f), new Vector2(520f, 300f), "卒", 220, new Color(.78f, .015f, .02f, 1f)); deathMark.fontStyle = FontStyle.Bold;
+        TextNode("Txt_DeathTitle", death.transform, new Vector2(0f, 75f), new Vector2(700f, 80f), "此身已殒", 42, new Color(.92f, .82f, .78f, 1f));
+        Button deathContinue = ButtonNode("Btn_DeathContinue", death.transform, new Vector2(0f, -75f), "从上一个存档点继续");
+        Button deathMenu = ButtonNode("Btn_DeathMainMenu", death.transform, new Vector2(0f, -205f), "返回主菜单");
 
         GameStateUIController controller = root.GetComponent<GameStateUIController>();
-        UnityEventTools.AddPersistentListener(pauseContinue.onClick, controller.ContinueFromCheckpoint);
-        UnityEventTools.AddPersistentListener(pauseMenu.onClick, controller.ReturnToMainMenu);
-        UnityEventTools.AddPersistentListener(deathContinue.onClick, controller.ContinueFromCheckpoint);
-        UnityEventTools.AddPersistentListener(deathMenu.onClick, controller.ReturnToMainMenu);
-
-        PlayerCharacterController player = Object.FindAnyObjectByType<PlayerCharacterController>();
-        GameObject hud = GameObject.Find("Root_角色战斗HUD");
+        UnityEventTools.AddPersistentListener(pauseContinue.onClick, controller.ContinueFromCheckpoint); UnityEventTools.AddPersistentListener(pauseHelp.onClick, controller.ShowHelp); UnityEventTools.AddPersistentListener(pauseMenu.onClick, controller.ReturnToMainMenu); UnityEventTools.AddPersistentListener(previous.onClick, controller.PreviousHelpPage); UnityEventTools.AddPersistentListener(next.onClick, controller.NextHelpPage); UnityEventTools.AddPersistentListener(helpBack.onClick, controller.CloseHelp); UnityEventTools.AddPersistentListener(deathContinue.onClick, controller.ContinueFromCheckpoint); UnityEventTools.AddPersistentListener(deathMenu.onClick, controller.ReturnToMainMenu);
         SerializedObject serialized = new SerializedObject(controller);
-        serialized.FindProperty("player").objectReferenceValue = player;
-        serialized.FindProperty("gameplayHudRoot").objectReferenceValue = hud;
-        serialized.FindProperty("panelPause").objectReferenceValue = pause;
-        serialized.FindProperty("panelDeath").objectReferenceValue = death;
-        serialized.FindProperty("pauseContinueButton").objectReferenceValue = pauseContinue;
-        serialized.FindProperty("deathContinueButton").objectReferenceValue = deathContinue;
-        serialized.ApplyModifiedPropertiesWithoutUndo();
-
-        pause.SetActive(false);
-        death.SetActive(false);
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
-        AssetDatabase.SaveAssets();
-        Debug.Log("Pause and death UI authored in Extra scene hierarchy.");
+        serialized.FindProperty("player").objectReferenceValue = Object.FindAnyObjectByType<PlayerCharacterController>(); serialized.FindProperty("gameplayHudRoot").objectReferenceValue = GameObject.Find("Root_角色战斗HUD"); serialized.FindProperty("panelPause").objectReferenceValue = pause; serialized.FindProperty("panelHelp").objectReferenceValue = help; serialized.FindProperty("panelDeath").objectReferenceValue = death; serialized.FindProperty("pauseContinueButton").objectReferenceValue = pauseContinue; serialized.FindProperty("helpPreviousButton").objectReferenceValue = previous; serialized.FindProperty("helpNextButton").objectReferenceValue = next; serialized.FindProperty("helpPageIndicator").objectReferenceValue = pageIndicator; serialized.FindProperty("helpPages").arraySize = pages.Length;
+        for (int i = 0; i < pages.Length; i++) serialized.FindProperty("helpPages").GetArrayElementAtIndex(i).objectReferenceValue = pages[i];
+        serialized.FindProperty("deathContinueButton").objectReferenceValue = deathContinue; serialized.ApplyModifiedPropertiesWithoutUndo();
+        pause.SetActive(false); help.SetActive(false); death.SetActive(false); EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene); AssetDatabase.SaveAssets();
     }
 
-    private static GameObject ScreenPanel(string name, Transform parent, Color color)
+    private static GameObject HelpPage(Transform parent, string name, string title, string description, string placeholderLabel)
     {
-        GameObject panel = NewUi(name, parent, typeof(CanvasRenderer), typeof(Image));
-        RectTransform rect = panel.GetComponent<RectTransform>();
-        rect.anchorMin = Vector2.zero;
-        rect.anchorMax = Vector2.one;
-        rect.anchoredPosition = Vector2.zero;
-        rect.sizeDelta = Vector2.zero;
-        Image image = panel.GetComponent<Image>();
-        image.color = color;
-        image.raycastTarget = true;
-        return panel;
+        GameObject page = NewUi(name, parent); Stretch(page.GetComponent<RectTransform>());
+        TextNode("Txt_PageTitle", page.transform, new Vector2(0f, 315f), new Vector2(1100f, 70f), title, 40, new Color(1f, .9f, .78f, 1f));
+        GameObject image = NewUi("Img_InstructionPlaceholder", page.transform, typeof(CanvasRenderer), typeof(Image)); RectTransform imageRect = image.GetComponent<RectTransform>(); imageRect.anchorMin = imageRect.anchorMax = new Vector2(.5f, .5f); imageRect.anchoredPosition = new Vector2(0f, 30f); imageRect.sizeDelta = new Vector2(920f, 480f); image.GetComponent<Image>().color = Color.white;
+        TextNode("Txt_Placeholder", image.transform, Vector2.zero, Vector2.zero, placeholderLabel, 28, new Color(.2f, .2f, .2f, 1f), true); TextNode("Txt_PageDescription", page.transform, new Vector2(0f, -285f), new Vector2(1160f, 105f), description, 28, Color.white); return page;
     }
 
-    private static Button ButtonNode(string name, Transform parent, Vector2 position, string label)
-    {
-        GameObject go = NewUi(name, parent, typeof(CanvasRenderer), typeof(Image), typeof(Button));
-        RectTransform rect = go.GetComponent<RectTransform>();
-        rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
-        rect.anchoredPosition = position;
-        rect.sizeDelta = new Vector2(470f, 92f);
-        Image image = go.GetComponent<Image>();
-        image.color = new Color(.14f, .12f, .12f, .98f);
-        Button button = go.GetComponent<Button>();
-        button.targetGraphic = image;
-        ColorBlock colors = button.colors;
-        colors.highlightedColor = new Color(.48f, .08f, .07f, 1f);
-        colors.pressedColor = new Color(.68f, .035f, .025f, 1f);
-        colors.selectedColor = colors.highlightedColor;
-        button.colors = colors;
-        TextNode("Txt_按钮文字", go.transform, Vector2.zero, Vector2.zero, label, 28, Color.white, true);
-        return button;
-    }
-
-    private static Text TextNode(string name, Transform parent, Vector2 position, Vector2 size, string value, int fontSize, Color color, bool stretch = false)
-    {
-        GameObject go = NewUi(name, parent, typeof(CanvasRenderer), typeof(Text));
-        RectTransform rect = go.GetComponent<RectTransform>();
-        if (stretch)
-        {
-            rect.anchorMin = Vector2.zero;
-            rect.anchorMax = Vector2.one;
-            rect.anchoredPosition = Vector2.zero;
-            rect.sizeDelta = new Vector2(-24f, -12f);
-        }
-        else
-        {
-            rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f);
-            rect.anchoredPosition = position;
-            rect.sizeDelta = size;
-        }
-        Text text = go.GetComponent<Text>();
-        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        text.text = value;
-        text.fontSize = fontSize;
-        text.alignment = TextAnchor.MiddleCenter;
-        text.color = color;
-        text.raycastTarget = false;
-        return text;
-    }
-
-    private static GameObject NewUi(string name, Transform parent, params System.Type[] components)
-    {
-        GameObject go = new GameObject(name, typeof(RectTransform));
-        go.layer = LayerMask.NameToLayer("UI");
-        if (parent != null) go.transform.SetParent(parent, false);
-        foreach (System.Type component in components) go.AddComponent(component);
-        return go;
-    }
+    private static GameObject ScreenPanel(string name, Transform parent, Color color) { GameObject panel = NewUi(name, parent, typeof(CanvasRenderer), typeof(Image)); Stretch(panel.GetComponent<RectTransform>()); Image image = panel.GetComponent<Image>(); image.color = color; image.raycastTarget = true; return panel; }
+    private static Button ButtonNode(string name, Transform parent, Vector2 position, string label, Vector2? size = null, int fontSize = 28) { GameObject go = NewUi(name, parent, typeof(CanvasRenderer), typeof(Image), typeof(Button)); RectTransform rect = go.GetComponent<RectTransform>(); rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f); rect.anchoredPosition = position; rect.sizeDelta = size ?? new Vector2(470f, 92f); Image image = go.GetComponent<Image>(); image.color = new Color(.14f, .12f, .12f, .98f); Button button = go.GetComponent<Button>(); button.targetGraphic = image; ColorBlock colors = button.colors; colors.highlightedColor = new Color(.48f, .08f, .07f, 1f); colors.pressedColor = new Color(.68f, .035f, .025f, 1f); colors.selectedColor = colors.highlightedColor; button.colors = colors; TextNode("Txt_ButtonLabel", go.transform, Vector2.zero, Vector2.zero, label, fontSize, Color.white, true); return button; }
+    private static Text TextNode(string name, Transform parent, Vector2 position, Vector2 size, string value, int fontSize, Color color, bool stretch = false) { GameObject go = NewUi(name, parent, typeof(CanvasRenderer), typeof(Text)); RectTransform rect = go.GetComponent<RectTransform>(); if (stretch) Stretch(rect, new Vector2(-24f, -12f)); else { rect.anchorMin = rect.anchorMax = new Vector2(.5f, .5f); rect.anchoredPosition = position; rect.sizeDelta = size; } Text text = go.GetComponent<Text>(); text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); text.text = value; text.fontSize = fontSize; text.alignment = TextAnchor.MiddleCenter; text.color = color; text.raycastTarget = false; return text; }
+    private static void Stretch(RectTransform rect, Vector2? sizeDelta = null) { rect.anchorMin = Vector2.zero; rect.anchorMax = Vector2.one; rect.anchoredPosition = Vector2.zero; rect.sizeDelta = sizeDelta ?? Vector2.zero; }
+    private static GameObject NewUi(string name, Transform parent, params System.Type[] components) { GameObject go = new GameObject(name, typeof(RectTransform)); go.layer = LayerMask.NameToLayer("UI"); if (parent != null) go.transform.SetParent(parent, false); foreach (System.Type component in components) go.AddComponent(component); return go; }
 }

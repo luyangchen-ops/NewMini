@@ -7,7 +7,8 @@ public sealed class BreakableMapProp : MonoBehaviour
     private static readonly int BreakTrigger = Animator.StringToHash("Break");
     private static readonly int IntactState = Animator.StringToHash("Intact");
 
-    [SerializeField] private bool clickToBreak = true;
+    [Tooltip("Optional editor/debug shortcut. Gameplay attacks should break this prop through Break().")]
+    [SerializeField] private bool clickToBreak;
     [SerializeField] private bool disableCollidersOnBreak = true;
 
     private Animator propAnimator;
@@ -30,7 +31,8 @@ public sealed class BreakableMapProp : MonoBehaviour
 
         CacheComponents();
         isBroken = true;
-        SpecialItemDropSpawner.TryDropFromBreakable(transform.position);
+        GameAudioManager.PlaySfx(GameSfx.BreakableDestroyed);
+        SpecialItemDropSpawner.TryDropFromBreakable(GetBreakPosition());
         propAnimator.ResetTrigger(BreakTrigger);
         propAnimator.SetTrigger(BreakTrigger);
 
@@ -50,6 +52,30 @@ public sealed class BreakableMapProp : MonoBehaviour
         SetCollidersEnabled(true);
     }
 
+    private Vector3 GetBreakPosition()
+    {
+        bool hasBounds = false;
+        Bounds combinedBounds = default;
+        foreach (Collider2D propCollider in propColliders)
+        {
+            if (propCollider == null || !propCollider.enabled) continue;
+            if (!hasBounds)
+            {
+                combinedBounds = propCollider.bounds;
+                hasBounds = true;
+            }
+            else
+            {
+                combinedBounds.Encapsulate(propCollider.bounds);
+            }
+        }
+
+        if (hasBounds) return combinedBounds.center;
+
+        SpriteRenderer propRenderer = GetComponentInChildren<SpriteRenderer>();
+        return propRenderer != null ? propRenderer.bounds.center : transform.position;
+    }
+
     private void OnMouseDown()
     {
         if (Application.isPlaying && clickToBreak)
@@ -67,7 +93,7 @@ public sealed class BreakableMapProp : MonoBehaviour
 
         if (propColliders == null || propColliders.Length == 0)
         {
-            propColliders = GetComponents<Collider2D>();
+            propColliders = GetComponentsInChildren<Collider2D>(true);
         }
     }
 

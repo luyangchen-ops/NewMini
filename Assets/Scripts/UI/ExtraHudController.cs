@@ -67,7 +67,7 @@ public sealed class ExtraHudController : MonoBehaviour
         dodgeCooldownFill.fillAmount = cooldown;
         dodgeText.text = cooldown > 0f ? $"翻滚冷却  {cooldown * 100f:0}%" : "翻滚  就绪";
 
-        knifeText.text = $"飞刀  Q   x{(items != null ? items.ThrowingKnifeCount : 0)}";
+        knifeText.text = $"Q  ×{(items != null ? items.ThrowingKnifeCount : 0)}";
 
         float momentum = player.MaximumMomentum <= 0 ? 0f : player.CurrentMomentum / (float)player.MaximumMomentum;
         momentumFill.fillAmount = momentum;
