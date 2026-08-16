@@ -140,6 +140,7 @@ public class PlayerCharacterController : MonoBehaviour
     private Transform lockedDashTarget;
     private Transform bufferedTarget;
     private Transform lastKilledTarget;
+    private bool isFreeKillChainDash;
     private PlayerSpecialItemInventory specialItems;
 
     private static readonly int Speed = Animator.StringToHash("Speed");
@@ -153,6 +154,7 @@ public class PlayerCharacterController : MonoBehaviour
     private static readonly int ChainWindow01 = Shader.PropertyToID("_ChainWindow01");
     private static readonly int RangeRadius01 = Shader.PropertyToID("_RangeRadius01");
     private static readonly int EffectStrength = Shader.PropertyToID("_EffectStrength");
+    private const float KillChainPropBreakRadius = .35f;
 
     public PlayerStateId State => stateMachine != null ? stateMachine.Current : PlayerStateId.Locomotion;
     public bool IsDodging => stateMachine != null && stateMachine.Is(PlayerStateId.Dodge);
@@ -439,6 +441,8 @@ public class PlayerCharacterController : MonoBehaviour
 
         if (IsValidTarget(currentTarget))
             StartKillChainDash(currentTarget);
+        else if (!HasAnyTargetInRange(null))
+            StartFreeKillChainDash();
         else
             onInvalidKillChainTarget?.Invoke();
     }
@@ -447,6 +451,7 @@ public class PlayerCharacterController : MonoBehaviour
     {
         if (!IsValidTarget(target)) return;
 
+        isFreeKillChainDash = false;
         lockedDashTarget = target;
         SetCurrentTarget(null);
         bufferedTarget = null;
@@ -465,6 +470,35 @@ public class PlayerCharacterController : MonoBehaviour
         PlaySfx(DashWindCutSfx, dashWindCutVolume, false);
     }
 
+    private void StartFreeKillChainDash()
+    {
+        Vector2 direction = PointerWorld() - body.position;
+        if (direction.sqrMagnitude <= Mathf.Epsilon)
+            direction = visualRenderer != null && visualRenderer.flipX ? Vector2.left : Vector2.right;
+        else
+            direction.Normalize();
+
+        isFreeKillChainDash = true;
+        lockedDashTarget = null;
+        SetCurrentTarget(null);
+        bufferedTarget = null;
+        bufferedTargetUntil = 0f;
+        perfectDodgeAfterimage?.StopAndRestore();
+        dashStart = body.position;
+        killDashDirection = direction;
+        dashTarget = cameraController.Clamp(
+            dashStart + direction * AttackDashDistance,
+            Padding,
+            transform.position.z);
+        dashElapsed = -AttackDashWindupDuration;
+        activeDashDuration = Mathf.Max(.01f, AttackDashDuration);
+        stateMachine.Change(PlayerStateId.KillChainDash);
+        UpdateFacing(direction);
+        visualAnimator?.SetTrigger(DashAttack);
+        PlaySfx(dashAttackSfx);
+        PlaySfx(DashWindCutSfx, dashWindCutVolume, false);
+    }
+
     private void HandleDashInputBuffer()
     {
         Transform candidate = FindBestTarget(lockedDashTarget);
@@ -474,19 +508,51 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void UpdateKillChainDash()
     {
-        if (!IsTargetAlive(lockedDashTarget))
+        if (!isFreeKillChainDash && !IsTargetAlive(lockedDashTarget))
         {
             lockedDashTarget = null;
             EnterTargeting();
             return;
         }
 
-        RecalculateKillDashTarget();
+        if (!isFreeKillChainDash) RecalculateKillDashTarget();
         dashElapsed += Time.fixedDeltaTime;
         if (dashElapsed <= 0f) return;
         float t = Mathf.Clamp01(dashElapsed / activeDashDuration);
-        body.MovePosition(Vector2.LerpUnclamped(dashStart, dashTarget, EaseOutCubic(t)));
-        if (t >= 1f) ConfirmKill(lockedDashTarget);
+        Vector2 nextPosition = Vector2.LerpUnclamped(dashStart, dashTarget, EaseOutCubic(t));
+        BreakPropsAlongKillDash(body.position, nextPosition);
+        body.MovePosition(nextPosition);
+        if (t < 1f) return;
+
+        if (isFreeKillChainDash)
+        {
+            body.position = dashTarget;
+            body.linearVelocity = Vector2.zero;
+            isFreeKillChainDash = false;
+            EndKillChain();
+            return;
+        }
+
+        ConfirmKill(lockedDashTarget);
+    }
+
+    private static void BreakPropsAlongKillDash(Vector2 from, Vector2 to)
+    {
+        Vector2 offset = to - from;
+        float distance = offset.magnitude;
+        if (distance <= Mathf.Epsilon) return;
+
+        foreach (RaycastHit2D hit in Physics2D.CircleCastAll(
+                     from,
+                     KillChainPropBreakRadius,
+                     offset / distance,
+                     distance))
+        {
+            BreakableMapProp breakable = hit.collider != null
+                ? hit.collider.GetComponentInParent<BreakableMapProp>()
+                : null;
+            if (breakable != null && !breakable.IsBroken) breakable.Break();
+        }
     }
 
     private void RecalculateKillDashTarget()
@@ -561,6 +627,7 @@ public class PlayerCharacterController : MonoBehaviour
     private void EndKillChain()
     {
         int completedKills = killChainCount;
+        isFreeKillChainDash = false;
         SetCurrentTarget(null);
         lockedDashTarget = bufferedTarget = lastKilledTarget = null;
         chainWindowRemaining = 0f;
@@ -670,30 +737,44 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void TryNormalAttackHit(Vector2 direction)
     {
-        Transform closestEnemy = null;
+        Transform closestTarget = null;
+        BreakableMapProp closestBreakable = null;
         float closestDistanceSquared = float.PositiveInfinity;
         foreach (Collider2D hit in Physics2D.OverlapCircleAll(body.position, NormalAttackRange))
         {
             Transform enemy = FindEnemy(hit.transform);
-            if (enemy == null) continue;
-            Vector2 offset = (Vector2)enemy.position - body.position;
+            BreakableMapProp breakable = enemy == null
+                ? hit.GetComponentInParent<BreakableMapProp>()
+                : null;
+            if (enemy == null && (breakable == null || breakable.IsBroken)) continue;
+
+            Transform target = enemy != null ? enemy : breakable.transform;
+            Vector2 targetPoint = enemy != null ? (Vector2)enemy.position : hit.bounds.center;
+            Vector2 offset = targetPoint - body.position;
             if (offset.sqrMagnitude > Mathf.Epsilon
                 && Vector2.Angle(direction, offset) > normalAttackArcAngle * .5f) continue;
             if (offset.sqrMagnitude >= closestDistanceSquared) continue;
-            closestEnemy = enemy;
+            closestTarget = target;
+            closestBreakable = breakable;
             closestDistanceSquared = offset.sqrMagnitude;
         }
 
-        if (closestEnemy == null) return;
-        EnemyAgent enemyAgent = closestEnemy.GetComponent<EnemyAgent>();
+        if (closestTarget == null) return;
+        if (closestBreakable != null)
+        {
+            closestBreakable.Break();
+            return;
+        }
+
+        EnemyAgent enemyAgent = closestTarget.GetComponent<EnemyAgent>();
         if (enemyAgent != null && !enemyAgent.CanBeKilledBy(body.position, IsMomentumFull))
         {
             enemyAgent.BlockIncomingAttack();
             return;
         }
-        PlayBloodHitEffect(closestEnemy, direction);
-        SpecialItemDropSpawner.TryDropFromEnemy(closestEnemy.position);
-        KillEnemy(closestEnemy);
+        PlayBloodHitEffect(closestTarget, direction);
+        SpecialItemDropSpawner.TryDropFromEnemy(closestTarget.position);
+        KillEnemy(closestTarget);
         AwardMomentum(0);
         PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
         PlaySfx(killSfx);

@@ -1,6 +1,6 @@
 {
   "assetPack": "InkWuxiaHero_DirectionalCombatSprites",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "projectRoot": "Assets/Resources/InkWuxiaHero/Art",
   "format": "PNG",
   "colorMode": "RGBA",
@@ -25,7 +25,53 @@
     "mipMaps": false,
     "compression": "None"
   },
-  "bindingIncluded": false,
+  "runtimeAlignment": {
+    "runRight": {
+      "pivotY": 0.05,
+      "groundLineTolerancePixels": 1,
+      "phaseMatchedTailFrames": [
+        "Run_08",
+        "Run_09",
+        "Run_10",
+        "Run_11"
+      ],
+      "phaseReferenceFrames": [
+        "Run_04",
+        "Run_05",
+        "Run_06",
+        "Run_07"
+      ],
+      "tailScaleCompensation": [
+        1.045,
+        1.069,
+        1.096,
+        1.152
+      ],
+      "note": "Preserves the existing per-frame horizontal anchor, locks the vertical pivot, and aligns the tail frames by mask/torso phase to remove loop jitter."
+    },
+    "runUp": {
+      "uniformScale": 1.06,
+      "anchorX": 512,
+      "contentBottomExclusive": 736,
+      "note": "Matches the perceived character scale of RunDown without changing PPU."
+    },
+    "normalAttack": {
+      "pivotMode": "per-frame-ground-aligned",
+      "pivotYPixels": [
+        44,
+        44,
+        56,
+        60,
+        124,
+        127,
+        125,
+        100
+      ],
+      "groundOffsetFromOriginPixels": -1,
+      "note": "Prevents the character from floating upward when transitioning from Idle Hold Ink Echo."
+    }
+  },
+  "bindingIncluded": true,
   "animations": [
     {
       "id": "RunRight",

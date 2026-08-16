@@ -12,15 +12,23 @@ public sealed class SpecialItemPickup : MonoBehaviour
         itemType = type;
         name = $"Pickup_{type}";
 
+        Sprite itemSprite = SpecialItemVisualCatalog.GetSprite(itemType);
+        float visualScale = itemSprite != null
+            ? .8f / Mathf.Max(.01f, itemSprite.bounds.size.y)
+            : .35f;
+        transform.localScale = Vector3.one * visualScale;
+
         CircleCollider2D pickupCollider = GetComponent<CircleCollider2D>();
         if (pickupCollider == null) pickupCollider = gameObject.AddComponent<CircleCollider2D>();
         pickupCollider.isTrigger = true;
-        pickupCollider.radius = .25f;
+        pickupCollider.radius = .28f / visualScale;
 
         SpriteRenderer renderer = GetComponent<SpriteRenderer>();
         if (renderer == null) renderer = gameObject.AddComponent<SpriteRenderer>();
-        renderer.sprite = Resources.GetBuiltinResource<Sprite>("UI/Skin/Knob.psd");
-        renderer.color = itemType switch
+        renderer.sprite = itemSprite != null
+            ? itemSprite
+            : Resources.GetBuiltinResource<Sprite>("UI/Skin/Knob.psd");
+        renderer.color = itemSprite != null ? Color.white : itemType switch
         {
             SpecialItemType.OneHitShield => new Color(.25f, .75f, 1f),
             SpecialItemType.HealingPotion => new Color(.95f, .2f, .25f),

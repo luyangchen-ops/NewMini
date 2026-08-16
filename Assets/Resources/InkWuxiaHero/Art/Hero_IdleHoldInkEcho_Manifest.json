@@ -1,14 +1,22 @@
 {
   "asset": "Hero_IdleHoldInkEcho",
-  "version": 1,
+  "version": 2,
   "frame": {
     "width": 512,
     "height": 576,
     "format": "RGBA PNG",
     "pixelsPerUnit": 100,
-    "pivot": [0.5, 0.05],
+    "pivot": [0.3984375, 0.0763888889],
+    "pivotPixelsBottomLeft": [204, 44],
+    "footBaselinePixelsTopLeft": 532,
     "mipmaps": false,
     "compression": "None"
+  },
+  "sourceExtraction": {
+    "sourceSheet": "Temp/BabylonIdleInkEchoV1/Hero_IdleHoldInkEcho_12Frames_Magenta.png",
+    "method": "per-row custom bounds",
+    "rowBoundsPixelsTopLeft": [[0, 609], [609, 1157], [1157, 1728]],
+    "reason": "The generated figures cross the nominal 576-pixel row boundaries; fixed-grid extraction clipped feet in frames 1, 5, 6 and 8."
   },
   "clips": [
     {
@@ -23,11 +31,17 @@
       "name": "IdleHoldInkEcho",
       "frameCount": 12,
       "loop": true,
-      "suggestedFps": 8,
+      "fps": 8,
       "inkEchoFramesOneBased": [5, 6, 7, 8],
       "folder": "Sprites/IdleHoldInkEcho",
-      "sheet": "Sheets/Hero_IdleHoldInkEcho_12Frames_Transparent.png"
+      "sheet": "Sheets/Hero_IdleHoldInkEcho_12Frames_Transparent.png",
+      "sheetImportMode": "Multiple",
+      "sheetGrid": [4, 3],
+      "clip": "Animations/Clips/Hero_IdleHoldInkEcho.anim",
+      "animatedProperty": "SpriteRenderer.m_Sprite",
+      "transformCurveCount": 0
     }
   ],
-  "bindingModified": false
+  "bindingModified": true,
+  "bindingNote": "The existing clip asset was updated in place so Animator references keep the same clip GUID."
 }

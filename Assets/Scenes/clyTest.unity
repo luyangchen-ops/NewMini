@@ -2151,6 +2151,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSpecialItemInventory
   shieldCharges: 0
   throwingKnifeCount: 0
+  maximumThrowingKnives: 3
+  shieldDuration: 60
   potionHealing: 20
   knifeSpeed: 14
   knifeLifetime: 2

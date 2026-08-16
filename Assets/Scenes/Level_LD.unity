@@ -3640,7 +3640,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bd66879bb9e95d418c42504e19afff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreakableMapProp
-  clickToBreak: 1
+  clickToBreak: 0
   disableCollidersOnBreak: 1
 --- !u!95 &186977017
 Animator:
@@ -8403,7 +8403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bd66879bb9e95d418c42504e19afff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreakableMapProp
-  clickToBreak: 1
+  clickToBreak: 0
   disableCollidersOnBreak: 1
 --- !u!95 &463744507
 Animator:
@@ -10903,7 +10903,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bd66879bb9e95d418c42504e19afff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreakableMapProp
-  clickToBreak: 1
+  clickToBreak: 0
   disableCollidersOnBreak: 1
 --- !u!95 &656967101
 Animator:
@@ -12593,7 +12593,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bd66879bb9e95d418c42504e19afff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreakableMapProp
-  clickToBreak: 1
+  clickToBreak: 0
   disableCollidersOnBreak: 1
 --- !u!95 &785771508
 Animator:

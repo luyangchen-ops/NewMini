@@ -131,7 +131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bd66879bb9e95d418c42504e19afff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreakableMapProp
-  clickToBreak: 1
+  clickToBreak: 0
   disableCollidersOnBreak: 1
 --- !u!95 &88177861
 Animator:
@@ -1709,7 +1709,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bd66879bb9e95d418c42504e19afff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreakableMapProp
-  clickToBreak: 1
+  clickToBreak: 0
   disableCollidersOnBreak: 1
 --- !u!61 &720000010
 BoxCollider2D:
@@ -1907,7 +1907,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bd66879bb9e95d418c42504e19afff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreakableMapProp
-  clickToBreak: 1
+  clickToBreak: 0
   disableCollidersOnBreak: 1
 --- !u!61 &720000018
 BoxCollider2D:
@@ -1967,7 +1967,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bd66879bb9e95d418c42504e19afff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BreakableMapProp
-  clickToBreak: 1
+  clickToBreak: 0
   disableCollidersOnBreak: 1
 --- !u!95 &720000020
 Animator:
