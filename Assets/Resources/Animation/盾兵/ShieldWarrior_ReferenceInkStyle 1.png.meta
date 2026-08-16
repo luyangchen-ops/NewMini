@@ -1,0 +1,1283 @@
+fileFormatVersion: 2
+guid: 38b193d9e90d23d4d8e87e000081a546
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3986707157639746175
+    second: ShieldWarrior_ReferenceInkStyle 1_0
+  - first:
+      213: -8002787943010527874
+    second: ShieldWarrior_ReferenceInkStyle 1_1
+  - first:
+      213: -2748797115354596428
+    second: ShieldWarrior_ReferenceInkStyle 1_2
+  - first:
+      213: 450210021598513633
+    second: ShieldWarrior_ReferenceInkStyle 1_3
+  - first:
+      213: 5360747559676797189
+    second: ShieldWarrior_ReferenceInkStyle 1_4
+  - first:
+      213: -3578685826051719139
+    second: ShieldWarrior_ReferenceInkStyle 1_5
+  - first:
+      213: -4772748372173808835
+    second: ShieldWarrior_ReferenceInkStyle 1_6
+  - first:
+      213: 4130204208178970578
+    second: ShieldWarrior_ReferenceInkStyle 1_7
+  - first:
+      213: 3679160609378944411
+    second: ShieldWarrior_ReferenceInkStyle 1_8
+  - first:
+      213: -1741089766970498946
+    second: ShieldWarrior_ReferenceInkStyle 1_9
+  - first:
+      213: -6803383094860187726
+    second: ShieldWarrior_ReferenceInkStyle 1_10
+  - first:
+      213: 629945137961684841
+    second: ShieldWarrior_ReferenceInkStyle 1_11
+  - first:
+      213: 7663870233767153463
+    second: ShieldWarrior_ReferenceInkStyle 1_12
+  - first:
+      213: -7431453473238809534
+    second: ShieldWarrior_ReferenceInkStyle 1_13
+  - first:
+      213: 692308001093015147
+    second: ShieldWarrior_ReferenceInkStyle 1_14
+  - first:
+      213: -9098451476390190291
+    second: ShieldWarrior_ReferenceInkStyle 1_15
+  - first:
+      213: 6376813773766576369
+    second: ShieldWarrior_ReferenceInkStyle 1_16
+  - first:
+      213: 6293599116406421325
+    second: ShieldWarrior_ReferenceInkStyle 1_17
+  - first:
+      213: -6642006365516762382
+    second: ShieldWarrior_ReferenceInkStyle 1_18
+  - first:
+      213: 497503060509414623
+    second: ShieldWarrior_ReferenceInkStyle 1_19
+  - first:
+      213: 5044884583665643895
+    second: ShieldWarrior_ReferenceInkStyle 1_20
+  - first:
+      213: -625346515131118983
+    second: ShieldWarrior_ReferenceInkStyle 1_21
+  - first:
+      213: 2776896743069925898
+    second: ShieldWarrior_ReferenceInkStyle 1_22
+  - first:
+      213: 2669655860603095302
+    second: ShieldWarrior_ReferenceInkStyle 1_23
+  - first:
+      213: -4978377458465941074
+    second: ShieldWarrior_ReferenceInkStyle 1_24
+  - first:
+      213: -5422099463185438921
+    second: ShieldWarrior_ReferenceInkStyle 1_25
+  - first:
+      213: -2148569521767941459
+    second: ShieldWarrior_ReferenceInkStyle 1_26
+  - first:
+      213: 1738271500729969650
+    second: ShieldWarrior_ReferenceInkStyle 1_27
+  - first:
+      213: 2781129313408453826
+    second: ShieldWarrior_ReferenceInkStyle 1_28
+  - first:
+      213: 368649965048824532
+    second: ShieldWarrior_ReferenceInkStyle 1_29
+  - first:
+      213: 149958908522647065
+    second: ShieldWarrior_ReferenceInkStyle 1_30
+  - first:
+      213: -7839600068185259795
+    second: ShieldWarrior_ReferenceInkStyle 1_31
+  - first:
+      213: -7327447373433263215
+    second: ShieldWarrior_ReferenceInkStyle 1_32
+  - first:
+      213: 7205350608169607991
+    second: ShieldWarrior_ReferenceInkStyle 1_33
+  - first:
+      213: 6645287256187799787
+    second: ShieldWarrior_ReferenceInkStyle 1_34
+  - first:
+      213: -3624212291833964192
+    second: ShieldWarrior_ReferenceInkStyle 1_35
+  - first:
+      213: -4241523863571517034
+    second: ShieldWarrior_ReferenceInkStyle 1_36
+  - first:
+      213: 5591507794171129412
+    second: ShieldWarrior_ReferenceInkStyle 1_37
+  - first:
+      213: -3564199393866552287
+    second: ShieldWarrior_Idle_01
+  - first:
+      213: -8012695234901976462
+    second: ShieldWarrior_Idle_02
+  - first:
+      213: -6547461658926032141
+    second: ShieldWarrior_Idle_03
+  - first:
+      213: -6403510230302358931
+    second: ShieldWarrior_Idle_04
+  - first:
+      213: 5816077716716701164
+    second: ShieldWarrior_Idle_05
+  - first:
+      213: -3144608824959225598
+    second: ShieldWarrior_Idle_06
+  - first:
+      213: 5011121394325309923
+    second: ShieldWarrior_Idle_07
+  - first:
+      213: 4278490706427214459
+    second: ShieldWarrior_Idle_08
+  - first:
+      213: 8105600794422002244
+    second: ShieldWarrior_Run_01
+  - first:
+      213: 2863631497339091185
+    second: ShieldWarrior_Run_02
+  - first:
+      213: 2925447500606750586
+    second: ShieldWarrior_Run_03
+  - first:
+      213: 3365067131451584562
+    second: ShieldWarrior_Run_04
+  - first:
+      213: 2632743909328617861
+    second: ShieldWarrior_Run_05
+  - first:
+      213: -728130103320262998
+    second: ShieldWarrior_Run_06
+  - first:
+      213: -8292882477988822501
+    second: ShieldWarrior_Run_07
+  - first:
+      213: 4931323090753869286
+    second: ShieldWarrior_Run_08
+  - first:
+      213: 2888907916080873733
+    second: ShieldWarrior_Block_01
+  - first:
+      213: 3380610037377794755
+    second: ShieldWarrior_Block_02
+  - first:
+      213: -3601230934030058795
+    second: ShieldWarrior_Block_03
+  - first:
+      213: 1975548375191961285
+    second: ShieldWarrior_Block_04
+  - first:
+      213: -7165189765668923916
+    second: ShieldWarrior_Block_05
+  - first:
+      213: -6999227654476782944
+    second: ShieldWarrior_Block_06
+  - first:
+      213: -7363989369479431527
+    second: ShieldWarrior_Block_07
+  - first:
+      213: 2659470506948711414
+    second: ShieldWarrior_Block_08
+  - first:
+      213: 4711051813870249172
+    second: ShieldWarrior_Attack_01
+  - first:
+      213: -2828645071993403196
+    second: ShieldWarrior_Attack_02
+  - first:
+      213: 6616179442766549505
+    second: ShieldWarrior_Attack_03
+  - first:
+      213: 6092054353422241820
+    second: ShieldWarrior_Attack_04
+  - first:
+      213: 7394663060319121205
+    second: ShieldWarrior_Attack_05
+  - first:
+      213: -8423817403515123904
+    second: ShieldWarrior_Attack_06
+  - first:
+      213: 8989068368082497324
+    second: ShieldWarrior_Attack_07
+  - first:
+      213: -5107347429467353680
+    second: ShieldWarrior_Death_01
+  - first:
+      213: 915755935576975805
+    second: ShieldWarrior_Death_02
+  - first:
+      213: 3687348542300856296
+    second: ShieldWarrior_Death_03
+  - first:
+      213: 6203009215631136073
+    second: ShieldWarrior_Death_04
+  - first:
+      213: 1654770635859772905
+    second: ShieldWarrior_Death_05
+  - first:
+      213: -8190319701057662542
+    second: ShieldWarrior_Death_06
+  - first:
+      213: 8414361595140958903
+    second: ShieldWarrior_Death_07
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ShieldWarrior_Idle_01
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 790
+        width: 102
+        height: 186
+      alignment: 9
+      pivot: {x: 0.4560363, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12cebe3098b698ec0800000000000000
+      internalID: -3564199393866552287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Idle_02
+      rect:
+        serializedVersion: 2
+        x: 295
+        y: 790
+        width: 100
+        height: 186
+      alignment: 9
+      pivot: {x: 0.44618836, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 27ad33e03203dc090800000000000000
+      internalID: -8012695234901976462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Idle_03
+      rect:
+        serializedVersion: 2
+        x: 493
+        y: 790
+        width: 100
+        height: 186
+      alignment: 9
+      pivot: {x: 0.4324646, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3fa5937af4eb225a0800000000000000
+      internalID: -6547461658926032141
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Idle_04
+      rect:
+        serializedVersion: 2
+        x: 684
+        y: 790
+        width: 99
+        height: 186
+      alignment: 9
+      pivot: {x: 0.43002412, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d628f3f6f592227a0800000000000000
+      internalID: -6403510230302358931
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Idle_05
+      rect:
+        serializedVersion: 2
+        x: 876
+        y: 790
+        width: 100
+        height: 186
+      alignment: 9
+      pivot: {x: 0.44203734, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce5c6f25edbd6b050800000000000000
+      internalID: 5816077716716701164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Idle_06
+      rect:
+        serializedVersion: 2
+        x: 1069
+        y: 790
+        width: 100
+        height: 186
+      alignment: 9
+      pivot: {x: 0.44191527, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2013fbe3fea1c54d0800000000000000
+      internalID: -3144608824959225598
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Idle_07
+      rect:
+        serializedVersion: 2
+        x: 1254
+        y: 790
+        width: 102
+        height: 186
+      alignment: 9
+      pivot: {x: 0.44536516, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3e9ce1bab541b8540800000000000000
+      internalID: 5011121394325309923
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Idle_08
+      rect:
+        serializedVersion: 2
+        x: 1447
+        y: 790
+        width: 103
+        height: 185
+      alignment: 9
+      pivot: {x: 0.43775126, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7a776b01a0406b30800000000000000
+      internalID: 4278490706427214459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_01
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 598
+        width: 174
+        height: 166
+      alignment: 9
+      pivot: {x: 0.53643036, y: 0.036144577}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 442c5aa2af0ec7070800000000000000
+      internalID: 8105600794422002244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_02
+      rect:
+        serializedVersion: 2
+        x: 243
+        y: 604
+        width: 167
+        height: 159
+      alignment: 9
+      pivot: {x: 0.45913568, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f83486bca9adb720800000000000000
+      internalID: 2863631497339091185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_03
+      rect:
+        serializedVersion: 2
+        x: 443
+        y: 599
+        width: 161
+        height: 169
+      alignment: 9
+      pivot: {x: 0.52601314, y: 0.0295858}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7f38ba8007499820800000000000000
+      internalID: 2925447500606750586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_04
+      rect:
+        serializedVersion: 2
+        x: 639
+        y: 595
+        width: 158
+        height: 170
+      alignment: 9
+      pivot: {x: 0.4369959, y: 0.052941177}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 230b3872abe13be20800000000000000
+      internalID: 3365067131451584562
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_05
+      rect:
+        serializedVersion: 2
+        x: 835
+        y: 599
+        width: 160
+        height: 166
+      alignment: 9
+      pivot: {x: 0.47257692, y: 0.030120483}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5810b1cf2a2698420800000000000000
+      internalID: 2632743909328617861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_06
+      rect:
+        serializedVersion: 2
+        x: 1013
+        y: 602
+        width: 160
+        height: 165
+      alignment: 9
+      pivot: {x: 0.50309145, y: 0.012121212}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa6c351678925e5f0800000000000000
+      internalID: -728130103320262998
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_07
+      rect:
+        serializedVersion: 2
+        x: 1202
+        y: 601
+        width: 162
+        height: 164
+      alignment: 9
+      pivot: {x: 0.5237148, y: 0.018292682}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b124a67e253c9ec80800000000000000
+      internalID: -8292882477988822501
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_08
+      rect:
+        serializedVersion: 2
+        x: 1403
+        y: 600
+        width: 160
+        height: 169
+      alignment: 9
+      pivot: {x: 0.51162875, y: 0.02366864}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e5d01949349f6440800000000000000
+      internalID: 4931323090753869286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Block_01
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 424
+        width: 122
+        height: 157
+      alignment: 9
+      pivot: {x: 0.5358645, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50180de8176771820800000000000000
+      internalID: 2888907916080873733
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Block_02
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 423
+        width: 125
+        height: 159
+      alignment: 9
+      pivot: {x: 0.51137155, y: 0.006289308}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c20602fae65aee20800000000000000
+      internalID: 3380610037377794755
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Block_03
+      rect:
+        serializedVersion: 2
+        x: 434
+        y: 423
+        width: 130
+        height: 157
+      alignment: 9
+      pivot: {x: 0.48689175, y: 0.006369427}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5da7dfeab8bd50ec0800000000000000
+      internalID: -3601230934030058795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Block_04
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 423
+        width: 125
+        height: 159
+      alignment: 9
+      pivot: {x: 0.42823192, y: 0.006289308}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5cebae3c7ce8a6b10800000000000000
+      internalID: 1975548375191961285
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Block_05
+      rect:
+        serializedVersion: 2
+        x: 837
+        y: 424
+        width: 123
+        height: 158
+      alignment: 9
+      pivot: {x: 0.43870035, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f51a05fed1209c90800000000000000
+      internalID: -7165189765668923916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Block_06
+      rect:
+        serializedVersion: 2
+        x: 1030
+        y: 424
+        width: 127
+        height: 156
+      alignment: 9
+      pivot: {x: 0.44558644, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a222d0288fbdde90800000000000000
+      internalID: -6999227654476782944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Block_07
+      rect:
+        serializedVersion: 2
+        x: 1223
+        y: 424
+        width: 120
+        height: 157
+      alignment: 9
+      pivot: {x: 0.44584858, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99afc6e3faaddc990800000000000000
+      internalID: -7363989369479431527
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Block_08
+      rect:
+        serializedVersion: 2
+        x: 1434
+        y: 421
+        width: 113
+        height: 153
+      alignment: 9
+      pivot: {x: 0.42185664, y: 0.019607844}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f35e49e55658e420800000000000000
+      internalID: 2659470506948711414
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Attack_01
+      rect:
+        serializedVersion: 2
+        x: 60
+        y: 231
+        width: 96
+        height: 167
+      alignment: 9
+      pivot: {x: 0.45700598, y: 0.017964073}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4d4223c1aa4016140800000000000000
+      internalID: 4711051813870249172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Attack_02
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 232
+        width: 109
+        height: 164
+      alignment: 9
+      pivot: {x: 0.51597804, y: 0.0121951215}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c88c283b42aeb8d0800000000000000
+      internalID: -2828645071993403196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Attack_03
+      rect:
+        serializedVersion: 2
+        x: 412
+        y: 231
+        width: 139
+        height: 175
+      alignment: 9
+      pivot: {x: 0.585523, y: 0.017142856}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1029750362461db50800000000000000
+      internalID: 6616179442766549505
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Attack_04
+      rect:
+        serializedVersion: 2
+        x: 608
+        y: 234
+        width: 126
+        height: 173
+      alignment: 9
+      pivot: {x: 0.5477775, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c10da1848235b8450800000000000000
+      internalID: 6092054353422241820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Attack_05
+      rect:
+        serializedVersion: 2
+        x: 810
+        y: 231
+        width: 159
+        height: 163
+      alignment: 9
+      pivot: {x: 0.40354717, y: 0.018404908}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53f2600ffde1f9660800000000000000
+      internalID: 7394663060319121205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Attack_06
+      rect:
+        serializedVersion: 2
+        x: 1005
+        y: 232
+        width: 171
+        height: 156
+      alignment: 9
+      pivot: {x: 0.3955071, y: 0.012820513}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0474abae3b6981b80800000000000000
+      internalID: -8423817403515123904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Attack_07
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 232
+        width: 135
+        height: 147
+      alignment: 9
+      pivot: {x: 0.5268112, y: 0.013605442}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c2fe14dfd069fbc70800000000000000
+      internalID: 8989068368082497324
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Death_01
+      rect:
+        serializedVersion: 2
+        x: 33
+        y: 38
+        width: 130
+        height: 175
+      alignment: 9
+      pivot: {x: 0.5716463, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bd0812a29e0f19b0800000000000000
+      internalID: -5107347429467353680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Death_02
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 37
+        width: 139
+        height: 169
+      alignment: 9
+      pivot: {x: 0.5814453, y: 0.00591716}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db96509eb2b65bc00800000000000000
+      internalID: 915755935576975805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Death_03
+      rect:
+        serializedVersion: 2
+        x: 394
+        y: 38
+        width: 173
+        height: 150
+      alignment: 9
+      pivot: {x: 0.56293786, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ef95ea76f71c2330800000000000000
+      internalID: 3687348542300856296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Death_04
+      rect:
+        serializedVersion: 2
+        x: 616
+        y: 37
+        width: 134
+        height: 138
+      alignment: 9
+      pivot: {x: 0.5095625, y: 0.007246377}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9451b244404851650800000000000000
+      internalID: 6203009215631136073
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Death_05
+      rect:
+        serializedVersion: 2
+        x: 792
+        y: 33
+        width: 144
+        height: 106
+      alignment: 9
+      pivot: {x: 0.51468617, y: 0.047169812}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e54b2f302de6f610800000000000000
+      internalID: 1654770635859772905
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Death_06
+      rect:
+        serializedVersion: 2
+        x: 967
+        y: 37
+        width: 193
+        height: 75
+      alignment: 9
+      pivot: {x: 0.5785975, y: 0.013333334}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2b1139540a3265e80800000000000000
+      internalID: -8190319701057662542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Death_07
+      rect:
+        serializedVersion: 2
+        x: 1399
+        y: 20
+        width: 183
+        height: 77
+      alignment: 9
+      pivot: {x: 0.49408326, y: 0.23376623}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7bae0122a41d5c470800000000000000
+      internalID: 8414361595140958903
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      ShieldWarrior_Attack_01: 4711051813870249172
+      ShieldWarrior_Attack_02: -2828645071993403196
+      ShieldWarrior_Attack_03: 6616179442766549505
+      ShieldWarrior_Attack_04: 6092054353422241820
+      ShieldWarrior_Attack_05: 7394663060319121205
+      ShieldWarrior_Attack_06: -8423817403515123904
+      ShieldWarrior_Attack_07: 8989068368082497324
+      ShieldWarrior_Block_01: 2888907916080873733
+      ShieldWarrior_Block_02: 3380610037377794755
+      ShieldWarrior_Block_03: -3601230934030058795
+      ShieldWarrior_Block_04: 1975548375191961285
+      ShieldWarrior_Block_05: -7165189765668923916
+      ShieldWarrior_Block_06: -6999227654476782944
+      ShieldWarrior_Block_07: -7363989369479431527
+      ShieldWarrior_Block_08: 2659470506948711414
+      ShieldWarrior_Death_01: -5107347429467353680
+      ShieldWarrior_Death_02: 915755935576975805
+      ShieldWarrior_Death_03: 3687348542300856296
+      ShieldWarrior_Death_04: 6203009215631136073
+      ShieldWarrior_Death_05: 1654770635859772905
+      ShieldWarrior_Death_06: -8190319701057662542
+      ShieldWarrior_Death_07: 8414361595140958903
+      ShieldWarrior_Idle_01: -3564199393866552287
+      ShieldWarrior_Idle_02: -8012695234901976462
+      ShieldWarrior_Idle_03: -6547461658926032141
+      ShieldWarrior_Idle_04: -6403510230302358931
+      ShieldWarrior_Idle_05: 5816077716716701164
+      ShieldWarrior_Idle_06: -3144608824959225598
+      ShieldWarrior_Idle_07: 5011121394325309923
+      ShieldWarrior_Idle_08: 4278490706427214459
+      ShieldWarrior_ReferenceInkStyle 1_0: -3986707157639746175
+      ShieldWarrior_ReferenceInkStyle 1_1: -8002787943010527874
+      ShieldWarrior_ReferenceInkStyle 1_10: -6803383094860187726
+      ShieldWarrior_ReferenceInkStyle 1_11: 629945137961684841
+      ShieldWarrior_ReferenceInkStyle 1_12: 7663870233767153463
+      ShieldWarrior_ReferenceInkStyle 1_13: -7431453473238809534
+      ShieldWarrior_ReferenceInkStyle 1_14: 692308001093015147
+      ShieldWarrior_ReferenceInkStyle 1_15: -9098451476390190291
+      ShieldWarrior_ReferenceInkStyle 1_16: 6376813773766576369
+      ShieldWarrior_ReferenceInkStyle 1_17: 6293599116406421325
+      ShieldWarrior_ReferenceInkStyle 1_18: -6642006365516762382
+      ShieldWarrior_ReferenceInkStyle 1_19: 497503060509414623
+      ShieldWarrior_ReferenceInkStyle 1_2: -2748797115354596428
+      ShieldWarrior_ReferenceInkStyle 1_20: 5044884583665643895
+      ShieldWarrior_ReferenceInkStyle 1_21: -625346515131118983
+      ShieldWarrior_ReferenceInkStyle 1_22: 2776896743069925898
+      ShieldWarrior_ReferenceInkStyle 1_23: 2669655860603095302
+      ShieldWarrior_ReferenceInkStyle 1_24: -4978377458465941074
+      ShieldWarrior_ReferenceInkStyle 1_25: -5422099463185438921
+      ShieldWarrior_ReferenceInkStyle 1_26: -2148569521767941459
+      ShieldWarrior_ReferenceInkStyle 1_27: 1738271500729969650
+      ShieldWarrior_ReferenceInkStyle 1_28: 2781129313408453826
+      ShieldWarrior_ReferenceInkStyle 1_29: 368649965048824532
+      ShieldWarrior_ReferenceInkStyle 1_3: 450210021598513633
+      ShieldWarrior_ReferenceInkStyle 1_30: 149958908522647065
+      ShieldWarrior_ReferenceInkStyle 1_31: -7839600068185259795
+      ShieldWarrior_ReferenceInkStyle 1_32: -7327447373433263215
+      ShieldWarrior_ReferenceInkStyle 1_33: 7205350608169607991
+      ShieldWarrior_ReferenceInkStyle 1_34: 6645287256187799787
+      ShieldWarrior_ReferenceInkStyle 1_35: -3624212291833964192
+      ShieldWarrior_ReferenceInkStyle 1_36: -4241523863571517034
+      ShieldWarrior_ReferenceInkStyle 1_37: 5591507794171129412
+      ShieldWarrior_ReferenceInkStyle 1_4: 5360747559676797189
+      ShieldWarrior_ReferenceInkStyle 1_5: -3578685826051719139
+      ShieldWarrior_ReferenceInkStyle 1_6: -4772748372173808835
+      ShieldWarrior_ReferenceInkStyle 1_7: 4130204208178970578
+      ShieldWarrior_ReferenceInkStyle 1_8: 3679160609378944411
+      ShieldWarrior_ReferenceInkStyle 1_9: -1741089766970498946
+      ShieldWarrior_Run_01: 8105600794422002244
+      ShieldWarrior_Run_02: 2863631497339091185
+      ShieldWarrior_Run_03: 2925447500606750586
+      ShieldWarrior_Run_04: 3365067131451584562
+      ShieldWarrior_Run_05: 2632743909328617861
+      ShieldWarrior_Run_06: -728130103320262998
+      ShieldWarrior_Run_07: -8292882477988822501
+      ShieldWarrior_Run_08: 4931323090753869286
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

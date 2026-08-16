@@ -1,0 +1,987 @@
+fileFormatVersion: 2
+guid: 473582aed4122be4daae8b4015db6ac3
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1508379409704253496
+    second: BanditSpearman_Atlas_v4_0
+  - first:
+      213: -4502459709232043375
+    second: BanditSpearman_Atlas_v4_1
+  - first:
+      213: -5369374941909195751
+    second: BanditSpearman_Atlas_v4_2
+  - first:
+      213: -7272973928188885556
+    second: BanditSpearman_Atlas_v4_3
+  - first:
+      213: 6265283368847830176
+    second: BanditSpearman_Atlas_v4_4
+  - first:
+      213: 1547414047529556121
+    second: BanditSpearman_Atlas_v4_5
+  - first:
+      213: -7109283226261704561
+    second: BanditSpearman_Atlas_v4_6
+  - first:
+      213: 2971435192233693567
+    second: BanditSpearman_Atlas_v4_7
+  - first:
+      213: -1196408812928592453
+    second: BanditSpearman_Atlas_v4_8
+  - first:
+      213: -8892170211797573788
+    second: BanditSpearman_Atlas_v4_9
+  - first:
+      213: 502665947506837998
+    second: BanditSpearman_Atlas_v4_10
+  - first:
+      213: 8632483827559747742
+    second: BanditSpearman_Atlas_v4_11
+  - first:
+      213: 6838282525754791715
+    second: BanditSpearman_Atlas_v4_12
+  - first:
+      213: -363848994400905378
+    second: BanditSpearman_Atlas_v4_13
+  - first:
+      213: 8243684756345961152
+    second: BanditSpearman_Atlas_v4_14
+  - first:
+      213: 5507952060484122815
+    second: BanditSpearman_Atlas_v4_15
+  - first:
+      213: -2563997233771266596
+    second: BanditSpearman_Atlas_v4_16
+  - first:
+      213: 6352440548317580960
+    second: BanditSpearman_Atlas_v4_17
+  - first:
+      213: 4255230243669176090
+    second: BanditSpearman_Atlas_v4_18
+  - first:
+      213: 3452867748939232859
+    second: BanditSpearman_Atlas_v4_19
+  - first:
+      213: 5266203702884749168
+    second: BanditSpearman_Atlas_v4_20
+  - first:
+      213: -814949292680755252
+    second: BanditSpearman_Atlas_v4_21
+  - first:
+      213: 6547669729289188417
+    second: BanditSpearman_Atlas_v4_22
+  - first:
+      213: 2096733556489950415
+    second: BanditSpearman_Atlas_v4_23
+  - first:
+      213: 1491530743434504922
+    second: BanditSpearman_Atlas_v4_24
+  - first:
+      213: -2263168795994190669
+    second: BanditSpearman_Atlas_v4_25
+  - first:
+      213: 8691867352039514702
+    second: BanditSpearman_Atlas_v4_26
+  - first:
+      213: 753509265581172419
+    second: BanditSpearman_Atlas_v4_27
+  - first:
+      213: -1575020777425859311
+    second: BanditSpearman_Atlas_v4_28
+  - first:
+      213: -4655811790893133007
+    second: BanditSpearman_Atlas_v4_29
+  - first:
+      213: -3680128063212105583
+    second: BanditSpearman_Atlas_v4_30
+  - first:
+      213: 4012018035296122422
+    second: BanditSpearman_Atlas_v4_31
+  - first:
+      213: -2108067565014805381
+    second: BanditSpearman_Atlas_v4_32
+  - first:
+      213: -6733800810921766409
+    second: BanditSpearman_Atlas_v4_33
+  - first:
+      213: 7969900676306033539
+    second: BanditSpearman_Atlas_v4_34
+  - first:
+      213: -5791660251831319618
+    second: BanditSpearman_Atlas_v4_35
+  - first:
+      213: 3308286085297353554
+    second: BanditSpearman_Atlas_v4_36
+  - first:
+      213: 4498118347553809542
+    second: BanditSpearman_Atlas_v4_37
+  - first:
+      213: -3728720361054244222
+    second: BanditSpearman_Atlas_v4_38
+  - first:
+      213: -5982449002688860984
+    second: BanditSpearman_Atlas_v4_39
+  - first:
+      213: 8368556836865708253
+    second: BanditSpearman_Atlas_v4_40
+  - first:
+      213: 534753329475624792
+    second: BanditSpearman_Atlas_v4_41
+  - first:
+      213: -3014927258639793029
+    second: BanditSpearman_Atlas_v4_42
+  - first:
+      213: 7472915946073158325
+    second: BanditSpearman_Atlas_v4_43
+  - first:
+      213: 8074326952810316629
+    second: BanditSpearman_Atlas_v4_44
+  - first:
+      213: -7881452509858170685
+    second: BanditSpearman_Atlas_v4_45
+  - first:
+      213: 7345832632811608218
+    second: BanditSpearman_Atlas_v4_46
+  - first:
+      213: -8652871250541089297
+    second: BanditSpearman_Atlas_v4_47
+  - first:
+      213: 529616812773289928
+    second: BanditSpearman_Atlas_v4_48
+  - first:
+      213: -3519163057908465628
+    second: BanditSpearman_Atlas_v4_49
+  - first:
+      213: 4128782388585179048
+    second: BanditSpearman_Atlas_v4_50
+  - first:
+      213: 3311267877734441968
+    second: BanditSpearman_Atlas_v4_51
+  - first:
+      213: -4884382883252542900
+    second: BanditSpearman_Atlas_v4_52
+  - first:
+      213: 7449287108627643106
+    second: BanditSpearman_Atlas_v4_53
+  - first:
+      213: 3166847324805595096
+    second: BanditSpearman_Atlas_v4_54
+  - first:
+      213: -6360707521074630620
+    second: BanditSpearman_Atlas_v4_55
+  - first:
+      213: 5618306495847240084
+    second: BanditSpearman_Atlas_v4_56
+  - first:
+      213: -4867008493771864902
+    second: BanditSpearman_Atlas_v4_57
+  - first:
+      213: -4091468630164800233
+    second: BanditSpearman_Atlas_v4_58
+  - first:
+      213: -3041943107373501882
+    second: BanditSpearman_Atlas_v4_59
+  - first:
+      213: -8107239062135853148
+    second: BanditSpearman_Atlas_v4_60
+  - first:
+      213: 2442222881652422761
+    second: BanditSpearman_Atlas_v4_61
+  - first:
+      213: 6808820183255746194
+    second: BanditSpearman_Atlas_v4_62
+  - first:
+      213: -4506959856335655666
+    second: BanditSpearman_Atlas_v4_63
+  - first:
+      213: -7728921000023701727
+    second: BanditSpearman_Atlas_v4_64
+  - first:
+      213: 2304577214708622245
+    second: BanditSpearman_Atlas_v4_65
+  - first:
+      213: -7407714451744834099
+    second: BanditSpearman_Atlas_v4_66
+  - first:
+      213: 7575333288654144988
+    second: BanditSpearman_Atlas_v4_67
+  - first:
+      213: 7743494380753775445
+    second: BanditSpearman_Atlas_v4_68
+  - first:
+      213: 8265468214124403802
+    second: BanditSpearman_Atlas_v4_69
+  - first:
+      213: 199221913975649156
+    second: BanditSpearman_Atlas_v4_70
+  - first:
+      213: 8206045878196079136
+    second: BanditSpearman_Atlas_v4_71
+  - first:
+      213: -5725860305431850401
+    second: BanditSpearman_Atlas_v4_72
+  - first:
+      213: 4939986995987589872
+    second: BanditSpearman_Atlas_v4_73
+  - first:
+      213: 870834059792699279
+    second: BanditSpearman_Atlas_v4_74
+  - first:
+      213: 7221394112588785795
+    second: BanditSpearman_Atlas_v4_75
+  - first:
+      213: 3778962327173749963
+    second: BanditSpearman_Atlas_v4_76
+  - first:
+      213: 4973278351827894852
+    second: BanditSpearman_Atlas_v4_77
+  - first:
+      213: -8930043886126887853
+    second: BanditSpearman_Atlas_v4_78
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_0
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 757
+        width: 181
+        height: 229
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8387fe5d417dee410800000000000000
+      internalID: 1508379409704253496
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_1
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 759
+        width: 212
+        height: 220
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 19a27bfdfbc0481c0800000000000000
+      internalID: -4502459709232043375
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_3
+      rect:
+        serializedVersion: 2
+        x: 496
+        y: 752
+        width: 151
+        height: 232
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc5cf950fb4311b90800000000000000
+      internalID: -7272973928188885556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_5
+      rect:
+        serializedVersion: 2
+        x: 739
+        y: 768
+        width: 145
+        height: 219
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 998d27fa0e4897510800000000000000
+      internalID: 1547414047529556121
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_11
+      rect:
+        serializedVersion: 2
+        x: 22
+        y: 502
+        width: 171
+        height: 225
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e90d007ed4ebcc770800000000000000
+      internalID: 8632483827559747742
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_12
+      rect:
+        serializedVersion: 2
+        x: 260
+        y: 503
+        width: 168
+        height: 224
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3271065f9b576ee50800000000000000
+      internalID: 6838282525754791715
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_13
+      rect:
+        serializedVersion: 2
+        x: 517
+        y: 505
+        width: 180
+        height: 222
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e57d9d0744953faf0800000000000000
+      internalID: -363848994400905378
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_14
+      rect:
+        serializedVersion: 2
+        x: 763
+        y: 500
+        width: 169
+        height: 224
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0cabd46eb93776270800000000000000
+      internalID: 8243684756345961152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_15
+      rect:
+        serializedVersion: 2
+        x: 995
+        y: 505
+        width: 182
+        height: 225
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb87905773d207c40800000000000000
+      internalID: 5507952060484122815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_16
+      rect:
+        serializedVersion: 2
+        x: 1235
+        y: 500
+        width: 160
+        height: 223
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cddbafbb91ada6cd0800000000000000
+      internalID: -2563997233771266596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_17
+      rect:
+        serializedVersion: 2
+        x: 1453
+        y: 513
+        width: 163
+        height: 225
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0aec143a507682850800000000000000
+      internalID: 6352440548317580960
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_18
+      rect:
+        serializedVersion: 2
+        x: 1674
+        y: 514
+        width: 176
+        height: 224
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a1f66678c5d9d0b30800000000000000
+      internalID: 4255230243669176090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_20
+      rect:
+        serializedVersion: 2
+        x: 1883
+        y: 507
+        width: 170
+        height: 223
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07fca41cd50551940800000000000000
+      internalID: 5266203702884749168
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_29
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 271
+        width: 243
+        height: 213
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1335dbef7db336fb0800000000000000
+      internalID: -4655811790893133007
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_30
+      rect:
+        serializedVersion: 2
+        x: 303
+        y: 271
+        width: 273
+        height: 185
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 190db40560f8decc0800000000000000
+      internalID: -3680128063212105583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_31
+      rect:
+        serializedVersion: 2
+        x: 627
+        y: 255
+        width: 296
+        height: 201
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6363942852d8da730800000000000000
+      internalID: 4012018035296122422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_32
+      rect:
+        serializedVersion: 2
+        x: 972
+        y: 255
+        width: 330
+        height: 195
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7415c8f7b3aeb2e0800000000000000
+      internalID: -2108067565014805381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_34
+      rect:
+        serializedVersion: 2
+        x: 1355
+        y: 259
+        width: 332
+        height: 188
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38bdd525076ca9e60800000000000000
+      internalID: 7969900676306033539
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_41
+      rect:
+        serializedVersion: 2
+        x: 1774
+        y: 245
+        width: 196
+        height: 205
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 85f1ad5e153db6700800000000000000
+      internalID: 534753329475624792
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_49
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 0
+        width: 224
+        height: 225
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42040ba18db692fc0800000000000000
+      internalID: -3519163057908465628
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_62
+      rect:
+        serializedVersion: 2
+        x: 273
+        y: 5
+        width: 229
+        height: 209
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 296087ac1e9cd7e50800000000000000
+      internalID: 6808820183255746194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_64
+      rect:
+        serializedVersion: 2
+        x: 599
+        y: 5
+        width: 255
+        height: 206
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 127c780dc4b5db490800000000000000
+      internalID: -7728921000023701727
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_71
+      rect:
+        serializedVersion: 2
+        x: 972
+        y: 0
+        width: 297
+        height: 171
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02a8f6caf3bb1e170800000000000000
+      internalID: 8206045878196079136
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BanditSpearman_Atlas_v4_75
+      rect:
+        serializedVersion: 2
+        x: 1344
+        y: 11
+        width: 281
+        height: 102
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 388a3ff4fab873460800000000000000
+      internalID: 7221394112588785795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: e7c21ebc880ae33489198102ae254812
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      BanditSpearman_Atlas_v4_0: 1508379409704253496
+      BanditSpearman_Atlas_v4_1: -4502459709232043375
+      BanditSpearman_Atlas_v4_10: 502665947506837998
+      BanditSpearman_Atlas_v4_11: 8632483827559747742
+      BanditSpearman_Atlas_v4_12: 6838282525754791715
+      BanditSpearman_Atlas_v4_13: -363848994400905378
+      BanditSpearman_Atlas_v4_14: 8243684756345961152
+      BanditSpearman_Atlas_v4_15: 5507952060484122815
+      BanditSpearman_Atlas_v4_16: -2563997233771266596
+      BanditSpearman_Atlas_v4_17: 6352440548317580960
+      BanditSpearman_Atlas_v4_18: 4255230243669176090
+      BanditSpearman_Atlas_v4_19: 3452867748939232859
+      BanditSpearman_Atlas_v4_2: -5369374941909195751
+      BanditSpearman_Atlas_v4_20: 5266203702884749168
+      BanditSpearman_Atlas_v4_21: -814949292680755252
+      BanditSpearman_Atlas_v4_22: 6547669729289188417
+      BanditSpearman_Atlas_v4_23: 2096733556489950415
+      BanditSpearman_Atlas_v4_24: 1491530743434504922
+      BanditSpearman_Atlas_v4_25: -2263168795994190669
+      BanditSpearman_Atlas_v4_26: 8691867352039514702
+      BanditSpearman_Atlas_v4_27: 753509265581172419
+      BanditSpearman_Atlas_v4_28: -1575020777425859311
+      BanditSpearman_Atlas_v4_29: -4655811790893133007
+      BanditSpearman_Atlas_v4_3: -7272973928188885556
+      BanditSpearman_Atlas_v4_30: -3680128063212105583
+      BanditSpearman_Atlas_v4_31: 4012018035296122422
+      BanditSpearman_Atlas_v4_32: -2108067565014805381
+      BanditSpearman_Atlas_v4_33: -6733800810921766409
+      BanditSpearman_Atlas_v4_34: 7969900676306033539
+      BanditSpearman_Atlas_v4_35: -5791660251831319618
+      BanditSpearman_Atlas_v4_36: 3308286085297353554
+      BanditSpearman_Atlas_v4_37: 4498118347553809542
+      BanditSpearman_Atlas_v4_38: -3728720361054244222
+      BanditSpearman_Atlas_v4_39: -5982449002688860984
+      BanditSpearman_Atlas_v4_4: 6265283368847830176
+      BanditSpearman_Atlas_v4_40: 8368556836865708253
+      BanditSpearman_Atlas_v4_41: 534753329475624792
+      BanditSpearman_Atlas_v4_42: -3014927258639793029
+      BanditSpearman_Atlas_v4_43: 7472915946073158325
+      BanditSpearman_Atlas_v4_44: 8074326952810316629
+      BanditSpearman_Atlas_v4_45: -7881452509858170685
+      BanditSpearman_Atlas_v4_46: 7345832632811608218
+      BanditSpearman_Atlas_v4_47: -8652871250541089297
+      BanditSpearman_Atlas_v4_48: 529616812773289928
+      BanditSpearman_Atlas_v4_49: -3519163057908465628
+      BanditSpearman_Atlas_v4_5: 1547414047529556121
+      BanditSpearman_Atlas_v4_50: 4128782388585179048
+      BanditSpearman_Atlas_v4_51: 3311267877734441968
+      BanditSpearman_Atlas_v4_52: -4884382883252542900
+      BanditSpearman_Atlas_v4_53: 7449287108627643106
+      BanditSpearman_Atlas_v4_54: 3166847324805595096
+      BanditSpearman_Atlas_v4_55: -6360707521074630620
+      BanditSpearman_Atlas_v4_56: 5618306495847240084
+      BanditSpearman_Atlas_v4_57: -4867008493771864902
+      BanditSpearman_Atlas_v4_58: -4091468630164800233
+      BanditSpearman_Atlas_v4_59: -3041943107373501882
+      BanditSpearman_Atlas_v4_6: -7109283226261704561
+      BanditSpearman_Atlas_v4_60: -8107239062135853148
+      BanditSpearman_Atlas_v4_61: 2442222881652422761
+      BanditSpearman_Atlas_v4_62: 6808820183255746194
+      BanditSpearman_Atlas_v4_63: -4506959856335655666
+      BanditSpearman_Atlas_v4_64: -7728921000023701727
+      BanditSpearman_Atlas_v4_65: 2304577214708622245
+      BanditSpearman_Atlas_v4_66: -7407714451744834099
+      BanditSpearman_Atlas_v4_67: 7575333288654144988
+      BanditSpearman_Atlas_v4_68: 7743494380753775445
+      BanditSpearman_Atlas_v4_69: 8265468214124403802
+      BanditSpearman_Atlas_v4_7: 2971435192233693567
+      BanditSpearman_Atlas_v4_70: 199221913975649156
+      BanditSpearman_Atlas_v4_71: 8206045878196079136
+      BanditSpearman_Atlas_v4_72: -5725860305431850401
+      BanditSpearman_Atlas_v4_73: 4939986995987589872
+      BanditSpearman_Atlas_v4_74: 870834059792699279
+      BanditSpearman_Atlas_v4_75: 7221394112588785795
+      BanditSpearman_Atlas_v4_76: 3778962327173749963
+      BanditSpearman_Atlas_v4_77: 4973278351827894852
+      BanditSpearman_Atlas_v4_78: -8930043886126887853
+      BanditSpearman_Atlas_v4_8: -1196408812928592453
+      BanditSpearman_Atlas_v4_9: -8892170211797573788
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
