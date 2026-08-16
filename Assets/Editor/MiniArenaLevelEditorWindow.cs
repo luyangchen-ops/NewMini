@@ -421,7 +421,7 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
         swordsmanPrefab ??= FindEnemyPrefab("刀兵", "Swordsman");
         archerPrefab ??= FindEnemyPrefab("弓兵", "Archer");
         shieldBearerPrefab ??= FindEnemyPrefab("盾兵", "ShieldBearer");
-        spearmanPrefab ??= FindEnemyPrefab("枪兵", "Spearman");
+        spearmanPrefab ??= FindEnemyPrefab("长矛兵", "枪兵", "Spearman");
     }
 
     private static GameObject FindEnemyPrefab(params string[] searchNames)

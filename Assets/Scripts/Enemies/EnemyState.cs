@@ -296,8 +296,7 @@ public sealed class EnemyShieldBlockState : EnemyState
     public override void Enter()
     {
         remaining = Agent.Data.ShieldBlockDuration;
-        Agent.SetDesiredVelocity(Vector2.zero);
-        Agent.FaceTarget();
+        Agent.BeginShieldBlock();
     }
 
     public override void Tick()
