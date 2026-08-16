@@ -20,7 +20,7 @@ MonoBehaviour:
   <MeleeSeparationRadius>k__BackingField: 0.8
   <MeleeSeparationStrength>k__BackingField: 0.9
   <Damage>k__BackingField: 12
-  <AttackSfx>k__BackingField: {fileID: 0}
+  <AttackSfx>k__BackingField: {fileID: 8300000, guid: a1d8948e2a716ca4da9366ca6a38aabf, type: 3}
   <AttackSfxVolume>k__BackingField: 0.8
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4
