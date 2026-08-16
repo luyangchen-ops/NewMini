@@ -184,10 +184,19 @@ public sealed class GameAudioManager : MonoBehaviour
 
     public static void PlaySfx(GameSfx sound, float volumeScale = 1f)
     {
-        GameAudioManager manager = EnsureInstance();
         AudioClip clip = GetClip(sound);
+        PlaySfx(clip, volumeScale);
+    }
+
+    /// <summary>
+    /// Plays an authored sound effect through the shared SFX source so it is
+    /// controlled by the Sound Effects slider in the main menu.
+    /// </summary>
+    public static void PlaySfx(AudioClip clip, float volumeScale = 1f)
+    {
         if (clip == null) return;
 
+        GameAudioManager manager = EnsureInstance();
         manager.sfxSource.PlayOneShot(clip, Mathf.Clamp01(volumeScale));
     }
 

@@ -224,8 +224,33 @@ public static class RebuildShieldWarriorAnimator
         settings.loopTime = loop;
         settings.loopBlend = false;
         AnimationUtility.SetAnimationClipSettings(clip, settings);
+        AnimationUtility.SetAnimationEvents(clip, BuildSoundEvents(name));
         EditorUtility.SetDirty(clip);
         return clip;
+    }
+
+    private static AnimationEvent[] BuildSoundEvents(string clipName)
+    {
+        return clipName switch
+        {
+            "ShieldWarrior_Block" => new[]
+            {
+                new AnimationEvent
+                {
+                    time = 4f / 14f,
+                    functionName = "PlayShieldBlockSfx"
+                }
+            },
+            "ShieldWarrior_Attack" => new[]
+            {
+                new AnimationEvent
+                {
+                    time = 2f / 8f,
+                    functionName = "PlayShieldAttackSfx"
+                }
+            },
+            _ => Array.Empty<AnimationEvent>()
+        };
     }
 
     private static void CreateController(IReadOnlyDictionary<string, AnimationClip> clips)
