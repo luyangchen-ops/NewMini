@@ -19,6 +19,7 @@ public sealed class BeginMenuController : MonoBehaviour
     [Header("Navigation")]
     [SerializeField] private Button buttonStart;
     [SerializeField] private Button buttonBack;
+    [SerializeField] private SceneFlowController sceneFlow;
 
     [Header("Audio Controls")]
     [SerializeField] private Slider sliderMaster;
@@ -31,6 +32,7 @@ public sealed class BeginMenuController : MonoBehaviour
     private void Awake()
     {
         GameAudioSettings.Load();
+        sceneFlow ??= FindAnyObjectByType<SceneFlowController>();
 
         sliderMaster.SetValueWithoutNotify(GameAudioSettings.MasterVolume);
         sliderMusic.SetValueWithoutNotify(GameAudioSettings.MusicVolume);
@@ -60,7 +62,8 @@ public sealed class BeginMenuController : MonoBehaviour
     public void StartGame()
     {
         GameAudioSettings.Save();
-        SceneManager.LoadScene(GameplayScene);
+        if (sceneFlow != null) sceneFlow.StartGame();
+        else SceneManager.LoadScene(GameplayScene);
     }
 
     public void ShowAudioOptions()

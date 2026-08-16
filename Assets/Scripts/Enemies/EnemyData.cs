@@ -76,6 +76,12 @@ public sealed class EnemyData : ScriptableObject
     [field: Tooltip("How long the forward thrust movement lasts.")]
     [field: SerializeField, Min(0.01f)] public float SpearThrustDuration { get; private set; } = .18f;
     [field: SerializeField, Min(0f)] public float SpearThrustSpeed { get; private set; } = 8f;
+    [field: Tooltip("Playback multiplier for the spear attack animation during the stationary windup.")]
+    [field: SerializeField, Range(.05f, 1f)] public float SpearWindupAnimationSpeed { get; private set; } = .3f;
+    [field: Tooltip("Point within the thrust at which the spear reaches its damaging impact.")]
+    [field: SerializeField, Range(.1f, 1f)] public float SpearImpactNormalizedTime { get; private set; } = .85f;
+    [field: Tooltip("Perfect-dodge window centred on the spear impact.")]
+    [field: SerializeField, Min(.01f)] public float SpearPerfectDodgeWindowDuration { get; private set; } = .24f;
     [field: Tooltip("Maximum distance from the spear soldier's centre that can be struck during the thrust.")]
     [field: SerializeField, Min(0.01f)] public float SpearHitRange { get; private set; } = 2f;
     [field: Tooltip("Width of the spear hit area. Targets need to stay close to the thrust line.")]
@@ -89,6 +95,8 @@ public sealed class EnemyData : ScriptableObject
     [field: SerializeField, Min(.05f)] public float ShieldAttackWindup { get; private set; } = .6f;
     [field: SerializeField, Min(.05f)] public float ShieldAttackDuration { get; private set; } = .95f;
     [field: SerializeField, Min(.1f)] public float ShieldAttackInterval { get; private set; } = 2.8f;
+    [field: Tooltip("Perfect-dodge window centred on the shield bash impact.")]
+    [field: SerializeField, Min(.01f)] public float ShieldPerfectDodgeWindowDuration { get; private set; } = .28f;
 
     private void OnValidate()
     {
@@ -121,6 +129,9 @@ public sealed class EnemyData : ScriptableObject
         SpearWindupDuration = Mathf.Max(.05f, SpearWindupDuration);
         SpearThrustDuration = Mathf.Max(.01f, SpearThrustDuration);
         SpearThrustSpeed = Mathf.Max(0f, SpearThrustSpeed);
+        SpearWindupAnimationSpeed = Mathf.Clamp(SpearWindupAnimationSpeed, .05f, 1f);
+        SpearImpactNormalizedTime = Mathf.Clamp(SpearImpactNormalizedTime, .1f, 1f);
+        SpearPerfectDodgeWindowDuration = Mathf.Max(.01f, SpearPerfectDodgeWindowDuration);
         SpearHitRange = Mathf.Max(.01f, SpearHitRange);
         SpearHitRadius = Mathf.Max(.01f, SpearHitRadius);
         MeleeFormationRadius = Mathf.Max(.1f, MeleeFormationRadius);
@@ -131,6 +142,7 @@ public sealed class EnemyData : ScriptableObject
         ShieldAttackWindup = Mathf.Max(.05f, ShieldAttackWindup);
         ShieldAttackDuration = Mathf.Max(ShieldAttackWindup, ShieldAttackDuration);
         ShieldAttackInterval = Mathf.Max(.1f, ShieldAttackInterval);
+        ShieldPerfectDodgeWindowDuration = Mathf.Max(.01f, ShieldPerfectDodgeWindowDuration);
         ProjectileGravity = Mathf.Max(0f, ProjectileGravity);
         RangedAttackReleaseDelay = Mathf.Max(0f, RangedAttackReleaseDelay);
         RangedAttackDuration = Mathf.Max(RangedAttackReleaseDelay, RangedAttackDuration);
