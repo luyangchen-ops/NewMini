@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ShieldBearerEnemyData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   <Archetype>k__BackingField: 0
-  <MoveSpeed>k__BackingField: 2.5
+  <MoveSpeed>k__BackingField: 1.35
   <StoppingDistance>k__BackingField: 1.2
   <MeleeFormationRadius>k__BackingField: 1.05
   <MeleeFormationArrivalDistance>k__BackingField: 0.18
@@ -37,8 +37,9 @@ MonoBehaviour:
   <FireInterval>k__BackingField: 1.2
   <MeleePerfectDodgeDelay>k__BackingField: 0.35
   <MeleePerfectDodgeDuration>k__BackingField: 0.18
-  <ShieldRearKillHalfAngle>k__BackingField: 55
+  <ShieldRearKillHalfAngle>k__BackingField: 35
   <ShieldBlockDuration>k__BackingField: 0.55
-  <ShieldAttackWindup>k__BackingField: 0.6
-  <ShieldAttackDuration>k__BackingField: 0.95
-  <ShieldAttackInterval>k__BackingField: 2.8
+  <ShieldAttackWindup>k__BackingField: 1.1
+  <ShieldAttackDuration>k__BackingField: 1.7
+  <ShieldAttackInterval>k__BackingField: 4.2
+  <ShieldPerfectDodgeWindowDuration>k__BackingField: 0.28
