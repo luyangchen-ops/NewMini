@@ -14,6 +14,8 @@ public sealed class ArenaWaveSpawner : MonoBehaviour
     [Serializable]
     public sealed class SpawnEntry
     {
+        [Tooltip("Enemy category used by level-editing tools and later prefab replacement.")]
+        public EnemySpawner.EnemyType enemyType;
         [Tooltip("Enemy prefab with an EnemyAgent component.")]
         public GameObject enemyPrefab;
         [Tooltip("Enemy positions in this entry. The count is distributed across these points in order.")]

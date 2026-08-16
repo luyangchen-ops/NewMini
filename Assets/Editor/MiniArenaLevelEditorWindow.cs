@@ -11,13 +11,38 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
     private bool hasArea;
     private Vector2 dragStart;
     private Vector2 dragEnd;
+    [SerializeField] private ArenaWaveSpawner targetWaveSpawner;
+    [SerializeField] private int selectedWaveIndex;
+    [SerializeField] private EnemySpawner.EnemyType placementEnemyType;
+    [SerializeField] private GameObject swordsmanPrefab;
+    [SerializeField] private GameObject archerPrefab;
+    [SerializeField] private GameObject shieldBearerPrefab;
+    [SerializeField] private GameObject spearmanPrefab;
+    private bool isPlacingEnemy;
+
+    private static readonly string[] EnemyTypeLabels = { "刀兵", "弓兵", "盾兵", "枪兵" };
 
     [MenuItem("Tools/NewMini/箱庭关卡编辑器")]
     public static void Open() => GetWindow<MiniArenaLevelEditorWindow>("箱庭关卡编辑器");
 
-    private void OnEnable() => SceneView.duringSceneGui += DrawSceneAreaSelector;
+    private void OnEnable()
+    {
+        SceneView.duringSceneGui += DrawSceneAreaSelector;
+        TryAssignKnownEnemyPrefabs();
+        TryUseSpawnerFromSelection();
+    }
 
-    private void OnDisable() => SceneView.duringSceneGui -= DrawSceneAreaSelector;
+    private void OnDisable()
+    {
+        SceneView.duringSceneGui -= DrawSceneAreaSelector;
+        isPlacingEnemy = false;
+    }
+
+    private void OnSelectionChange()
+    {
+        TryUseSpawnerFromSelection();
+        Repaint();
+    }
 
     private void OnGUI()
     {
@@ -30,6 +55,7 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
         {
             if (GUILayout.Button(isDrawingArea ? "框选中：回到 Scene 视图拖拽" : "开始框选战区", GUILayout.Height(32)))
             {
+                isPlacingEnemy = false;
                 isDrawingArea = !isDrawingArea;
                 hasArea = false;
                 SceneView.RepaintAll();
@@ -58,12 +84,458 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
         using (new EditorGUI.DisabledScope(selectedZone == null))
         {
             if (GUILayout.Button("为选中战区添加波次生成器", GUILayout.Height(28)))
-                CreateWaveSpawner(selectedZone);
+            {
+                targetWaveSpawner = CreateWaveSpawner(selectedZone);
+                selectedWaveIndex = 0;
+            }
         }
+
+        DrawWavePlacementTools();
+    }
+
+    private void DrawWavePlacementTools()
+    {
+        EditorGUILayout.Space(12f);
+        EditorGUILayout.LabelField("Scene 点选布怪", EditorStyles.boldLabel);
+
+        EditorGUI.BeginChangeCheck();
+        ArenaWaveSpawner assignedSpawner = EditorGUILayout.ObjectField(
+            "Wave Spawner",
+            targetWaveSpawner,
+            typeof(ArenaWaveSpawner),
+            true) as ArenaWaveSpawner;
+        if (EditorGUI.EndChangeCheck())
+        {
+            isPlacingEnemy = false;
+            targetWaveSpawner = assignedSpawner;
+            selectedWaveIndex = 0;
+            SceneView.RepaintAll();
+        }
+
+        if (targetWaveSpawner == null)
+        {
+            EditorGUILayout.HelpBox("在 Hierarchy 中选择 Group_WaveSpawner，或将它拖到上方字段。", MessageType.Info);
+            return;
+        }
+
+        SerializedObject serializedSpawner = new(targetWaveSpawner);
+        serializedSpawner.Update();
+        SerializedProperty waves = serializedSpawner.FindProperty("waves");
+        if (waves == null)
+        {
+            EditorGUILayout.HelpBox("当前 ArenaWaveSpawner 找不到 Waves 数据。", MessageType.Error);
+            return;
+        }
+
+        using (new EditorGUILayout.HorizontalScope())
+        {
+            if (waves.arraySize > 0)
+            {
+                selectedWaveIndex = Mathf.Clamp(selectedWaveIndex, 0, waves.arraySize - 1);
+                selectedWaveIndex = EditorGUILayout.Popup("目标 Wave", selectedWaveIndex, GetWaveNames(waves));
+            }
+            else
+            {
+                EditorGUILayout.LabelField("目标 Wave", "尚未创建");
+            }
+
+            if (GUILayout.Button("+ 新建 Wave", GUILayout.Width(100f)))
+            {
+                selectedWaveIndex = AddWave(targetWaveSpawner);
+                serializedSpawner.Update();
+                waves = serializedSpawner.FindProperty("waves");
+            }
+        }
+
+        placementEnemyType = (EnemySpawner.EnemyType)GUILayout.Toolbar(
+            (int)placementEnemyType,
+            EnemyTypeLabels,
+            GUILayout.Height(25f));
+
+        GameObject selectedPrefab = GetPrefab(placementEnemyType);
+        EditorGUI.BeginChangeCheck();
+        selectedPrefab = EditorGUILayout.ObjectField(
+            $"{GetEnemyTypeName(placementEnemyType)} Prefab",
+            selectedPrefab,
+            typeof(GameObject),
+            false) as GameObject;
+        if (EditorGUI.EndChangeCheck())
+        {
+            SetPrefab(placementEnemyType, selectedPrefab);
+            ApplyPrefabToAllWaveEntries(placementEnemyType, selectedPrefab);
+        }
+
+        if (selectedPrefab == null)
+        {
+            EditorGUILayout.HelpBox(
+                $"{GetEnemyTypeName(placementEnemyType)}尚未指定 Prefab。仍可先布置并写入类型与点位，Prefab 到位后再补。",
+                MessageType.Warning);
+        }
+        else if (selectedPrefab.GetComponentInChildren<EnemyAgent>(true) == null)
+        {
+            EditorGUILayout.HelpBox("当前 Prefab 没有 EnemyAgent，运行时不会被战斗系统正确识别。", MessageType.Warning);
+        }
+
+        if (waves.arraySize > 0) DrawSelectedWaveSummary(waves.GetArrayElementAtIndex(selectedWaveIndex));
+
+        using (new EditorGUI.DisabledScope(waves.arraySize == 0))
+        {
+            string buttonLabel = isPlacingEnemy
+                ? "结束点选布怪（Esc）"
+                : $"开始放置：{GetEnemyTypeName(placementEnemyType)}";
+            if (GUILayout.Button(buttonLabel, GUILayout.Height(32f)))
+            {
+                isDrawingArea = false;
+                hasArea = false;
+                isPlacingEnemy = !isPlacingEnemy;
+                SceneView.lastActiveSceneView?.Focus();
+                SceneView.RepaintAll();
+            }
+        }
+
+        EditorGUILayout.HelpBox(
+            "开始后在 Scene 中左键连续添加出生点；切换兵种后可继续放置。按 Esc 结束。每个点会自动写入当前 Wave。",
+            MessageType.Info);
+    }
+
+    private void DrawEnemyPlacement(SceneView sceneView)
+    {
+        if (targetWaveSpawner == null || !TryGetSelectedWave(out SerializedProperty selectedWave))
+        {
+            isPlacingEnemy = false;
+            Repaint();
+            return;
+        }
+
+        Event current = Event.current;
+        if (current.type == EventType.KeyDown && current.keyCode == KeyCode.Escape)
+        {
+            isPlacingEnemy = false;
+            current.Use();
+            Repaint();
+            sceneView.Repaint();
+            return;
+        }
+
+        int controlId = GUIUtility.GetControlID("NewMiniEnemyPlacement".GetHashCode(), FocusType.Passive);
+        if (current.type == EventType.Layout) HandleUtility.AddDefaultControl(controlId);
+
+        DrawWaveSpawnPoints(selectedWave);
+        Vector3 worldPosition = GetMouseWorldPosition(current.mousePosition, targetWaveSpawner.transform.position.z);
+        Color typeColor = GetEnemyTypeColor(placementEnemyType);
+        float markerSize = HandleUtility.GetHandleSize(worldPosition) * .12f;
+        Handles.color = new Color(typeColor.r, typeColor.g, typeColor.b, .35f);
+        Handles.DrawSolidDisc(worldPosition, Vector3.forward, markerSize);
+        Handles.color = typeColor;
+        Handles.DrawWireDisc(worldPosition, Vector3.forward, markerSize);
+        Handles.Label(
+            worldPosition + Vector3.up * markerSize * 1.3f,
+            $"{GetSelectedWaveName(selectedWave)} · {GetEnemyTypeName(placementEnemyType)}\n左键放置 / Esc 结束");
+
+        if (current.type == EventType.MouseMove) sceneView.Repaint();
+        if (current.type != EventType.MouseDown || current.button != 0 || current.alt) return;
+
+        AddEnemySpawnPoint(worldPosition);
+        current.Use();
+        Repaint();
+        sceneView.Repaint();
+    }
+
+    private bool TryGetSelectedWave(out SerializedProperty selectedWave)
+    {
+        selectedWave = null;
+        if (targetWaveSpawner == null) return false;
+
+        SerializedObject serializedSpawner = new(targetWaveSpawner);
+        serializedSpawner.Update();
+        SerializedProperty waves = serializedSpawner.FindProperty("waves");
+        if (waves == null || selectedWaveIndex < 0 || selectedWaveIndex >= waves.arraySize) return false;
+        selectedWave = waves.GetArrayElementAtIndex(selectedWaveIndex);
+        return true;
+    }
+
+    private void AddEnemySpawnPoint(Vector3 worldPosition)
+    {
+        if (targetWaveSpawner == null) return;
+
+        int undoGroup = Undo.GetCurrentGroup();
+        Undo.SetCurrentGroupName("Add Wave Enemy Spawn Point");
+        Undo.RecordObject(targetWaveSpawner, "Add Wave Enemy Spawn Point");
+
+        SerializedObject serializedSpawner = new(targetWaveSpawner);
+        serializedSpawner.Update();
+        SerializedProperty waves = serializedSpawner.FindProperty("waves");
+        if (waves == null || selectedWaveIndex < 0 || selectedWaveIndex >= waves.arraySize) return;
+
+        SerializedProperty wave = waves.GetArrayElementAtIndex(selectedWaveIndex);
+        SerializedProperty spawns = wave.FindPropertyRelative("spawns");
+        int entryIndex = FindSpawnEntryIndex(spawns, placementEnemyType);
+        if (entryIndex < 0)
+        {
+            entryIndex = spawns.arraySize;
+            spawns.arraySize++;
+            SerializedProperty newEntry = spawns.GetArrayElementAtIndex(entryIndex);
+            newEntry.FindPropertyRelative("enemyType").intValue = (int)placementEnemyType;
+            newEntry.FindPropertyRelative("enemyPrefab").objectReferenceValue = null;
+            newEntry.FindPropertyRelative("spawnPoints").arraySize = 0;
+            newEntry.FindPropertyRelative("count").intValue = 1;
+        }
+
+        SerializedProperty entry = spawns.GetArrayElementAtIndex(entryIndex);
+        entry.FindPropertyRelative("enemyType").intValue = (int)placementEnemyType;
+        GameObject configuredPrefab = GetPrefab(placementEnemyType);
+        if (configuredPrefab != null)
+            entry.FindPropertyRelative("enemyPrefab").objectReferenceValue = configuredPrefab;
+
+        SerializedProperty spawnPoints = entry.FindPropertyRelative("spawnPoints");
+        Transform pointsRoot = GetOrCreateChild(targetWaveSpawner.transform, "Group_SpawnPoints");
+        Transform waveGroup = GetOrCreateChild(pointsRoot, $"Group_Wave_{selectedWaveIndex + 1:00}");
+        Transform typeGroup = GetOrCreateChild(waveGroup, $"Group_{GetEnemyTypeName(placementEnemyType)}");
+        int pointNumber = spawnPoints.arraySize + 1;
+        GameObject pointObject = new($"Spawn_{GetEnemyTypeName(placementEnemyType)}_{pointNumber:00}");
+        Undo.RegisterCreatedObjectUndo(pointObject, "Create Enemy Spawn Point");
+        pointObject.transform.SetParent(typeGroup, false);
+        pointObject.transform.position = worldPosition;
+
+        spawnPoints.arraySize++;
+        spawnPoints.GetArrayElementAtIndex(spawnPoints.arraySize - 1).objectReferenceValue = pointObject.transform;
+        entry.FindPropertyRelative("count").intValue = spawnPoints.arraySize;
+        serializedSpawner.ApplyModifiedProperties();
+
+        EditorUtility.SetDirty(targetWaveSpawner);
+        EditorSceneManager.MarkSceneDirty(targetWaveSpawner.gameObject.scene);
+        Undo.CollapseUndoOperations(undoGroup);
+    }
+
+    private void DrawWaveSpawnPoints(SerializedProperty wave)
+    {
+        SerializedProperty spawns = wave.FindPropertyRelative("spawns");
+        if (spawns == null) return;
+
+        for (int entryIndex = 0; entryIndex < spawns.arraySize; entryIndex++)
+        {
+            SerializedProperty entry = spawns.GetArrayElementAtIndex(entryIndex);
+            SerializedProperty typeProperty = entry.FindPropertyRelative("enemyType");
+            EnemySpawner.EnemyType type = typeProperty != null
+                ? (EnemySpawner.EnemyType)typeProperty.intValue
+                : EnemySpawner.EnemyType.Swordsman;
+            SerializedProperty spawnPoints = entry.FindPropertyRelative("spawnPoints");
+            if (spawnPoints == null) continue;
+
+            Handles.color = GetEnemyTypeColor(type);
+            for (int pointIndex = 0; pointIndex < spawnPoints.arraySize; pointIndex++)
+            {
+                Transform point = spawnPoints.GetArrayElementAtIndex(pointIndex).objectReferenceValue as Transform;
+                if (point == null) continue;
+                float size = HandleUtility.GetHandleSize(point.position) * .08f;
+                Handles.DrawSolidDisc(point.position, Vector3.forward, size);
+                Handles.Label(point.position + Vector3.up * size, $"{GetEnemyTypeName(type)} {pointIndex + 1}");
+            }
+        }
+    }
+
+    private static int FindSpawnEntryIndex(SerializedProperty spawns, EnemySpawner.EnemyType type)
+    {
+        for (int i = 0; i < spawns.arraySize; i++)
+        {
+            SerializedProperty typeProperty = spawns.GetArrayElementAtIndex(i).FindPropertyRelative("enemyType");
+            if (typeProperty != null && typeProperty.intValue == (int)type) return i;
+        }
+        return -1;
+    }
+
+    private static string[] GetWaveNames(SerializedProperty waves)
+    {
+        string[] names = new string[waves.arraySize];
+        for (int i = 0; i < waves.arraySize; i++)
+        {
+            SerializedProperty wave = waves.GetArrayElementAtIndex(i);
+            string waveName = wave.FindPropertyRelative("waveName").stringValue;
+            names[i] = string.IsNullOrWhiteSpace(waveName) ? $"Wave {i + 1}" : $"{i + 1}: {waveName}";
+        }
+        return names;
+    }
+
+    private static string GetSelectedWaveName(SerializedProperty wave)
+    {
+        string waveName = wave.FindPropertyRelative("waveName").stringValue;
+        return string.IsNullOrWhiteSpace(waveName) ? "Wave" : waveName;
+    }
+
+    private static int AddWave(ArenaWaveSpawner spawner)
+    {
+        Undo.RecordObject(spawner, "Add Arena Wave");
+        SerializedObject serializedSpawner = new(spawner);
+        serializedSpawner.Update();
+        SerializedProperty waves = serializedSpawner.FindProperty("waves");
+        int newIndex = waves.arraySize;
+        waves.arraySize++;
+        SerializedProperty wave = waves.GetArrayElementAtIndex(newIndex);
+        wave.FindPropertyRelative("waveName").stringValue = $"Wave {newIndex + 1}";
+        wave.FindPropertyRelative("delayBeforeWave").floatValue = 0f;
+        wave.FindPropertyRelative("spawns").arraySize = 0;
+        serializedSpawner.ApplyModifiedProperties();
+        EditorUtility.SetDirty(spawner);
+        EditorSceneManager.MarkSceneDirty(spawner.gameObject.scene);
+        return newIndex;
+    }
+
+    private void DrawSelectedWaveSummary(SerializedProperty wave)
+    {
+        int[] counts = new int[EnemyTypeLabels.Length];
+        SerializedProperty spawns = wave.FindPropertyRelative("spawns");
+        for (int i = 0; i < spawns.arraySize; i++)
+        {
+            SerializedProperty entry = spawns.GetArrayElementAtIndex(i);
+            int typeIndex = entry.FindPropertyRelative("enemyType").intValue;
+            SerializedProperty points = entry.FindPropertyRelative("spawnPoints");
+            if (typeIndex >= 0 && typeIndex < counts.Length && points != null) counts[typeIndex] += points.arraySize;
+        }
+        EditorGUILayout.LabelField(
+            "当前 Wave",
+            $"刀 {counts[0]} / 弓 {counts[1]} / 盾 {counts[2]} / 枪 {counts[3]}");
+    }
+
+    private void TryUseSpawnerFromSelection()
+    {
+        GameObject selectedObject = Selection.activeGameObject;
+        if (selectedObject == null) return;
+
+        ArenaWaveSpawner selectedSpawner = selectedObject.GetComponent<ArenaWaveSpawner>()
+            ?? selectedObject.GetComponentInParent<ArenaWaveSpawner>();
+        if (selectedSpawner == null)
+        {
+            ArenaWaveSpawner[] childSpawners = selectedObject.GetComponentsInChildren<ArenaWaveSpawner>(true);
+            if (childSpawners.Length == 1) selectedSpawner = childSpawners[0];
+        }
+
+        if (selectedSpawner == null || selectedSpawner == targetWaveSpawner) return;
+        isPlacingEnemy = false;
+        targetWaveSpawner = selectedSpawner;
+        selectedWaveIndex = 0;
+        SceneView.RepaintAll();
+    }
+
+    private void TryAssignKnownEnemyPrefabs()
+    {
+        swordsmanPrefab ??= FindEnemyPrefab("刀兵", "Swordsman");
+        archerPrefab ??= FindEnemyPrefab("弓兵", "Archer");
+        shieldBearerPrefab ??= FindEnemyPrefab("盾兵", "ShieldBearer");
+        spearmanPrefab ??= FindEnemyPrefab("枪兵", "Spearman");
+    }
+
+    private static GameObject FindEnemyPrefab(params string[] searchNames)
+    {
+        foreach (string searchName in searchNames)
+        {
+            string[] guids = AssetDatabase.FindAssets($"{searchName} t:Prefab", new[] { "Assets" });
+            foreach (string guid in guids)
+            {
+                GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(guid));
+                if (prefab != null && prefab.GetComponentInChildren<EnemyAgent>(true) != null) return prefab;
+            }
+        }
+        return null;
+    }
+
+    private GameObject GetPrefab(EnemySpawner.EnemyType type)
+    {
+        return type switch
+        {
+            EnemySpawner.EnemyType.Archer => archerPrefab,
+            EnemySpawner.EnemyType.ShieldBearer => shieldBearerPrefab,
+            EnemySpawner.EnemyType.Spearman => spearmanPrefab,
+            _ => swordsmanPrefab
+        };
+    }
+
+    private void SetPrefab(EnemySpawner.EnemyType type, GameObject prefab)
+    {
+        switch (type)
+        {
+            case EnemySpawner.EnemyType.Archer:
+                archerPrefab = prefab;
+                break;
+            case EnemySpawner.EnemyType.ShieldBearer:
+                shieldBearerPrefab = prefab;
+                break;
+            case EnemySpawner.EnemyType.Spearman:
+                spearmanPrefab = prefab;
+                break;
+            default:
+                swordsmanPrefab = prefab;
+                break;
+        }
+    }
+
+    private void ApplyPrefabToAllWaveEntries(EnemySpawner.EnemyType type, GameObject prefab)
+    {
+        if (targetWaveSpawner == null) return;
+
+        SerializedObject serializedSpawner = new(targetWaveSpawner);
+        serializedSpawner.Update();
+        SerializedProperty waves = serializedSpawner.FindProperty("waves");
+        if (waves == null) return;
+
+        Undo.RecordObject(targetWaveSpawner, "Assign Wave Enemy Prefab");
+        bool changed = false;
+        for (int waveIndex = 0; waveIndex < waves.arraySize; waveIndex++)
+        {
+            SerializedProperty spawns = waves.GetArrayElementAtIndex(waveIndex).FindPropertyRelative("spawns");
+            for (int entryIndex = 0; entryIndex < spawns.arraySize; entryIndex++)
+            {
+                SerializedProperty entry = spawns.GetArrayElementAtIndex(entryIndex);
+                if (entry.FindPropertyRelative("enemyType").intValue != (int)type) continue;
+                entry.FindPropertyRelative("enemyPrefab").objectReferenceValue = prefab;
+                changed = true;
+            }
+        }
+
+        if (!changed) return;
+        serializedSpawner.ApplyModifiedProperties();
+        EditorUtility.SetDirty(targetWaveSpawner);
+        EditorSceneManager.MarkSceneDirty(targetWaveSpawner.gameObject.scene);
+    }
+
+    private static string GetEnemyTypeName(EnemySpawner.EnemyType type)
+    {
+        int index = Mathf.Clamp((int)type, 0, EnemyTypeLabels.Length - 1);
+        return EnemyTypeLabels[index];
+    }
+
+    private static Color GetEnemyTypeColor(EnemySpawner.EnemyType type)
+    {
+        return type switch
+        {
+            EnemySpawner.EnemyType.Archer => new Color(.25f, .85f, .35f, 1f),
+            EnemySpawner.EnemyType.ShieldBearer => new Color(.25f, .65f, 1f, 1f),
+            EnemySpawner.EnemyType.Spearman => new Color(.75f, .4f, 1f, 1f),
+            _ => new Color(1f, .35f, .25f, 1f)
+        };
+    }
+
+    private static Transform GetOrCreateChild(Transform parent, string childName)
+    {
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            Transform child = parent.GetChild(i);
+            if (child.name == childName) return child;
+        }
+
+        GameObject childObject = new(childName);
+        Undo.RegisterCreatedObjectUndo(childObject, $"Create {childName}");
+        childObject.transform.SetParent(parent, false);
+        return childObject.transform;
     }
 
     private void DrawSceneAreaSelector(SceneView sceneView)
     {
+        if (isPlacingEnemy)
+        {
+            DrawEnemyPlacement(sceneView);
+            return;
+        }
+
         if (!isDrawingArea && !hasArea) return;
 
         Event current = Event.current;
@@ -107,6 +579,13 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
         Ray ray = HandleUtility.GUIPointToWorldRay(guiPosition);
         Plane mapPlane = new(Vector3.forward, Vector3.zero);
         return mapPlane.Raycast(ray, out float distance) ? ray.GetPoint(distance) : Vector3.zero;
+    }
+
+    private static Vector3 GetMouseWorldPosition(Vector2 guiPosition, float worldZ)
+    {
+        Ray ray = HandleUtility.GUIPointToWorldRay(guiPosition);
+        Plane mapPlane = new(Vector3.forward, new Vector3(0f, 0f, worldZ));
+        return mapPlane.Raycast(ray, out float distance) ? ray.GetPoint(distance) : new Vector3(0f, 0f, worldZ);
     }
 
     private void DrawAreaPreview()
@@ -172,7 +651,7 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
         SceneView.lastActiveSceneView?.FrameSelected();
     }
 
-    private static void CreateWaveSpawner(ArenaCombatZone zone)
+    private static ArenaWaveSpawner CreateWaveSpawner(ArenaCombatZone zone)
     {
         GameObject spawnerObject = new("Group_WaveSpawner");
         Undo.RegisterCreatedObjectUndo(spawnerObject, "Create Arena Wave Spawner");
@@ -182,9 +661,6 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
 
         GameObject pointsGroup = new("Group_SpawnPoints");
         pointsGroup.transform.SetParent(spawnerObject.transform, false);
-        GameObject pointObject = new("Group_SpawnPoint_01");
-        pointObject.transform.SetParent(pointsGroup.transform, false);
-        pointObject.transform.position = zone.transform.position;
 
         GameObject enemiesGroup = new("Group_SpawnedEnemies");
         enemiesGroup.transform.SetParent(spawnerObject.transform, false);
@@ -196,12 +672,7 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
         SerializedProperty firstWave = waves.GetArrayElementAtIndex(0);
         firstWave.FindPropertyRelative("waveName").stringValue = "Wave 1";
         SerializedProperty spawns = firstWave.FindPropertyRelative("spawns");
-        spawns.arraySize = 1;
-        SerializedProperty firstSpawn = spawns.GetArrayElementAtIndex(0);
-        firstSpawn.FindPropertyRelative("count").intValue = 1;
-        SerializedProperty spawnPoints = firstSpawn.FindPropertyRelative("spawnPoints");
-        spawnPoints.arraySize = 1;
-        spawnPoints.GetArrayElementAtIndex(0).objectReferenceValue = pointObject.transform;
+        spawns.arraySize = 0;
         serializedSpawner.ApplyModifiedPropertiesWithoutUndo();
 
         SerializedObject serializedZone = new(zone);
@@ -213,6 +684,7 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
 
         Selection.activeGameObject = spawnerObject;
         EditorSceneManager.MarkSceneDirty(zone.gameObject.scene);
+        return spawner;
     }
 
     private static ArenaBoundaryGate CreateGate(string name, Transform parent, Vector2 position, Vector2 size)
