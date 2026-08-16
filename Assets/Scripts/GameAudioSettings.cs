@@ -171,6 +171,13 @@ public sealed class GameAudioManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     private static void Bootstrap() => EnsureInstance();
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    private static void RefreshMusicAfterSceneLoad()
+    {
+        GameAudioManager manager = EnsureInstance();
+        manager.ApplyMusicForScene(SceneManager.GetActiveScene());
+    }
+
     public static void PlaySfx(GameSfx sound, float volumeScale = 1f)
     {
         GameAudioManager manager = EnsureInstance();
@@ -246,6 +253,16 @@ public sealed class GameAudioManager : MonoBehaviour
         // Covers direct play-mode entry when scene reload is disabled and no
         // SceneManager.sceneLoaded callback is emitted for the active scene.
         ApplyMusicForScene(SceneManager.GetActiveScene());
+    }
+
+    private void Update()
+    {
+        if (musicSource != null &&
+            !musicSource.isPlaying &&
+            BattleSceneNames.Contains(SceneManager.GetActiveScene().name))
+        {
+            PlayBattleMusic();
+        }
     }
 
     private void OnDisable()
