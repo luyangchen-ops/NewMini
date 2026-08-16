@@ -30,6 +30,7 @@ public sealed class BreakableMapProp : MonoBehaviour
 
         CacheComponents();
         isBroken = true;
+        SpecialItemDropSpawner.TryDropFromBreakable(transform.position);
         propAnimator.ResetTrigger(BreakTrigger);
         propAnimator.SetTrigger(BreakTrigger);
 

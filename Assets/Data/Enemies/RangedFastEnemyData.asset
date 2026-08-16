@@ -20,7 +20,7 @@ MonoBehaviour:
   <IdleChance>k__BackingField: 0.4
   <RoamStateDurationRange>k__BackingField: {x: 0.5, y: 1.4}
   <ProjectilePrefab>k__BackingField: {fileID: 5887521079033147050, guid: d3e97d22802b1b8418b98451095bc619, type: 3}
-  <ProjectileSpawnOffset>k__BackingField: 1.5
+  <ProjectileSpawnOffset>k__BackingField: 0.65
   <ProjectileSpeed>k__BackingField: 7
   <FireInterval>k__BackingField: 1.2
   <RangedAttackReleaseDelay>k__BackingField: 0.25

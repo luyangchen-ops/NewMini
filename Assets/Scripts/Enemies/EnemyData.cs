@@ -3,7 +3,8 @@ using UnityEngine;
 public enum EnemyArchetype
 {
     Melee,
-    Ranged
+    Ranged,
+    Spearman
 }
 
 [CreateAssetMenu(menuName = "NewMini/Enemies/Enemy Data", fileName = "EnemyData")]
@@ -44,6 +45,18 @@ public sealed class EnemyData : ScriptableObject
     [field: SerializeField, Min(0f)] public float MeleePerfectDodgeDelay { get; private set; } = .35f;
     [field: SerializeField, Min(0.01f)] public float MeleePerfectDodgeDuration { get; private set; } = .18f;
 
+    [field: Header("Spearman Attack")]
+    [field: Tooltip("Time spent holding the spear back before the forward thrust begins.")]
+    [field: SerializeField, Min(0.05f)] public float SpearWindupDuration { get; private set; } = .45f;
+    [field: Tooltip("How long the forward thrust movement lasts.")]
+    [field: SerializeField, Min(0.01f)] public float SpearThrustDuration { get; private set; } = .18f;
+    [field: SerializeField, Min(0f)] public float SpearThrustSpeed { get; private set; } = 8f;
+    [field: Tooltip("Maximum distance from the spear soldier's centre that can be struck during the thrust.")]
+    [field: SerializeField, Min(0.01f)] public float SpearHitRange { get; private set; } = 2f;
+    [field: Tooltip("Width of the spear hit area. Targets need to stay close to the thrust line.")]
+    [field: SerializeField, Min(0.01f)] public float SpearHitRadius { get; private set; } = .4f;
+    [field: SerializeField, Range(1f, 179f)] public float SpearHitAngle { get; private set; } = 50f;
+
     [field: Header("Shield Bearer")]
     [field: Tooltip("Half-angle of the protected frontal arc. Attacks outside the rear arc are blocked.")]
     [field: SerializeField, Range(0f, 89f)] public float ShieldRearKillHalfAngle { get; private set; } = 55f;
@@ -60,6 +73,11 @@ public sealed class EnemyData : ScriptableObject
         RoamStateDurationRange = durationRange;
         MeleePerfectDodgeDelay = Mathf.Max(0f, MeleePerfectDodgeDelay);
         MeleePerfectDodgeDuration = Mathf.Max(.01f, MeleePerfectDodgeDuration);
+        SpearWindupDuration = Mathf.Max(.05f, SpearWindupDuration);
+        SpearThrustDuration = Mathf.Max(.01f, SpearThrustDuration);
+        SpearThrustSpeed = Mathf.Max(0f, SpearThrustSpeed);
+        SpearHitRange = Mathf.Max(.01f, SpearHitRange);
+        SpearHitRadius = Mathf.Max(.01f, SpearHitRadius);
         MeleeFormationRadius = Mathf.Max(.1f, MeleeFormationRadius);
         MeleeFormationArrivalDistance = Mathf.Max(.01f, MeleeFormationArrivalDistance);
         MeleeSeparationRadius = Mathf.Max(.1f, MeleeSeparationRadius);

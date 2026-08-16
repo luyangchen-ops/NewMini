@@ -1,0 +1,33 @@
+{
+  "asset": "Hero_IdleHoldInkEcho",
+  "version": 1,
+  "frame": {
+    "width": 512,
+    "height": 576,
+    "format": "RGBA PNG",
+    "pixelsPerUnit": 100,
+    "pivot": [0.5, 0.05],
+    "mipmaps": false,
+    "compression": "None"
+  },
+  "clips": [
+    {
+      "name": "Sheathe",
+      "frameCount": 8,
+      "loop": false,
+      "suggestedFps": 12,
+      "folder": "Sprites/Sheathe",
+      "sheet": "Sheets/Hero_Sheathe_8Frames_Transparent.png"
+    },
+    {
+      "name": "IdleHoldInkEcho",
+      "frameCount": 12,
+      "loop": true,
+      "suggestedFps": 8,
+      "inkEchoFramesOneBased": [5, 6, 7, 8],
+      "folder": "Sprites/IdleHoldInkEcho",
+      "sheet": "Sheets/Hero_IdleHoldInkEcho_12Frames_Transparent.png"
+    }
+  ],
+  "bindingModified": false
+}

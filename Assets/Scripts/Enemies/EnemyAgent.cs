@@ -8,8 +8,12 @@ public sealed class EnemyAgent : MonoBehaviour
         Auto,
         Swordsman,
         Archer,
-        ShieldBearer
+        ShieldBearer,
+        Spearman
     }
+
+    /// <summary>Animation integration point; spear animation assets are intentionally not assigned yet.</summary>
+    public enum EnemyAnimationState { Idle, Move, Attack, Death }
 
     [SerializeField] private EnemyData data;
     [Header("Visuals")]
@@ -47,6 +51,8 @@ public sealed class EnemyAgent : MonoBehaviour
     public bool HasTarget => target != null;
     public bool CanFire => !IsDead && data != null && data.ProjectilePrefab != null && fireCooldown <= 0f;
     public bool CanMeleeAttack => !IsDead && data != null && data.Archetype == EnemyArchetype.Melee && fireCooldown <= 0f;
+    public bool CanSpearAttack => !IsDead && data != null && data.Archetype == EnemyArchetype.Spearman && fireCooldown <= 0f;
+    public bool IsMeleeCombatant => data != null && (data.Archetype == EnemyArchetype.Melee || data.Archetype == EnemyArchetype.Spearman);
     public bool IsDead { get; private set; }
     public bool IsShieldBearer => GetVisualStyle() == EnemyVisualStyle.ShieldBearer;
     public bool IsShieldAttackExposed { get; private set; }
@@ -55,12 +61,13 @@ public sealed class EnemyAgent : MonoBehaviour
         && Time.time >= meleePerfectDodgeStartTime
         && Time.time <= meleePerfectDodgeEndTime;
     public EnemyIdleState IdleState { get; private set; }
-    public EnemyState DefaultActiveState => data.Archetype == EnemyArchetype.Melee
+    public EnemyState DefaultActiveState => IsMeleeCombatant
         ? IsShieldBearer ? shieldGuardState : chaseState
         : roamState;
     public EnemyRoamState RoamState => roamState;
     public EnemyAttackState AttackState => attackState;
     public EnemyShieldAttackState ShieldAttackState => shieldAttackState;
+    public event System.Action<EnemyAnimationState> AnimationStateChanged;
 
     private EnemyChaseState chaseState;
     private EnemyRoamState roamState;
@@ -156,14 +163,14 @@ public sealed class EnemyAgent : MonoBehaviour
     public Vector2 GetMeleeFormationMoveDirection(out bool isAtFormation)
     {
         isAtFormation = false;
-        if (!HasTarget || data == null || data.Archetype != EnemyArchetype.Melee) return Vector2.zero;
+        if (!HasTarget || data == null || !IsMeleeCombatant) return Vector2.zero;
 
         int formationCount = 0;
         int formationIndex = 0;
         EntityId ownEntityId = GetEntityId();
         foreach (EnemyAgent other in FindObjectsByType<EnemyAgent>(FindObjectsInactive.Exclude))
         {
-            if (other == null || other.data == null || other.data.Archetype != EnemyArchetype.Melee
+            if (other == null || other.data == null || !other.IsMeleeCombatant
                 || other.target != target) continue;
 
             formationCount++;
@@ -193,7 +200,7 @@ public sealed class EnemyAgent : MonoBehaviour
         {
             EnemyAgent other = hit.GetComponentInParent<EnemyAgent>();
             if (other == null || other == this || other.data == null
-                || other.data.Archetype != EnemyArchetype.Melee || other.target != target) continue;
+                || !other.IsMeleeCombatant || other.target != target) continue;
 
             Vector2 offset = body.position - other.body.position;
             float distance = offset.magnitude;
@@ -254,6 +261,47 @@ public sealed class EnemyAgent : MonoBehaviour
         }
         target?.GetComponentInParent<PlayerCharacterController>()?.TakeDamage(data.Damage);
         fireCooldown = data.FireInterval;
+    }
+
+    public void BeginSpearAttack()
+    {
+        SetDesiredVelocity(Vector2.zero);
+        FaceTarget();
+        SetAnimationState(EnemyAnimationState.Attack);
+        if (supportsAttack)
+        {
+            visualAnimator.ResetTrigger(Attack);
+            visualAnimator.SetTrigger(Attack);
+        }
+    }
+
+    public void BeginSpearThrust(Vector2 direction)
+    {
+        Face(direction.x);
+        meleePerfectDodgeStartTime = Time.time;
+        meleePerfectDodgeEndTime = Time.time + data.MeleePerfectDodgeDuration;
+    }
+
+    public void TryHitWithSpear(Vector2 direction)
+    {
+        if (data == null || !HasTarget || direction.sqrMagnitude <= .0001f) return;
+
+        Vector2 toTarget = (Vector2)target.position - body.position;
+        if (toTarget.sqrMagnitude <= .0001f
+            || Vector2.Angle(direction, toTarget) > data.SpearHitAngle * .5f) return;
+        float forwardDistance = Vector2.Dot(direction.normalized, toTarget);
+        if (forwardDistance < 0f || forwardDistance > data.SpearHitRange) return;
+        float lateralDistance = Mathf.Abs(Vector2.Perpendicular(direction.normalized).x * toTarget.x
+            + Vector2.Perpendicular(direction.normalized).y * toTarget.y);
+        if (lateralDistance > data.SpearHitRadius) return;
+
+        target.GetComponentInParent<PlayerCharacterController>()?.TakeDamage(data.Damage);
+    }
+
+    public void CompleteSpearAttack()
+    {
+        fireCooldown = data.FireInterval;
+        SetDesiredVelocity(Vector2.zero);
     }
 
     public void BeginRangedAttack()
@@ -382,8 +430,14 @@ public sealed class EnemyAgent : MonoBehaviour
         {
             EnemyVisualStyle.Archer => "Animation/弓兵/弓兵",
             EnemyVisualStyle.ShieldBearer => "Animation/盾兵/WarriorWalk/盾兵_行走",
+            // The spear soldier controller will be assigned once its animation clips are authored.
+            EnemyVisualStyle.Spearman => string.Empty,
             _ => "Animation/SwordBandit/SwordBandit"
         };
+        if (string.IsNullOrEmpty(controllerPath))
+        {
+            return;
+        }
         RuntimeAnimatorController controller = Resources.Load<RuntimeAnimatorController>(controllerPath);
         if (controller != null)
         {
@@ -400,9 +454,13 @@ public sealed class EnemyAgent : MonoBehaviour
             return visualStyle;
         }
 
-        return data != null && data.Archetype == EnemyArchetype.Ranged
-            ? EnemyVisualStyle.Archer
-            : EnemyVisualStyle.Swordsman;
+        if (data == null) return EnemyVisualStyle.Swordsman;
+        return data.Archetype switch
+        {
+            EnemyArchetype.Ranged => EnemyVisualStyle.Archer,
+            EnemyArchetype.Spearman => EnemyVisualStyle.Spearman,
+            _ => EnemyVisualStyle.Swordsman
+        };
     }
 
     private void CacheAnimatorParameters()
@@ -431,7 +489,13 @@ public sealed class EnemyAgent : MonoBehaviour
 
         if (supportsIsMoving) visualAnimator.SetBool(IsMoving, isMoving);
         if (supportsIsRunning) visualAnimator.SetBool(IsRunning, isMoving);
+        SetAnimationState(isMoving ? EnemyAnimationState.Move : EnemyAnimationState.Idle);
     }
+
+    /// <summary>Reserved for future death animations before the enemy object is removed.</summary>
+    public void NotifyDeathAnimation() => SetAnimationState(EnemyAnimationState.Death);
+
+    private void SetAnimationState(EnemyAnimationState state) => AnimationStateChanged?.Invoke(state);
 
     private void TryFindTarget()
     {
