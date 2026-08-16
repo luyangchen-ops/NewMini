@@ -147,6 +147,8 @@ public class PlayerCharacterController : MonoBehaviour
     private static readonly int NormalAttack = Animator.StringToHash("NormalAttack");
     private static readonly int DashAttack = Animator.StringToHash("DashAttack");
     private static readonly int Roll = Animator.StringToHash("Roll");
+    private static readonly int Hurt = Animator.StringToHash("Hurt");
+    private static readonly int Sheathe = Animator.StringToHash("Sheathe");
     private static readonly int IsDeadAnimatorParam = Animator.StringToHash("IsDead");
     private static readonly int ChainWindow01 = Shader.PropertyToID("_ChainWindow01");
     private static readonly int RangeRadius01 = Shader.PropertyToID("_RangeRadius01");
@@ -513,7 +515,7 @@ public class PlayerCharacterController : MonoBehaviour
         if (bufferedTarget == enemy) bufferedTarget = null;
         PlayBloodHitEffect(enemy, killDashDirection);
         SpecialItemDropSpawner.TryDropFromEnemy(enemy.position);
-        Destroy(enemy.gameObject);
+        KillEnemy(enemy);
         lockedDashTarget = null;
         killChainCount++;
         AwardMomentum(killChainCount);
@@ -566,7 +568,7 @@ public class PlayerCharacterController : MonoBehaviour
         cameraController.EndKillChain();
         perfectDodgeAfterimage?.StopAndRestore();
         if (completedKills >= 3 && HasNoActiveEnemies())
-            PlaySfx(KillChainEndSfx, killChainEndVolume);
+            PlaySheathePresentation();
         stateMachine.Change(PlayerStateId.Locomotion);
         onKillChainEnded?.Invoke(completedKills);
         KillChainFinished?.Invoke(completedKills);
@@ -691,7 +693,7 @@ public class PlayerCharacterController : MonoBehaviour
         }
         PlayBloodHitEffect(closestEnemy, direction);
         SpecialItemDropSpawner.TryDropFromEnemy(closestEnemy.position);
-        Destroy(closestEnemy.gameObject);
+        KillEnemy(closestEnemy);
         AwardMomentum(0);
         PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
         PlaySfx(killSfx);
@@ -704,7 +706,11 @@ public class PlayerCharacterController : MonoBehaviour
         if (specialItems != null && specialItems.TryBlockAttack()) return;
         currentHealth = Mathf.Max(0f, currentHealth - damage);
         HealthChanged?.Invoke(currentHealth, maximumHealth);
-        if (currentHealth > 0f) return;
+        if (currentHealth > 0f)
+        {
+            visualAnimator?.SetTrigger(Hurt);
+            return;
+        }
 
         isDead = true;
         body.linearVelocity = Vector2.zero;
@@ -905,7 +911,7 @@ public class PlayerCharacterController : MonoBehaviour
         RestoreUltimateTargetColor(target);
         PlayBloodHitEffect(target, slashDirection);
         SpecialItemDropSpawner.TryDropFromEnemy(target.position);
-        Destroy(target.gameObject);
+        KillEnemy(target);
         ultimateExecutedKills++;
 
         cameraController.AddKillImpact(slashDirection, MaximumCameraShake, ultimateExecutedKills);
@@ -1054,7 +1060,7 @@ public class PlayerCharacterController : MonoBehaviour
         stateMachine.Change(PlayerStateId.Locomotion);
 
         if (!completed) return;
-        PlaySfx(KillChainEndSfx, killChainEndVolume);
+        PlaySheathePresentation();
         onUltimateFinished?.Invoke(completedKills);
         UltimateFinished?.Invoke(completedKills);
     }
@@ -1079,9 +1085,28 @@ public class PlayerCharacterController : MonoBehaviour
         return null;
     }
 
+    private static void KillEnemy(Transform enemy)
+    {
+        if (enemy == null) return;
+
+        EnemyAgent agent = enemy.GetComponentInParent<EnemyAgent>();
+        if (agent != null)
+        {
+            agent.Die();
+            return;
+        }
+
+        Destroy(enemy.gameObject);
+    }
+
     private static bool HasNoActiveEnemies()
     {
-        return FindObjectsByType<EnemyAgent>(FindObjectsInactive.Exclude).Length == 0;
+        foreach (EnemyAgent enemy in FindObjectsByType<EnemyAgent>(FindObjectsInactive.Exclude))
+        {
+            if (!enemy.IsDead) return false;
+        }
+
+        return true;
     }
 
     private void PlayBloodHitEffect(Transform enemy, Vector2 slashDirection)
@@ -1318,7 +1343,7 @@ public class PlayerCharacterController : MonoBehaviour
         if (bulletTimeLoopSource.clip != BulletTimeLoopSfx) bulletTimeLoopSource.clip = BulletTimeLoopSfx;
         float slowRange = Mathf.Max(.01f, 1f - BulletTimeScale);
         bulletTimeLoopEnvelope = Mathf.Clamp01((1f - EnemyTimeScale) / slowRange);
-        bulletTimeLoopSource.volume = bulletTimeLoopEnvelope * bulletTimeLoopVolume * GameAudioSettings.SfxVolume;
+        bulletTimeLoopSource.volume = bulletTimeLoopEnvelope * bulletTimeLoopVolume * GetSfxChannelVolume();
 
         if (bulletTimeLoopEnvelope > .001f)
         {
@@ -1337,20 +1362,31 @@ public class PlayerCharacterController : MonoBehaviour
         sfxSource.PlayOneShot(clip, Mathf.Clamp01(volumeScale));
     }
 
+    private static float GetSfxChannelVolume()
+    {
+        return GameAudioSettings.GetChannelVolume(GameAudioChannel.SoundEffects);
+    }
+
+    private void PlaySheathePresentation()
+    {
+        visualAnimator?.SetTrigger(Sheathe);
+        PlaySfx(KillChainEndSfx, killChainEndVolume);
+    }
+
     private void PlayKillSfx()
     {
         if (sfxSource == null) return;
         sfxSource.pitch = 1f + Mathf.Min(Mathf.Max(0, killChainCount - 1), 4) * .035f;
-        if (HitBladeFleshSfx != null) sfxSource.PlayOneShot(HitBladeFleshSfx, hitBladeFleshVolume);
+        PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume, false);
         AudioClip confirmation = KillConfirmSfx != null ? KillConfirmSfx : killSfx;
-        if (confirmation != null) sfxSource.PlayOneShot(confirmation, killConfirmVolume);
+        PlaySfx(confirmation, killConfirmVolume, false);
     }
 
     private void ApplySfxVolume()
     {
-        if (sfxSource != null) sfxSource.volume = GameAudioSettings.SfxVolume;
+        if (sfxSource != null) sfxSource.volume = GetSfxChannelVolume();
         if (bulletTimeLoopSource != null)
-            bulletTimeLoopSource.volume = bulletTimeLoopEnvelope * bulletTimeLoopVolume * GameAudioSettings.SfxVolume;
+            bulletTimeLoopSource.volume = bulletTimeLoopEnvelope * bulletTimeLoopVolume * GetSfxChannelVolume();
     }
 
     private void OnDisable()

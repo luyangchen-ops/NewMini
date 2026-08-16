@@ -44,18 +44,41 @@ public sealed class EnemyChaseState : EnemyState
             return;
         }
 
-        Vector2 moveDirection = Agent.GetMeleeFormationMoveDirection(out bool isAtFormation);
-        Vector2 targetOffset = (Vector2)Agent.Target.position - Agent.Body.position;
-        if (isAtFormation
-            && targetOffset.sqrMagnitude <= Agent.Data.StoppingDistance * Agent.Data.StoppingDistance
-            && (Agent.CanMeleeAttack || Agent.CanSpearAttack))
+        if (Agent.IsWaitingToEngageInMelee)
         {
             Agent.SetDesiredVelocity(Vector2.zero);
-            StateMachine.ChangeState(Agent.AttackState);
             return;
         }
 
-        Agent.SetDesiredVelocity(moveDirection * Agent.Data.MoveSpeed);
+        if (!Agent.CanPressureTarget())
+        {
+            Agent.CancelMeleeAttackPreparation();
+            Agent.SetDesiredVelocity(Agent.GetMeleeWaitingRoamDirection() * Agent.Data.MoveSpeed);
+            return;
+        }
+
+        Vector2 moveDirection = Agent.GetMeleeFormationMoveDirection(out _);
+        bool isInAttackPosition = Agent.IsWithinMeleeAttackDistance();
+        if (Agent.IsMeleeAttackRecovering)
+        {
+            Agent.CancelMeleeAttackPreparation();
+            Agent.SetDesiredVelocity(Vector2.zero);
+            return;
+        }
+
+        if (isInAttackPosition)
+        {
+            Agent.SetDesiredVelocity(Vector2.zero);
+            if (Agent.TryBeginMeleeAttack())
+            {
+                StateMachine.ChangeState(Agent.AttackState);
+            }
+            return;
+        }
+
+        if (!isInAttackPosition) Agent.CancelMeleeAttackPreparation();
+
+        Agent.SetDesiredVelocity(moveDirection * Agent.MeleeEngagementMoveSpeed);
     }
 }
 
@@ -108,6 +131,7 @@ public sealed class EnemyAttackState : EnemyState
 {
     private float elapsed;
     private bool projectileReleased;
+    private bool meleeDamageDealt;
     private bool spearThrustStarted;
     private bool spearDamageDealt;
     private Vector2 spearDirection;
@@ -118,8 +142,9 @@ public sealed class EnemyAttackState : EnemyState
     {
         if (Agent.Data.Archetype == EnemyArchetype.Melee)
         {
-            Agent.PerformMeleeAttack();
-            StateMachine.ChangeState(Agent.DefaultActiveState);
+            elapsed = 0f;
+            meleeDamageDealt = false;
+            Agent.BeginMeleeAttack();
             return;
         }
 
@@ -142,7 +167,24 @@ public sealed class EnemyAttackState : EnemyState
 
     public override void Tick()
     {
-        if (Agent.Data.Archetype == EnemyArchetype.Melee) return;
+        if (Agent.Data.Archetype == EnemyArchetype.Melee)
+        {
+            elapsed += Agent.EnemyDeltaTime;
+            Agent.SetDesiredVelocity(Vector2.zero);
+
+            if (!meleeDamageDealt && elapsed >= Agent.Data.MeleeAttackHitDelay)
+            {
+                meleeDamageDealt = true;
+                Agent.PerformMeleeAttack();
+            }
+
+            if (elapsed >= Agent.Data.MeleeAttackDuration)
+            {
+                Agent.CompleteMeleeAttack();
+                StateMachine.ChangeState(Agent.DefaultActiveState);
+            }
+            return;
+        }
         if (!Agent.HasTarget)
         {
             StateMachine.ChangeState(Agent.IdleState);
@@ -171,7 +213,6 @@ public sealed class EnemyAttackState : EnemyState
             else
             {
                 Agent.SetDesiredVelocity(Vector2.zero);
-                Agent.FaceTarget();
             }
 
             if (elapsed >= Agent.Data.SpearWindupDuration + Agent.Data.SpearThrustDuration)
@@ -183,7 +224,6 @@ public sealed class EnemyAttackState : EnemyState
         }
 
         Agent.SetDesiredVelocity(Vector2.zero);
-        Agent.FaceTarget();
         if (!projectileReleased && elapsed >= Agent.Data.RangedAttackReleaseDelay)
         {
             projectileReleased = true;
@@ -209,17 +249,38 @@ public sealed class EnemyShieldGuardState : EnemyState
             return;
         }
 
-        Vector2 moveDirection = Agent.GetMeleeFormationMoveDirection(out bool isAtFormation);
-        Vector2 targetOffset = (Vector2)Agent.Target.position - Agent.Body.position;
-        if (!isAtFormation || targetOffset.sqrMagnitude > Agent.Data.StoppingDistance * Agent.Data.StoppingDistance)
+        if (Agent.IsWaitingToEngageInMelee)
         {
-            Agent.SetDesiredVelocity(moveDirection * Agent.Data.MoveSpeed);
+            Agent.SetDesiredVelocity(Vector2.zero);
+            return;
+        }
+
+        if (!Agent.CanPressureTarget())
+        {
+            Agent.CancelMeleeAttackPreparation();
+            Agent.SetDesiredVelocity(Agent.GetMeleeWaitingRoamDirection() * Agent.Data.MoveSpeed);
+            return;
+        }
+
+        if (Agent.IsMeleeAttackRecovering)
+        {
+            Agent.CancelMeleeAttackPreparation();
+            Agent.SetDesiredVelocity(Vector2.zero);
+            return;
+        }
+
+        Vector2 moveDirection = Agent.GetMeleeFormationMoveDirection(out _);
+        bool isInAttackPosition = Agent.IsWithinMeleeAttackDistance();
+        if (!isInAttackPosition)
+        {
+            Agent.CancelMeleeAttackPreparation();
+            Agent.SetDesiredVelocity(moveDirection * Agent.MeleeEngagementMoveSpeed);
             return;
         }
 
         Agent.SetDesiredVelocity(Vector2.zero);
         Agent.FaceTarget();
-        if (Agent.CanMeleeAttack)
+        if (Agent.TryBeginMeleeAttack())
         {
             StateMachine.ChangeState(Agent.ShieldAttackState);
         }
@@ -278,7 +339,6 @@ public sealed class EnemyShieldAttackState : EnemyState
 
         elapsed += Agent.EnemyDeltaTime;
         Agent.SetDesiredVelocity(Vector2.zero);
-        Agent.FaceTarget();
         if (!dealtDamage && elapsed >= Agent.Data.ShieldAttackWindup)
         {
             dealtDamage = true;

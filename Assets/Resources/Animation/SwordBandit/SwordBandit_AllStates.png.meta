@@ -1,0 +1,983 @@
+fileFormatVersion: 2
+guid: 65de21ab0be6e1743a83d5a470be1891
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4752123187317540516
+    second: SwordBandit_AllStates_0
+  - first:
+      213: -7875254089986249252
+    second: SwordBandit_AllStates_1
+  - first:
+      213: 8106983511677564275
+    second: SwordBandit_AllStates_2
+  - first:
+      213: -7617083720679916814
+    second: SwordBandit_AllStates_3
+  - first:
+      213: -199767962288120064
+    second: SwordBandit_AllStates_4
+  - first:
+      213: -6364630793309316926
+    second: SwordBandit_AllStates_5
+  - first:
+      213: 7778040261429271935
+    second: SwordBandit_AllStates_6
+  - first:
+      213: -1549846110093063311
+    second: SwordBandit_AllStates_7
+  - first:
+      213: 5080329122712270116
+    second: SwordBandit_AllStates_8
+  - first:
+      213: -9025835490929615497
+    second: SwordBandit_AllStates_9
+  - first:
+      213: -6692521450503694045
+    second: SwordBandit_AllStates_10
+  - first:
+      213: 1727423580235800682
+    second: SwordBandit_AllStates_11
+  - first:
+      213: 3992064843910130634
+    second: SwordBandit_AllStates_12
+  - first:
+      213: 5104266767022943499
+    second: SwordBandit_AllStates_13
+  - first:
+      213: -8966658339356806771
+    second: SwordBandit_AllStates_14
+  - first:
+      213: -4731245206812830080
+    second: SwordBandit_AllStates_15
+  - first:
+      213: -1666287098960963645
+    second: SwordBandit_AllStates_16
+  - first:
+      213: -8230603193616393511
+    second: SwordBandit_AllStates_17
+  - first:
+      213: 8923382481416614604
+    second: SwordBandit_AllStates_18
+  - first:
+      213: -285474784483642908
+    second: SwordBandit_AllStates_19
+  - first:
+      213: -6679365841037533460
+    second: SwordBandit_AllStates_20
+  - first:
+      213: -6123809308194892335
+    second: SwordBandit_AllStates_21
+  - first:
+      213: -5192535289506923980
+    second: SwordBandit_AllStates_22
+  - first:
+      213: 3687219656930231004
+    second: SwordBandit_AllStates_23
+  - first:
+      213: -371095420890423957
+    second: SwordBandit_AllStates_24
+  - first:
+      213: 6327609449610830264
+    second: SwordBandit_AllStates_25
+  - first:
+      213: 1925739692766666609
+    second: SwordBandit_AllStates_26
+  - first:
+      213: 8776402108920196571
+    second: SwordBandit_AllStates_27
+  - first:
+      213: 9029784946509799135
+    second: SwordBandit_Idle_01
+  - first:
+      213: 3738197347105993246
+    second: SwordBandit_Idle_02
+  - first:
+      213: 8561576718222198220
+    second: SwordBandit_Idle_03
+  - first:
+      213: -3853301170137630589
+    second: SwordBandit_Idle_04
+  - first:
+      213: 5203084478573219989
+    second: SwordBandit_Run_01
+  - first:
+      213: 4570968418345928553
+    second: SwordBandit_Run_02
+  - first:
+      213: -6406912224516444241
+    second: SwordBandit_Run_03
+  - first:
+      213: -6624899628806216851
+    second: SwordBandit_Run_04
+  - first:
+      213: -8508105144787028001
+    second: SwordBandit_Run_05
+  - first:
+      213: 8008462767949625339
+    second: SwordBandit_Run_06
+  - first:
+      213: 3768177489748833762
+    second: SwordBandit_Run_07
+  - first:
+      213: -5508142453325272361
+    second: SwordBandit_Run_08
+  - first:
+      213: 7383945012392649928
+    second: SwordBandit_Attack_01
+  - first:
+      213: -5748191149929237088
+    second: SwordBandit_Attack_02
+  - first:
+      213: -8365068952014843414
+    second: SwordBandit_Attack_03
+  - first:
+      213: -928138191895868257
+    second: SwordBandit_Attack_04
+  - first:
+      213: -7213731566339312371
+    second: SwordBandit_Attack_05
+  - first:
+      213: 7165332664330921058
+    second: SwordBandit_Attack_06
+  - first:
+      213: -8078061082704002121
+    second: SwordBandit_Attack_07
+  - first:
+      213: 8191716586511751601
+    second: SwordBandit_Attack_08
+  - first:
+      213: 3836915629641626289
+    second: SwordBandit_Death_01
+  - first:
+      213: 416699339735994125
+    second: SwordBandit_Death_02
+  - first:
+      213: 2251725050031445188
+    second: SwordBandit_Death_03
+  - first:
+      213: -6028709985992039102
+    second: SwordBandit_Death_04
+  - first:
+      213: 779867300851583920
+    second: SwordBandit_Death_05
+  - first:
+      213: 5760343863450287538
+    second: SwordBandit_Death_06
+  - first:
+      213: 1539315505892537798
+    second: SwordBandit_Death_07
+  - first:
+      213: -29292342519181984
+    second: SwordBandit_Death_08
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 60
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: SwordBandit_Idle_01
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1536
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fded2e6219d305d70800000000000000
+      internalID: 9029784946509799135
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Idle_02
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 1536
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e127f8e6eaeb0e330800000000000000
+      internalID: 3738197347105993246
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Idle_03
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 1536
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc583eef9a4d0d670800000000000000
+      internalID: 8561576718222198220
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Idle_04
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 1536
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 388795d5003568ac0800000000000000
+      internalID: -3853301170137630589
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Run_01
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1280
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59094b124c1153840800000000000000
+      internalID: 5203084478573219989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Run_02
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 1280
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 967c907fe875f6f30800000000000000
+      internalID: 4570968418345928553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Run_03
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 1280
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fafe69ee6431617a0800000000000000
+      internalID: -6406912224516444241
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Run_04
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 1280
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d63636843e0af04a0800000000000000
+      internalID: -6624899628806216851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Run_05
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1024
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd7bb4dd2732de980800000000000000
+      internalID: -8508105144787028001
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Run_06
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 1024
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf73490f476c32f60800000000000000
+      internalID: 8008462767949625339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Run_07
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 1024
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e53a1756714b4430800000000000000
+      internalID: 3768177489748833762
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Run_08
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 1024
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7da6c414f952f83b0800000000000000
+      internalID: -5508142453325272361
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Attack_01
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 768
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c46ea0fdda097660800000000000000
+      internalID: 7383945012392649928
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Attack_02
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 768
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0a57c67ba925a30b0800000000000000
+      internalID: -5748191149929237088
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Attack_03
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 768
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae19181bb1e49eb80800000000000000
+      internalID: -8365068952014843414
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Attack_04
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 768
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f9cc2916b379e13f0800000000000000
+      internalID: -928138191895868257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Attack_05
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 512
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d05b2534c5da3eb90800000000000000
+      internalID: -7213731566339312371
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Attack_06
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 512
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 264a2fa3810607360800000000000000
+      internalID: 7165332664330921058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Attack_07
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 512
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7b34583ae36f4ef80800000000000000
+      internalID: -8078061082704002121
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Attack_08
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 512
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b955b775d2dea170800000000000000
+      internalID: 8191716586511751601
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Death_01
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b2fee1bf667f3530800000000000000
+      internalID: 3836915629641626289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Death_02
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 256
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0f8a1b77d968c500800000000000000
+      internalID: 416699339735994125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Death_03
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 256
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c419fab00cbf3f10800000000000000
+      internalID: 2251725050031445188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Death_04
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 256
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 245281f8538b55ca0800000000000000
+      internalID: -6028709985992039102
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Death_05
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0bb833f9d25a2da00800000000000000
+      internalID: 779867300851583920
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Death_06
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bd3e05693ad0ff40800000000000000
+      internalID: 5760343863450287538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Death_07
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 0
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6c5b9f50c4fbc5510800000000000000
+      internalID: 1539315505892537798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SwordBandit_Death_08
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0
+        width: 256
+        height: 256
+      alignment: 9
+      pivot: {x: 0.5, y: 0.03125}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 06d418905cee79ff0800000000000000
+      internalID: -29292342519181984
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      SwordBandit_AllStates_0: 4752123187317540516
+      SwordBandit_AllStates_1: -7875254089986249252
+      SwordBandit_AllStates_10: -6692521450503694045
+      SwordBandit_AllStates_11: 1727423580235800682
+      SwordBandit_AllStates_12: 3992064843910130634
+      SwordBandit_AllStates_13: 5104266767022943499
+      SwordBandit_AllStates_14: -8966658339356806771
+      SwordBandit_AllStates_15: -4731245206812830080
+      SwordBandit_AllStates_16: -1666287098960963645
+      SwordBandit_AllStates_17: -8230603193616393511
+      SwordBandit_AllStates_18: 8923382481416614604
+      SwordBandit_AllStates_19: -285474784483642908
+      SwordBandit_AllStates_2: 8106983511677564275
+      SwordBandit_AllStates_20: -6679365841037533460
+      SwordBandit_AllStates_21: -6123809308194892335
+      SwordBandit_AllStates_22: -5192535289506923980
+      SwordBandit_AllStates_23: 3687219656930231004
+      SwordBandit_AllStates_24: -371095420890423957
+      SwordBandit_AllStates_25: 6327609449610830264
+      SwordBandit_AllStates_26: 1925739692766666609
+      SwordBandit_AllStates_27: 8776402108920196571
+      SwordBandit_AllStates_3: -7617083720679916814
+      SwordBandit_AllStates_4: -199767962288120064
+      SwordBandit_AllStates_5: -6364630793309316926
+      SwordBandit_AllStates_6: 7778040261429271935
+      SwordBandit_AllStates_7: -1549846110093063311
+      SwordBandit_AllStates_8: 5080329122712270116
+      SwordBandit_AllStates_9: -9025835490929615497
+      SwordBandit_Attack_01: 7383945012392649928
+      SwordBandit_Attack_02: -5748191149929237088
+      SwordBandit_Attack_03: -8365068952014843414
+      SwordBandit_Attack_04: -928138191895868257
+      SwordBandit_Attack_05: -7213731566339312371
+      SwordBandit_Attack_06: 7165332664330921058
+      SwordBandit_Attack_07: -8078061082704002121
+      SwordBandit_Attack_08: 8191716586511751601
+      SwordBandit_Death_01: 3836915629641626289
+      SwordBandit_Death_02: 416699339735994125
+      SwordBandit_Death_03: 2251725050031445188
+      SwordBandit_Death_04: -6028709985992039102
+      SwordBandit_Death_05: 779867300851583920
+      SwordBandit_Death_06: 5760343863450287538
+      SwordBandit_Death_07: 1539315505892537798
+      SwordBandit_Death_08: -29292342519181984
+      SwordBandit_Idle_01: 9029784946509799135
+      SwordBandit_Idle_02: 3738197347105993246
+      SwordBandit_Idle_03: 8561576718222198220
+      SwordBandit_Idle_04: -3853301170137630589
+      SwordBandit_Run_01: 5203084478573219989
+      SwordBandit_Run_02: 4570968418345928553
+      SwordBandit_Run_03: -6406912224516444241
+      SwordBandit_Run_04: -6624899628806216851
+      SwordBandit_Run_05: -8508105144787028001
+      SwordBandit_Run_06: 8008462767949625339
+      SwordBandit_Run_07: 3768177489748833762
+      SwordBandit_Run_08: -5508142453325272361
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -7,6 +7,7 @@ public sealed class ExtraHudController : MonoBehaviour
     [SerializeField] private PlayerCharacterController player;
     [SerializeField] private PlayerSpecialItemInventory items;
     [SerializeField] private Image healthFill;
+    [SerializeField, Min(1f)] private float healthFillMaximumWidth = 350f;
     [SerializeField] private Text healthText;
     [SerializeField] private Image dodgeCooldownFill;
     [SerializeField] private Text dodgeText;
@@ -29,6 +30,27 @@ public sealed class ExtraHudController : MonoBehaviour
         momentumText ??= FindGraphic<Text>("Txt_势条");
     }
 
+    private void OnEnable()
+    {
+        if (player != null)
+        {
+            player.HealthChanged += RefreshHealth;
+        }
+    }
+
+    private void Start()
+    {
+        RefreshHealth(player != null ? player.CurrentHealth : 0f, player != null ? player.MaximumHealth : 0f);
+    }
+
+    private void OnDisable()
+    {
+        if (player != null)
+        {
+            player.HealthChanged -= RefreshHealth;
+        }
+    }
+
     private T FindGraphic<T>(string objectName) where T : Component
     {
         foreach (T component in GetComponentsInChildren<T>(true))
@@ -40,10 +62,6 @@ public sealed class ExtraHudController : MonoBehaviour
     {
         if (player == null) return;
         items ??= player.GetComponent<PlayerSpecialItemInventory>();
-
-        float health = player.HealthNormalized;
-        healthFill.fillAmount = health;
-        healthText.text = $"角色血量  {Mathf.CeilToInt(player.CurrentHealth)} / {Mathf.CeilToInt(player.MaximumHealth)}";
 
         float cooldown = player.DodgeCooldownNormalized;
         dodgeCooldownFill.fillAmount = cooldown;
@@ -57,5 +75,22 @@ public sealed class ExtraHudController : MonoBehaviour
         momentumText.text = player.IsMomentumFull
             ? "势条  已满"
             : $"势条  {player.CurrentMomentum} / {player.MaximumMomentum}";
+    }
+
+    private void RefreshHealth(float currentHealth, float maximumHealth)
+    {
+        if (healthFill == null || healthText == null)
+        {
+            return;
+        }
+
+        float maximum = Mathf.Max(1f, maximumHealth);
+        float current = Mathf.Clamp(currentHealth, 0f, maximum);
+        float normalizedHealth = current / maximum;
+        healthFill.fillAmount = normalizedHealth;
+        healthFill.rectTransform.SetSizeWithCurrentAnchors(
+            RectTransform.Axis.Horizontal,
+            healthFillMaximumWidth * normalizedHealth);
+        healthText.text = $"角色血量  {Mathf.RoundToInt(current)} / {Mathf.RoundToInt(maximum)}";
     }
 }

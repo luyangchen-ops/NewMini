@@ -15,13 +15,16 @@ MonoBehaviour:
   <Archetype>k__BackingField: 1
   <MoveSpeed>k__BackingField: 1.5
   <StoppingDistance>k__BackingField: 1.2
-  <Damage>k__BackingField: 0
+  <Damage>k__BackingField: 10
+  <AttackSfx>k__BackingField: {fileID: 0}
+  <AttackSfxVolume>k__BackingField: 0.8
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4
   <RoamStateDurationRange>k__BackingField: {x: 0.5, y: 1.4}
   <ProjectilePrefab>k__BackingField: {fileID: 5887521079033147050, guid: d3e97d22802b1b8418b98451095bc619, type: 3}
   <ProjectileSpawnOffset>k__BackingField: 0.65
-  <ProjectileSpeed>k__BackingField: 7
+  <ProjectileSpeed>k__BackingField: 5.5
+  <ProjectileGravity>k__BackingField: 4
   <FireInterval>k__BackingField: 1.8
   <RangedAttackReleaseDelay>k__BackingField: 0.25
   <RangedAttackDuration>k__BackingField: 0.34
