@@ -617,7 +617,6 @@ public sealed class EnemyAgent : MonoBehaviour
             visualAnimator.ResetTrigger(Attack);
             visualAnimator.SetTrigger(Attack);
         }
-        PlayAttackSfx();
     }
 
     public void EndShieldAttack()
@@ -712,17 +711,7 @@ public sealed class EnemyAgent : MonoBehaviour
         AudioClip clip = data != null ? data.AttackSfx : null;
         if (clip == null) return;
 
-        attackSfxSource ??= GetComponent<AudioSource>();
-        if (attackSfxSource == null)
-        {
-            attackSfxSource = gameObject.AddComponent<AudioSource>();
-            attackSfxSource.playOnAwake = false;
-            attackSfxSource.loop = false;
-            attackSfxSource.spatialBlend = 0f;
-        }
-
-        attackSfxSource.volume = GameAudioSettings.GetChannelVolume(GameAudioChannel.SoundEffects);
-        attackSfxSource.PlayOneShot(clip, data.AttackSfxVolume);
+        GameAudioManager.PlaySfx(clip, data.AttackSfxVolume);
     }
 
     private void TryDamageTarget()
@@ -775,6 +764,15 @@ public sealed class EnemyAgent : MonoBehaviour
             // Enemies may have been created before their visual style was assigned.
             // Always use the controller that matches the selected style so its parameters are valid.
             visualAnimator.runtimeAnimatorController = controller;
+        }
+
+        if (GetVisualStyle() == EnemyVisualStyle.ShieldBearer)
+        {
+            ShieldWarriorAnimationSfx shieldSfx = visualAnimator.GetComponent<ShieldWarriorAnimationSfx>();
+            if (shieldSfx == null)
+            {
+                shieldSfx = visualAnimator.gameObject.AddComponent<ShieldWarriorAnimationSfx>();
+            }
         }
     }
 
