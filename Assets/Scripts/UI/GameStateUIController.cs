@@ -21,6 +21,7 @@ public sealed class GameStateUIController : MonoBehaviour
     [SerializeField] private Button deathContinueButton;
     [Header("Navigation")]
     [SerializeField] private string mainMenuSceneName = "Begin";
+    [SerializeField] private SceneFlowController sceneFlow;
 
     private Vector3 levelStartPosition;
     private float previousTimeScale = 1f;
@@ -33,6 +34,7 @@ public sealed class GameStateUIController : MonoBehaviour
     private void Awake()
     {
         player ??= FindAnyObjectByType<PlayerCharacterController>();
+        sceneFlow ??= FindAnyObjectByType<SceneFlowController>();
         if (player != null) levelStartPosition = player.transform.position;
         if (gameplayHudRoot == null) gameplayHudRoot = GameObject.Find("Root_角色战斗HUD");
         panelPause?.SetActive(false); panelHelp?.SetActive(false); panelDeath?.SetActive(false);
@@ -84,7 +86,19 @@ public sealed class GameStateUIController : MonoBehaviour
         isPauseShown = false; isHelpShown = false; isDeathShown = false; RestoreTimeAndHud(); player?.RespawnAt(position); EventSystem.current?.SetSelectedGameObject(null);
     }
 
-    public void ReturnToMainMenu() { isPauseShown = false; isHelpShown = false; isDeathShown = false; Time.timeScale = 1f; GameAudioSettings.Save(); SceneManager.LoadScene(mainMenuSceneName); }
+    public void ReturnToMainMenu()
+    {
+        isPauseShown = false; isHelpShown = false; isDeathShown = false; Time.timeScale = 1f;
+        if (sceneFlow != null) sceneFlow.ReturnToMainMenu();
+        else { GameAudioSettings.Save(); SceneManager.LoadScene(mainMenuSceneName); }
+    }
+
+    public void RestartCurrentLevel()
+    {
+        isPauseShown = false; isHelpShown = false; isDeathShown = false; Time.timeScale = 1f;
+        if (sceneFlow != null) sceneFlow.RestartCurrentLevel();
+        else SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
 
     private void ShowDeath()
     {

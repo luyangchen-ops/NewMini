@@ -767,7 +767,7 @@ public class PlayerCharacterController : MonoBehaviour
         }
 
         EnemyAgent enemyAgent = closestTarget.GetComponent<EnemyAgent>();
-        if (enemyAgent != null && !enemyAgent.CanBeKilledBy(body.position, IsMomentumFull))
+        if (enemyAgent != null && !enemyAgent.CanBeKilledBy(body.position, false))
         {
             enemyAgent.BlockIncomingAttack();
             return;

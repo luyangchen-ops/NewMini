@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   <Archetype>k__BackingField: 2
   <MoveSpeed>k__BackingField: 2.25
-  <StoppingDistance>k__BackingField: 2.2
-  <MeleeFormationRadius>k__BackingField: 2.1
+  <StoppingDistance>k__BackingField: 3.2
+  <MeleeFormationRadius>k__BackingField: 3
   <MeleeFormationArrivalDistance>k__BackingField: 0.18
   <MeleeSeparationRadius>k__BackingField: 0.9
   <MeleeSeparationStrength>k__BackingField: 1
@@ -26,7 +26,7 @@ MonoBehaviour:
   <MeleeAttackIntervalVariance>k__BackingField: 0.2
   <MeleeAttackRecoveryDelayRange>k__BackingField: {x: 0.25, y: 0.65}
   <Damage>k__BackingField: 20
-  <AttackSfx>k__BackingField: {fileID: 8300000, guid: 8f83b3e8067f5c144b711f5d72ffb1e5, type: 3}
+  <AttackSfx>k__BackingField: {fileID: 8300000, guid: 3900e19705bb83044a960090df2035bb, type: 3}
   <AttackSfxVolume>k__BackingField: 0.65
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4
@@ -38,10 +38,13 @@ MonoBehaviour:
   <MeleePerfectDodgeDelay>k__BackingField: 0
   <MeleePerfectDodgeDuration>k__BackingField: 0.18
   <SpearWindupDuration>k__BackingField: 0.45
-  <SpearThrustDuration>k__BackingField: 0.18
-  <SpearThrustSpeed>k__BackingField: 8
-  <SpearHitRange>k__BackingField: 2.2
-  <SpearHitRadius>k__BackingField: 0.4
+  <SpearThrustDuration>k__BackingField: 0.36
+  <SpearThrustSpeed>k__BackingField: 9
+  <SpearWindupAnimationSpeed>k__BackingField: 0.3
+  <SpearImpactNormalizedTime>k__BackingField: 0.85
+  <SpearPerfectDodgeWindowDuration>k__BackingField: 0.42
+  <SpearHitRange>k__BackingField: 3.25
+  <SpearHitRadius>k__BackingField: 0.48
   <SpearHitAngle>k__BackingField: 50
   <ShieldRearKillHalfAngle>k__BackingField: 55
   <ShieldBlockDuration>k__BackingField: 0.55

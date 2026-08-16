@@ -127,7 +127,9 @@ public enum GameSfx
     BreakableDestroyed,
     HealingActivated,
     ShieldActivated,
-    ThrowingKnifeLaunched
+    ThrowingKnifeLaunched,
+    ShieldWarriorBlock,
+    ShieldWarriorAttack
 }
 
 /// <summary>Centralized, persistent playback for shared 2D sound effects.</summary>
@@ -149,7 +151,9 @@ public sealed class GameAudioManager : MonoBehaviour
         { GameSfx.BreakableDestroyed, "Audio/SE/SFX_Prop_WoodBarrel_Break" },
         { GameSfx.HealingActivated, "Audio/SE/SFX_Item_Heal_Activate" },
         { GameSfx.ShieldActivated, "Audio/SE/SFX_Item_Shield_Activate" },
-        { GameSfx.ThrowingKnifeLaunched, "Audio/SE/SFX_Weapon_ThrowingKnife_Launch" }
+        { GameSfx.ThrowingKnifeLaunched, "Audio/SE/SFX_Weapon_ThrowingKnife_Launch" },
+        { GameSfx.ShieldWarriorBlock, "Audio/SE/ShieldWarrior_Block" },
+        { GameSfx.ShieldWarriorAttack, "Audio/SE/ShieldWarrior_Attack" }
     };
 
     private static readonly Dictionary<GameSfx, AudioClip> ClipCache = new();
@@ -180,10 +184,19 @@ public sealed class GameAudioManager : MonoBehaviour
 
     public static void PlaySfx(GameSfx sound, float volumeScale = 1f)
     {
-        GameAudioManager manager = EnsureInstance();
         AudioClip clip = GetClip(sound);
+        PlaySfx(clip, volumeScale);
+    }
+
+    /// <summary>
+    /// Plays an authored sound effect through the shared SFX source so it is
+    /// controlled by the Sound Effects slider in the main menu.
+    /// </summary>
+    public static void PlaySfx(AudioClip clip, float volumeScale = 1f)
+    {
         if (clip == null) return;
 
+        GameAudioManager manager = EnsureInstance();
         manager.sfxSource.PlayOneShot(clip, Mathf.Clamp01(volumeScale));
     }
 

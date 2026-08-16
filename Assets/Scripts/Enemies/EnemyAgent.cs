@@ -41,6 +41,7 @@ public sealed class EnemyAgent : MonoBehaviour
     private float meleeAttackRecoveryEndTime = -1f;
     private float meleePerfectDodgeStartTime;
     private float meleePerfectDodgeEndTime;
+    private bool isSpearWindupAnimating;
     private EnemyStateMachine stateMachine;
 
     private static readonly int Attack = Animator.StringToHash("Attack");
@@ -72,7 +73,7 @@ public sealed class EnemyAgent : MonoBehaviour
     public bool IsWaitingToEngageInMelee => Time.time < meleeEngagementStartTime;
     public float MeleeEngagementMoveSpeed => data.MoveSpeed * meleeEngagementSpeedMultiplier;
     public bool IsMeleeAttackPerfectDodgeable => data != null
-        && data.Archetype == EnemyArchetype.Melee
+        && IsMeleeCombatant
         && Time.time >= meleePerfectDodgeStartTime
         && Time.time <= meleePerfectDodgeEndTime;
     public EnemyIdleState IdleState { get; private set; }
@@ -136,7 +137,10 @@ public sealed class EnemyAgent : MonoBehaviour
 
         if (visualAnimator != null)
         {
-            visualAnimator.speed = IsDead ? 1f : PlayerCharacterController.EnemyTimeScale;
+            float spearAnimationMultiplier = isSpearWindupAnimating && data != null
+                ? data.SpearWindupAnimationSpeed
+                : 1f;
+            visualAnimator.speed = IsDead ? 1f : PlayerCharacterController.EnemyTimeScale * spearAnimationMultiplier;
         }
 
         if (IsDead) return;
@@ -235,17 +239,31 @@ public sealed class EnemyAgent : MonoBehaviour
 
         int priority = 0;
         EntityId ownEntityId = GetEntityId();
+        int ownPressureRank = GetMeleePressureRank();
         foreach (EnemyAgent other in FindObjectsByType<EnemyAgent>(FindObjectsInactive.Exclude))
         {
             if (other == null || other.data == null || !other.IsMeleeCombatant || other.target != target) continue;
 
-            bool attackedEarlier = other.lastMeleeAttackTime < lastMeleeAttackTime;
-            bool sameAttackTimeWithLowerId = Mathf.Approximately(other.lastMeleeAttackTime, lastMeleeAttackTime)
+            int otherPressureRank = other.GetMeleePressureRank();
+            bool hasHigherArchetypePriority = otherPressureRank < ownPressureRank;
+            bool sameArchetype = otherPressureRank == ownPressureRank;
+            bool attackedEarlier = sameArchetype && other.lastMeleeAttackTime < lastMeleeAttackTime;
+            bool sameAttackTimeWithLowerId = sameArchetype
+                && Mathf.Approximately(other.lastMeleeAttackTime, lastMeleeAttackTime)
                 && other.GetEntityId() < ownEntityId;
-            if (attackedEarlier || sameAttackTimeWithLowerId) priority++;
+            if (hasHigherArchetypePriority || attackedEarlier || sameAttackTimeWithLowerId) priority++;
         }
 
         return priority < data.MeleePressureLimit;
+    }
+
+    // Lower values take the limited inner attack slots first.
+    // This preserves the desired line order: spears pressure first, then swords, then shields.
+    private int GetMeleePressureRank()
+    {
+        if (data == null) return int.MaxValue;
+        if (data.Archetype == EnemyArchetype.Spearman) return 0;
+        return IsShieldBearer ? 2 : 1;
     }
 
     private Vector2 GetMeleeRingMoveDirection(float ringRadius, out bool isAtRing)
@@ -445,6 +463,7 @@ public sealed class EnemyAgent : MonoBehaviour
     {
         SetDesiredVelocity(Vector2.zero);
         FaceTarget();
+        isSpearWindupAnimating = true;
         SetAnimationState(EnemyAnimationState.Attack);
         if (supportsAttack)
         {
@@ -456,9 +475,12 @@ public sealed class EnemyAgent : MonoBehaviour
 
     public void BeginSpearThrust(Vector2 direction)
     {
+        isSpearWindupAnimating = false;
         Face(direction.x);
-        meleePerfectDodgeStartTime = Time.time;
-        meleePerfectDodgeEndTime = Time.time + data.MeleePerfectDodgeDuration;
+        float impactTime = Time.time + data.SpearThrustDuration * data.SpearImpactNormalizedTime;
+        float perfectDodgeHalfDuration = data.SpearPerfectDodgeWindowDuration * .5f;
+        meleePerfectDodgeStartTime = impactTime - perfectDodgeHalfDuration;
+        meleePerfectDodgeEndTime = impactTime + perfectDodgeHalfDuration;
     }
 
     public void TryHitWithSpear(Vector2 direction)
@@ -479,6 +501,7 @@ public sealed class EnemyAgent : MonoBehaviour
 
     public void CompleteSpearAttack()
     {
+        isSpearWindupAnimating = false;
         fireCooldown = data.GetMeleeAttackCooldown(data.FireInterval);
         lastMeleeAttackTime = Time.time;
         StartMeleeAttackRecovery();
@@ -503,8 +526,6 @@ public sealed class EnemyAgent : MonoBehaviour
             return;
         }
 
-        meleePerfectDodgeStartTime = Time.time + data.MeleePerfectDodgeDelay;
-        meleePerfectDodgeEndTime = meleePerfectDodgeStartTime + data.MeleePerfectDodgeDuration;
         TryDamageTarget();
         fireCooldown = data.GetMeleeAttackCooldown(data.ShieldAttackInterval);
     }
@@ -586,13 +607,16 @@ public sealed class EnemyAgent : MonoBehaviour
         IsShieldAttackExposed = true;
         SetDesiredVelocity(Vector2.zero);
         FaceTarget();
+        float dodgeWindowHalfDuration = data.ShieldPerfectDodgeWindowDuration * .5f;
+        float shieldImpactTime = Time.time + data.ShieldAttackWindup;
+        meleePerfectDodgeStartTime = shieldImpactTime - dodgeWindowHalfDuration;
+        meleePerfectDodgeEndTime = shieldImpactTime + dodgeWindowHalfDuration;
         SetAnimationState(EnemyAnimationState.Attack);
         if (supportsAttack)
         {
             visualAnimator.ResetTrigger(Attack);
             visualAnimator.SetTrigger(Attack);
         }
-        PlayAttackSfx();
     }
 
     public void EndShieldAttack()
@@ -617,6 +641,7 @@ public sealed class EnemyAgent : MonoBehaviour
         if (IsDead) return;
 
         IsDead = true;
+        isSpearWindupAnimating = false;
         desiredVelocity = Vector2.zero;
         meleePerfectDodgeStartTime = 0f;
         meleePerfectDodgeEndTime = 0f;
@@ -686,17 +711,7 @@ public sealed class EnemyAgent : MonoBehaviour
         AudioClip clip = data != null ? data.AttackSfx : null;
         if (clip == null) return;
 
-        attackSfxSource ??= GetComponent<AudioSource>();
-        if (attackSfxSource == null)
-        {
-            attackSfxSource = gameObject.AddComponent<AudioSource>();
-            attackSfxSource.playOnAwake = false;
-            attackSfxSource.loop = false;
-            attackSfxSource.spatialBlend = 0f;
-        }
-
-        attackSfxSource.volume = GameAudioSettings.GetChannelVolume(GameAudioChannel.SoundEffects);
-        attackSfxSource.PlayOneShot(clip, data.AttackSfxVolume);
+        GameAudioManager.PlaySfx(clip, data.AttackSfxVolume);
     }
 
     private void TryDamageTarget()
@@ -749,6 +764,15 @@ public sealed class EnemyAgent : MonoBehaviour
             // Enemies may have been created before their visual style was assigned.
             // Always use the controller that matches the selected style so its parameters are valid.
             visualAnimator.runtimeAnimatorController = controller;
+        }
+
+        if (GetVisualStyle() == EnemyVisualStyle.ShieldBearer)
+        {
+            ShieldWarriorAnimationSfx shieldSfx = visualAnimator.GetComponent<ShieldWarriorAnimationSfx>();
+            if (shieldSfx == null)
+            {
+                shieldSfx = visualAnimator.gameObject.AddComponent<ShieldWarriorAnimationSfx>();
+            }
         }
     }
 

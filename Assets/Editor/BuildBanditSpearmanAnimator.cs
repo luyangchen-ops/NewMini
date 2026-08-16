@@ -113,6 +113,7 @@ public static class BuildBanditSpearmanAnimator
         AnimatorStateTransition transition = from.AddTransition(to);
         transition.AddCondition(value ? AnimatorConditionMode.If : AnimatorConditionMode.IfNot, 0f, "IsMoving");
         ConfigureImmediate(transition);
+        transition.duration = .08f;
     }
 
     private static void AddTriggerTransition(AnimatorStateMachine machine, AnimatorState destination, string trigger)

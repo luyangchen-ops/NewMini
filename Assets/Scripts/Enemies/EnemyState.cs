@@ -204,7 +204,9 @@ public sealed class EnemyAttackState : EnemyState
             if (spearThrustStarted)
             {
                 Agent.SetDesiredVelocity(spearDirection * Agent.Data.SpearThrustSpeed);
-                if (!spearDamageDealt)
+                float spearImpactTime = Agent.Data.SpearWindupDuration
+                    + Agent.Data.SpearThrustDuration * Agent.Data.SpearImpactNormalizedTime;
+                if (!spearDamageDealt && elapsed >= spearImpactTime)
                 {
                     spearDamageDealt = true;
                     Agent.TryHitWithSpear(spearDirection);
@@ -213,6 +215,7 @@ public sealed class EnemyAttackState : EnemyState
             else
             {
                 Agent.SetDesiredVelocity(Vector2.zero);
+                Agent.FaceTarget();
             }
 
             if (elapsed >= Agent.Data.SpearWindupDuration + Agent.Data.SpearThrustDuration)
@@ -239,7 +242,21 @@ public sealed class EnemyAttackState : EnemyState
 
 public sealed class EnemyShieldGuardState : EnemyState
 {
+    private enum ApproachPattern { Pause, Direct, Upward, Downward }
+
+    private ApproachPattern approachPattern;
+    private ApproachPattern pendingApproachPattern;
+    private float nextApproachPatternTime;
+    private bool isPausingBeforeTurn;
+
     public EnemyShieldGuardState(EnemyAgent agent, EnemyStateMachine stateMachine) : base(agent, stateMachine) { }
+
+    public override void Enter()
+    {
+        approachPattern = ApproachPattern.Pause;
+        isPausingBeforeTurn = false;
+        nextApproachPatternTime = 0f;
+    }
 
     public override void Tick()
     {
@@ -274,7 +291,7 @@ public sealed class EnemyShieldGuardState : EnemyState
         if (!isInAttackPosition)
         {
             Agent.CancelMeleeAttackPreparation();
-            Agent.SetDesiredVelocity(moveDirection * Agent.MeleeEngagementMoveSpeed);
+            Agent.SetDesiredVelocity(GetShieldApproachDirection(moveDirection) * Agent.MeleeEngagementMoveSpeed);
             return;
         }
 
@@ -284,6 +301,63 @@ public sealed class EnemyShieldGuardState : EnemyState
         {
             StateMachine.ChangeState(Agent.ShieldAttackState);
         }
+    }
+
+    private Vector2 GetShieldApproachDirection(Vector2 formationDirection)
+    {
+        if (Time.time >= nextApproachPatternTime)
+        {
+            if (isPausingBeforeTurn)
+            {
+                approachPattern = pendingApproachPattern;
+                isPausingBeforeTurn = false;
+                nextApproachPatternTime = Time.time + Random.Range(.35f, .85f);
+            }
+            else
+            {
+                ApproachPattern nextPattern = PickApproachPattern();
+                bool needsTurnPause = approachPattern != ApproachPattern.Pause
+                    && nextPattern != ApproachPattern.Pause
+                    && nextPattern != approachPattern;
+                if (needsTurnPause)
+                {
+                    pendingApproachPattern = nextPattern;
+                    approachPattern = ApproachPattern.Pause;
+                    isPausingBeforeTurn = true;
+                    nextApproachPatternTime = Time.time + Random.Range(.25f, .45f);
+                }
+                else
+                {
+                    approachPattern = nextPattern;
+                    nextApproachPatternTime = Time.time + Random.Range(.35f, .85f);
+                }
+            }
+        }
+
+        return approachPattern switch
+        {
+            ApproachPattern.Pause => Vector2.zero,
+            ApproachPattern.Upward => BlendApproachDirection(formationDirection, Vector2.up),
+            ApproachPattern.Downward => BlendApproachDirection(formationDirection, Vector2.down),
+            _ => formationDirection
+        };
+    }
+
+    private static ApproachPattern PickApproachPattern()
+    {
+        float roll = Random.value;
+        return roll < .3f ? ApproachPattern.Pause
+            : roll < .55f ? ApproachPattern.Direct
+            : roll < .775f ? ApproachPattern.Upward
+            : ApproachPattern.Downward;
+    }
+
+    private static Vector2 BlendApproachDirection(Vector2 formationDirection, Vector2 verticalDirection)
+    {
+        // Keep most of the motion oriented toward the assigned formation slot while
+        // visibly weaving above and below the player instead of charging in a straight line.
+        Vector2 blended = formationDirection * .65f + verticalDirection * .75f;
+        return blended.sqrMagnitude > .0001f ? blended.normalized : verticalDirection;
     }
 }
 
