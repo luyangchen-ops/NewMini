@@ -24,6 +24,20 @@ public sealed class EnemyData : ScriptableObject
     [field: SerializeField, Min(.1f)] public float MeleeSeparationRadius { get; private set; } = .8f;
     [field: SerializeField, Min(0f)] public float MeleeSeparationStrength { get; private set; } = .9f;
 
+    [field: Header("Melee Attack Timing")]
+    [field: Tooltip("Maximum number of melee units allowed to advance into the inner attack formation around one target.")]
+    [field: SerializeField, Min(1)] public int MeleePressureLimit { get; private set; } = 3;
+    [field: Tooltip("Random delay before a melee unit starts advancing on a newly acquired target. This breaks up synchronized charges.")]
+    [field: SerializeField] public Vector2 MeleeEngagementDelayRange { get; private set; } = new Vector2(0f, .6f);
+    [field: Tooltip("Per-unit movement speed variation used while advancing into the melee formation.")]
+    [field: SerializeField, Range(0f, .5f)] public float MeleeEngagementSpeedVariance { get; private set; } = .1f;
+    [field: Tooltip("Random delay applied after a melee unit reaches its attack position. This prevents a group from opening with the same swing.")]
+    [field: SerializeField] public Vector2 MeleeAttackPreparationDelayRange { get; private set; } = new Vector2(.1f, .45f);
+    [field: Tooltip("Random variation applied to every melee attack cooldown after an attack completes.")]
+    [field: SerializeField, Range(0f, .9f)] public float MeleeAttackIntervalVariance { get; private set; } = .2f;
+    [field: Tooltip("Random time a melee unit remains still after finishing an attack.")]
+    [field: SerializeField] public Vector2 MeleeAttackRecoveryDelayRange { get; private set; } = new Vector2(.15f, .4f);
+
     [field: Header("Combat")]
     [field: Tooltip("Temporarily set to zero for every enemy.")]
     [field: SerializeField, Min(0f)] public float Damage { get; private set; } = 0f;
@@ -37,6 +51,8 @@ public sealed class EnemyData : ScriptableObject
     [field: SerializeField] public EnemyProjectile ProjectilePrefab { get; private set; }
     [field: SerializeField, Min(0f)] public float ProjectileSpawnOffset { get; private set; } = 0.65f;
     [field: SerializeField, Min(0f)] public float ProjectileSpeed { get; private set; } = 7f;
+    [field: Tooltip("Downward acceleration applied to arrows. Higher values create a more pronounced arc.")]
+    [field: SerializeField, Min(0f)] public float ProjectileGravity { get; private set; } = 9.81f;
     [field: SerializeField, Min(0.05f)] public float FireInterval { get; private set; } = 1.2f;
     [field: SerializeField, Min(0f)] public float RangedAttackReleaseDelay { get; private set; } = .25f;
     [field: SerializeField, Min(.05f)] public float RangedAttackDuration { get; private set; } = .34f;
@@ -67,6 +83,23 @@ public sealed class EnemyData : ScriptableObject
 
     private void OnValidate()
     {
+        Vector2 meleeEngagementRange = MeleeEngagementDelayRange;
+        meleeEngagementRange.x = Mathf.Max(0f, meleeEngagementRange.x);
+        meleeEngagementRange.y = Mathf.Max(meleeEngagementRange.x, meleeEngagementRange.y);
+        MeleeEngagementDelayRange = meleeEngagementRange;
+        MeleeEngagementSpeedVariance = Mathf.Clamp(MeleeEngagementSpeedVariance, 0f, .5f);
+        MeleePressureLimit = Mathf.Max(1, MeleePressureLimit);
+
+        Vector2 meleePreparationRange = MeleeAttackPreparationDelayRange;
+        meleePreparationRange.x = Mathf.Max(0f, meleePreparationRange.x);
+        meleePreparationRange.y = Mathf.Max(meleePreparationRange.x, meleePreparationRange.y);
+        MeleeAttackPreparationDelayRange = meleePreparationRange;
+        MeleeAttackIntervalVariance = Mathf.Clamp(MeleeAttackIntervalVariance, 0f, .9f);
+        Vector2 meleeRecoveryRange = MeleeAttackRecoveryDelayRange;
+        meleeRecoveryRange.x = Mathf.Max(0f, meleeRecoveryRange.x);
+        meleeRecoveryRange.y = Mathf.Max(meleeRecoveryRange.x, meleeRecoveryRange.y);
+        MeleeAttackRecoveryDelayRange = meleeRecoveryRange;
+
         Vector2 durationRange = RoamStateDurationRange;
         durationRange.x = Mathf.Max(0.05f, durationRange.x);
         durationRange.y = Mathf.Max(durationRange.x, durationRange.y);
@@ -86,7 +119,29 @@ public sealed class EnemyData : ScriptableObject
         ShieldAttackWindup = Mathf.Max(.05f, ShieldAttackWindup);
         ShieldAttackDuration = Mathf.Max(ShieldAttackWindup, ShieldAttackDuration);
         ShieldAttackInterval = Mathf.Max(.1f, ShieldAttackInterval);
+        ProjectileGravity = Mathf.Max(0f, ProjectileGravity);
         RangedAttackReleaseDelay = Mathf.Max(0f, RangedAttackReleaseDelay);
         RangedAttackDuration = Mathf.Max(RangedAttackReleaseDelay, RangedAttackDuration);
+    }
+
+    public float GetMeleeAttackPreparationDelay()
+    {
+        return Random.Range(MeleeAttackPreparationDelayRange.x, MeleeAttackPreparationDelayRange.y);
+    }
+
+    public float GetMeleeEngagementDelay()
+    {
+        return Random.Range(MeleeEngagementDelayRange.x, MeleeEngagementDelayRange.y);
+    }
+
+    public float GetMeleeAttackCooldown(float baseInterval)
+    {
+        float variation = MeleeAttackIntervalVariance;
+        return Mathf.Max(.05f, baseInterval * Random.Range(1f - variation, 1f + variation));
+    }
+
+    public float GetMeleeAttackRecoveryDelay()
+    {
+        return Random.Range(MeleeAttackRecoveryDelayRange.x, MeleeAttackRecoveryDelayRange.y);
     }
 }

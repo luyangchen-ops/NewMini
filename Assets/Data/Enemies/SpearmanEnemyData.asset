@@ -19,7 +19,13 @@ MonoBehaviour:
   <MeleeFormationArrivalDistance>k__BackingField: 0.18
   <MeleeSeparationRadius>k__BackingField: 0.9
   <MeleeSeparationStrength>k__BackingField: 1
-  <Damage>k__BackingField: 0
+  <MeleeEngagementDelayRange>k__BackingField: {x: 0.05, y: 0.75}
+  <MeleeEngagementSpeedVariance>k__BackingField: 0.08
+  <MeleePressureLimit>k__BackingField: 3
+  <MeleeAttackPreparationDelayRange>k__BackingField: {x: 0.12, y: 0.55}
+  <MeleeAttackIntervalVariance>k__BackingField: 0.2
+  <MeleeAttackRecoveryDelayRange>k__BackingField: {x: 0.25, y: 0.65}
+  <Damage>k__BackingField: 20
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4
   <RoamStateDurationRange>k__BackingField: {x: 0.5, y: 1.4}

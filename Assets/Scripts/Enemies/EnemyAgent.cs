@@ -29,6 +29,13 @@ public sealed class EnemyAgent : MonoBehaviour
     private Vector2 desiredVelocity;
     private float nextTargetSearchTime;
     private float fireCooldown;
+    private float meleeEngagementStartTime;
+    private float meleeEngagementSpeedMultiplier = 1f;
+    private float lastMeleeAttackTime;
+    private Vector2 meleeWaitingRoamDirection;
+    private float nextMeleeWaitingRoamDirectionTime;
+    private float meleeAttackPreparationEndTime = -1f;
+    private float meleeAttackRecoveryEndTime = -1f;
     private float meleePerfectDodgeStartTime;
     private float meleePerfectDodgeEndTime;
     private EnemyStateMachine stateMachine;
@@ -53,6 +60,9 @@ public sealed class EnemyAgent : MonoBehaviour
     public bool IsMeleeCombatant => data != null && (data.Archetype == EnemyArchetype.Melee || data.Archetype == EnemyArchetype.Spearman);
     public bool IsShieldBearer => GetVisualStyle() == EnemyVisualStyle.ShieldBearer;
     public bool IsShieldAttackExposed { get; private set; }
+    public bool IsMeleeAttackRecovering => Time.time < meleeAttackRecoveryEndTime;
+    public bool IsWaitingToEngageInMelee => Time.time < meleeEngagementStartTime;
+    public float MeleeEngagementMoveSpeed => data.MoveSpeed * meleeEngagementSpeedMultiplier;
     public bool IsMeleeAttackPerfectDodgeable => data != null
         && data.Archetype == EnemyArchetype.Melee
         && Time.time >= meleePerfectDodgeStartTime
@@ -96,6 +106,14 @@ public sealed class EnemyAgent : MonoBehaviour
         TryFindTarget();
         target?.GetComponentInParent<PlayerCharacterController>()?.IgnoreEnemyCollisions(this);
         fireCooldown = data != null ? Random.Range(0.1f, data.FireInterval) : 0f;
+        if (data != null && IsMeleeCombatant)
+        {
+            meleeEngagementStartTime = Time.time + data.GetMeleeEngagementDelay();
+            float variation = data.MeleeEngagementSpeedVariance;
+            meleeEngagementSpeedMultiplier = Random.Range(1f - variation, 1f + variation);
+            // Establishes a stable but varied initial order before the first attack rotation.
+            lastMeleeAttackTime = Time.time - Random.Range(0f, 3f);
+        }
         stateMachine.ChangeState(IdleState);
     }
 
@@ -155,7 +173,49 @@ public sealed class EnemyAgent : MonoBehaviour
 
     public Vector2 GetMeleeFormationMoveDirection(out bool isAtFormation)
     {
-        isAtFormation = false;
+        return GetMeleeRingMoveDirection(data.MeleeFormationRadius, out isAtFormation);
+    }
+
+    public Vector2 GetMeleeWaitingRoamDirection()
+    {
+        if (Time.time >= nextMeleeWaitingRoamDirectionTime)
+        {
+            Vector2 durationRange = data.RoamStateDurationRange;
+            nextMeleeWaitingRoamDirectionTime = Time.time + Random.Range(durationRange.x, durationRange.y);
+            meleeWaitingRoamDirection = Random.value < data.IdleChance ? Vector2.zero : Random.Range(0, 4) switch
+            {
+                0 => Vector2.up,
+                1 => Vector2.down,
+                2 => Vector2.left,
+                _ => Vector2.right
+            };
+        }
+
+        return meleeWaitingRoamDirection;
+    }
+
+    public bool CanPressureTarget()
+    {
+        if (!HasTarget || data == null || !IsMeleeCombatant) return false;
+
+        int priority = 0;
+        EntityId ownEntityId = GetEntityId();
+        foreach (EnemyAgent other in FindObjectsByType<EnemyAgent>(FindObjectsInactive.Exclude))
+        {
+            if (other == null || other.data == null || !other.IsMeleeCombatant || other.target != target) continue;
+
+            bool attackedEarlier = other.lastMeleeAttackTime < lastMeleeAttackTime;
+            bool sameAttackTimeWithLowerId = Mathf.Approximately(other.lastMeleeAttackTime, lastMeleeAttackTime)
+                && other.GetEntityId() < ownEntityId;
+            if (attackedEarlier || sameAttackTimeWithLowerId) priority++;
+        }
+
+        return priority < data.MeleePressureLimit;
+    }
+
+    private Vector2 GetMeleeRingMoveDirection(float ringRadius, out bool isAtRing)
+    {
+        isAtRing = false;
         if (!HasTarget || data == null || !IsMeleeCombatant) return Vector2.zero;
 
         int formationCount = 0;
@@ -174,13 +234,13 @@ public sealed class EnemyAgent : MonoBehaviour
 
         float angle = formationIndex * Mathf.PI * 2f / formationCount;
         Vector2 formationPosition = (Vector2)target.position
-            + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * data.MeleeFormationRadius;
+            + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * ringRadius;
         Vector2 toFormation = formationPosition - body.position;
-        isAtFormation = toFormation.sqrMagnitude
+        isAtRing = toFormation.sqrMagnitude
             <= data.MeleeFormationArrivalDistance * data.MeleeFormationArrivalDistance;
 
         Vector2 separation = CalculateMeleeSeparation();
-        Vector2 formationDirection = isAtFormation ? Vector2.zero : toFormation.normalized;
+        Vector2 formationDirection = isAtRing ? Vector2.zero : toFormation.normalized;
         Vector2 steering = formationDirection + separation * data.MeleeSeparationStrength;
         return steering.sqrMagnitude > .0001f ? steering.normalized : Vector2.zero;
     }
@@ -230,7 +290,7 @@ public sealed class EnemyAgent : MonoBehaviour
             data.ProjectilePrefab,
             body.position + direction * data.ProjectileSpawnOffset,
             Quaternion.Euler(0f, 0f, angle));
-        projectile.Launch(direction, data.ProjectileSpeed, gameObject, data.Damage);
+        projectile.Launch(target.position, data.ProjectileSpeed, data.ProjectileGravity, gameObject, data.Damage);
         fireCooldown = data.FireInterval;
     }
 
@@ -253,7 +313,9 @@ public sealed class EnemyAgent : MonoBehaviour
             visualAnimator.SetTrigger(Attack);
         }
         target?.GetComponentInParent<PlayerCharacterController>()?.TakeDamage(data.Damage);
-        fireCooldown = data.FireInterval;
+        fireCooldown = data.GetMeleeAttackCooldown(data.FireInterval);
+        lastMeleeAttackTime = Time.time;
+        StartMeleeAttackRecovery();
     }
 
     public void BeginSpearAttack()
@@ -293,7 +355,9 @@ public sealed class EnemyAgent : MonoBehaviour
 
     public void CompleteSpearAttack()
     {
-        fireCooldown = data.FireInterval;
+        fireCooldown = data.GetMeleeAttackCooldown(data.FireInterval);
+        lastMeleeAttackTime = Time.time;
+        StartMeleeAttackRecovery();
         SetDesiredVelocity(Vector2.zero);
     }
 
@@ -319,7 +383,40 @@ public sealed class EnemyAgent : MonoBehaviour
         meleePerfectDodgeStartTime = Time.time + data.MeleePerfectDodgeDelay;
         meleePerfectDodgeEndTime = meleePerfectDodgeStartTime + data.MeleePerfectDodgeDuration;
         target.GetComponentInParent<PlayerCharacterController>()?.TakeDamage(data.Damage);
-        fireCooldown = data.ShieldAttackInterval;
+        fireCooldown = data.GetMeleeAttackCooldown(data.ShieldAttackInterval);
+    }
+
+    /// <summary>
+    /// Starts a per-unit reaction delay only after the unit reaches its melee position.
+    /// This keeps an approaching pack from becoming ready and swinging on the same frame.
+    /// </summary>
+    public bool TryBeginMeleeAttack()
+    {
+        if (data == null || !IsMeleeCombatant || fireCooldown > 0f)
+        {
+            return false;
+        }
+
+        if (meleeAttackPreparationEndTime < 0f)
+        {
+            meleeAttackPreparationEndTime = Time.time + data.GetMeleeAttackPreparationDelay();
+            return false;
+        }
+
+        if (Time.time < meleeAttackPreparationEndTime)
+        {
+            return false;
+        }
+
+        meleeAttackPreparationEndTime = -1f;
+        return true;
+    }
+
+    public void CancelMeleeAttackPreparation() => meleeAttackPreparationEndTime = -1f;
+
+    private void StartMeleeAttackRecovery()
+    {
+        meleeAttackRecoveryEndTime = Time.time + data.GetMeleeAttackRecoveryDelay();
     }
 
     public bool CanBeKilledBy(Vector2 attackerPosition, bool bypassShield)
@@ -355,7 +452,12 @@ public sealed class EnemyAgent : MonoBehaviour
         FaceTarget();
     }
 
-    public void EndShieldAttack() => IsShieldAttackExposed = false;
+    public void EndShieldAttack()
+    {
+        IsShieldAttackExposed = false;
+        lastMeleeAttackTime = Time.time;
+        StartMeleeAttackRecovery();
+    }
 
     public void FaceTarget()
     {

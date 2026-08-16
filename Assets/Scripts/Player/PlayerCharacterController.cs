@@ -146,6 +146,7 @@ public class PlayerCharacterController : MonoBehaviour
     private static readonly int NormalAttack = Animator.StringToHash("NormalAttack");
     private static readonly int DashAttack = Animator.StringToHash("DashAttack");
     private static readonly int Roll = Animator.StringToHash("Roll");
+    private static readonly int Sheathe = Animator.StringToHash("Sheathe");
     private static readonly int IsDeadAnimatorParam = Animator.StringToHash("IsDead");
     private static readonly int ChainWindow01 = Shader.PropertyToID("_ChainWindow01");
     private static readonly int RangeRadius01 = Shader.PropertyToID("_RangeRadius01");
@@ -565,7 +566,7 @@ public class PlayerCharacterController : MonoBehaviour
         cameraController.EndKillChain();
         perfectDodgeAfterimage?.StopAndRestore();
         if (completedKills >= 3 && HasNoActiveEnemies())
-            PlaySfx(KillChainEndSfx, killChainEndVolume);
+            PlaySheathePresentation();
         stateMachine.Change(PlayerStateId.Locomotion);
         onKillChainEnded?.Invoke(completedKills);
         KillChainFinished?.Invoke(completedKills);
@@ -1043,7 +1044,7 @@ public class PlayerCharacterController : MonoBehaviour
         stateMachine.Change(PlayerStateId.Locomotion);
 
         if (!completed) return;
-        PlaySfx(KillChainEndSfx, killChainEndVolume);
+        PlaySheathePresentation();
         onUltimateFinished?.Invoke(completedKills);
         UltimateFinished?.Invoke(completedKills);
     }
@@ -1324,6 +1325,12 @@ public class PlayerCharacterController : MonoBehaviour
         if (sfxSource == null || clip == null) return;
         if (resetPitch) sfxSource.pitch = 1f;
         sfxSource.PlayOneShot(clip, Mathf.Clamp01(volumeScale));
+    }
+
+    private void PlaySheathePresentation()
+    {
+        visualAnimator?.SetTrigger(Sheathe);
+        PlaySfx(KillChainEndSfx, killChainEndVolume);
     }
 
     private void PlayKillSfx()
