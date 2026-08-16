@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 40f0e8d2adf94026aa99e5a82fa86a13, type: 3}
-  m_Name: MeleeEnemyData
+  m_Name: ShieldBearerEnemyData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
   <Archetype>k__BackingField: 0
   <MoveSpeed>k__BackingField: 2.5
@@ -19,13 +19,13 @@ MonoBehaviour:
   <MeleeFormationArrivalDistance>k__BackingField: 0.18
   <MeleeSeparationRadius>k__BackingField: 0.8
   <MeleeSeparationStrength>k__BackingField: 0.9
-  <MeleeEngagementDelayRange>k__BackingField: {x: 0, y: 0.6}
-  <MeleeEngagementSpeedVariance>k__BackingField: 0.1
+  <MeleeEngagementDelayRange>k__BackingField: {x: 0.1, y: 0.9}
+  <MeleeEngagementSpeedVariance>k__BackingField: 0.06
   <MeleePressureLimit>k__BackingField: 3
-  <MeleeAttackPreparationDelayRange>k__BackingField: {x: 0.12, y: 0.48}
+  <MeleeAttackPreparationDelayRange>k__BackingField: {x: 0.15, y: 0.6}
   <MeleeAttackIntervalVariance>k__BackingField: 0.2
-  <MeleeAttackRecoveryDelayRange>k__BackingField: {x: 0.2, y: 0.55}
-  <Damage>k__BackingField: 12
+  <MeleeAttackRecoveryDelayRange>k__BackingField: {x: 0.25, y: 0.7}
+  <Damage>k__BackingField: 15
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4
   <RoamStateDurationRange>k__BackingField: {x: 0.5, y: 1.4}

@@ -44,18 +44,40 @@ public sealed class EnemyChaseState : EnemyState
             return;
         }
 
+        if (Agent.IsWaitingToEngageInMelee)
+        {
+            Agent.SetDesiredVelocity(Vector2.zero);
+            return;
+        }
+
+        if (!Agent.CanPressureTarget())
+        {
+            Agent.CancelMeleeAttackPreparation();
+            Agent.SetDesiredVelocity(Agent.GetMeleeWaitingRoamDirection() * Agent.Data.MoveSpeed);
+            return;
+        }
+
         Vector2 moveDirection = Agent.GetMeleeFormationMoveDirection(out bool isAtFormation);
         Vector2 targetOffset = (Vector2)Agent.Target.position - Agent.Body.position;
-        if (isAtFormation
-            && targetOffset.sqrMagnitude <= Agent.Data.StoppingDistance * Agent.Data.StoppingDistance
-            && (Agent.CanMeleeAttack || Agent.CanSpearAttack))
+        bool isInAttackPosition = isAtFormation
+            && targetOffset.sqrMagnitude <= Agent.Data.StoppingDistance * Agent.Data.StoppingDistance;
+        if (Agent.IsMeleeAttackRecovering)
+        {
+            Agent.CancelMeleeAttackPreparation();
+            Agent.SetDesiredVelocity(Vector2.zero);
+            return;
+        }
+
+        if (isInAttackPosition && Agent.TryBeginMeleeAttack())
         {
             Agent.SetDesiredVelocity(Vector2.zero);
             StateMachine.ChangeState(Agent.AttackState);
             return;
         }
 
-        Agent.SetDesiredVelocity(moveDirection * Agent.Data.MoveSpeed);
+        if (!isInAttackPosition) Agent.CancelMeleeAttackPreparation();
+
+        Agent.SetDesiredVelocity(moveDirection * Agent.MeleeEngagementMoveSpeed);
     }
 }
 
@@ -209,17 +231,40 @@ public sealed class EnemyShieldGuardState : EnemyState
             return;
         }
 
+        if (Agent.IsWaitingToEngageInMelee)
+        {
+            Agent.SetDesiredVelocity(Vector2.zero);
+            return;
+        }
+
+        if (!Agent.CanPressureTarget())
+        {
+            Agent.CancelMeleeAttackPreparation();
+            Agent.SetDesiredVelocity(Agent.GetMeleeWaitingRoamDirection() * Agent.Data.MoveSpeed);
+            return;
+        }
+
+        if (Agent.IsMeleeAttackRecovering)
+        {
+            Agent.CancelMeleeAttackPreparation();
+            Agent.SetDesiredVelocity(Vector2.zero);
+            return;
+        }
+
         Vector2 moveDirection = Agent.GetMeleeFormationMoveDirection(out bool isAtFormation);
         Vector2 targetOffset = (Vector2)Agent.Target.position - Agent.Body.position;
-        if (!isAtFormation || targetOffset.sqrMagnitude > Agent.Data.StoppingDistance * Agent.Data.StoppingDistance)
+        bool isInAttackPosition = isAtFormation
+            && targetOffset.sqrMagnitude <= Agent.Data.StoppingDistance * Agent.Data.StoppingDistance;
+        if (!isInAttackPosition)
         {
-            Agent.SetDesiredVelocity(moveDirection * Agent.Data.MoveSpeed);
+            Agent.CancelMeleeAttackPreparation();
+            Agent.SetDesiredVelocity(moveDirection * Agent.MeleeEngagementMoveSpeed);
             return;
         }
 
         Agent.SetDesiredVelocity(Vector2.zero);
         Agent.FaceTarget();
-        if (Agent.CanMeleeAttack)
+        if (Agent.TryBeginMeleeAttack())
         {
             StateMachine.ChangeState(Agent.ShieldAttackState);
         }

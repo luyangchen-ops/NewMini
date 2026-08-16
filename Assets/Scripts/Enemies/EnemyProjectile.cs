@@ -13,8 +13,8 @@ public sealed class EnemyProjectile : MonoBehaviour
     private float destroyTime;
     private bool hasHit;
     private bool isLaunched;
-    private Vector2 travelDirection;
-    private float travelSpeed;
+    private Vector2 velocity;
+    private float gravity;
 
     private void Awake()
     {
@@ -51,9 +51,23 @@ public sealed class EnemyProjectile : MonoBehaviour
         }
     }
 
-    private void FixedUpdate() => body.linearVelocity = travelDirection * (travelSpeed * PlayerCharacterController.EnemyTimeScale);
+    private void FixedUpdate()
+    {
+        if (!isLaunched || body == null)
+        {
+            return;
+        }
 
-    public void Launch(Vector2 direction, float speed, GameObject projectileOwner, float attackDamage = 0f)
+        float timeScale = PlayerCharacterController.EnemyTimeScale;
+        velocity += Vector2.down * (gravity * timeScale * Time.fixedDeltaTime);
+        body.linearVelocity = velocity * timeScale;
+        if (velocity.sqrMagnitude > .0001f)
+        {
+            transform.right = velocity;
+        }
+    }
+
+    public void Launch(Vector2 targetPosition, float speed, float projectileGravity, GameObject projectileOwner, float attackDamage = 0f)
     {
         if (body == null)
         {
@@ -61,13 +75,22 @@ public sealed class EnemyProjectile : MonoBehaviour
         }
 
         owner = projectileOwner;
-        travelDirection = direction.sqrMagnitude > 0f ? direction.normalized : Vector2.right;
-        travelSpeed = Mathf.Max(0f, speed);
+        float launchSpeed = Mathf.Max(0.01f, speed);
+        gravity = Mathf.Max(0f, projectileGravity);
+        Vector2 toTarget = targetPosition - (Vector2)transform.position;
+        float travelTime = Mathf.Max(.02f, toTarget.magnitude / launchSpeed);
+
+        // Solve v = displacement / time - 1/2 * acceleration * time.
+        // This retains the current aim point while introducing a visible gravity arc.
+        velocity = toTarget / travelTime + Vector2.up * (.5f * gravity * travelTime);
         damage = Mathf.Max(0f, attackDamage);
         destroyTime = Time.time + lifetime;
         isLaunched = true;
-        body.linearVelocity = travelDirection * (travelSpeed * PlayerCharacterController.EnemyTimeScale);
-        transform.right = travelDirection;
+        body.linearVelocity = velocity * PlayerCharacterController.EnemyTimeScale;
+        if (velocity.sqrMagnitude > .0001f)
+        {
+            transform.right = velocity;
+        }
         IgnoreOwnerCollisions();
     }
 

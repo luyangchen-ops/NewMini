@@ -14,7 +14,12 @@ public static class BuildHeroDirectionalAnimations
     private const string ControllerPath = "Assets/Resources/InkWuxiaHero/Animations/Controller/Hero_InkWuxia.controller";
     private const float RunFps = 14f;
     private const float AttackFps = 16f;
-    private const string AlignmentVersion = "InkWuxiaHero.FootAnchored.v1";
+    // The existing sheathe SFX is 0.75 seconds long. Eight frames at this rate
+    // make the visual and audio finish together when triggered on the same frame.
+    private const float SheatheFps = 8f / .75f;
+    private const float IdleHoldFps = 6f;
+    private const string DirectionalAlignmentVersion = "InkWuxiaHero.FootAnchored.v1";
+    private const string HorizontalRunAlignmentVersion = "InkWuxiaHero.HorizontalRunFootAnchored.v2";
     private const int RunAnchorX = 512;
     // Texture2D pixels use a bottom-left origin. Source feet sit 32 pixels above it.
     private const int RunAnchorFootY = 32;
@@ -33,10 +38,14 @@ public static class BuildHeroDirectionalAnimations
         }
 
         AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
+        bool needsRunFrameAlignment = NeedsRunFrameAlignment();
         if (controller == null || AssetDatabase.LoadAssetAtPath<AnimationClip>($"{ClipsRoot}/Hero_RunUp.anim") == null ||
-            Array.Find(controller.parameters, parameter => parameter.name == "VerticalDirection") == null || NeedsRunFrameAlignment())
+            AssetDatabase.LoadAssetAtPath<AnimationClip>($"{ClipsRoot}/Hero_Sheathe.anim") == null ||
+            AssetDatabase.LoadAssetAtPath<AnimationClip>($"{ClipsRoot}/Hero_IdleHoldInkEcho.anim") == null ||
+            Array.Find(controller.parameters, parameter => parameter.name == "VerticalDirection") == null ||
+            Array.Find(controller.parameters, parameter => parameter.name == "Sheathe") == null || needsRunFrameAlignment)
         {
-            NormalizeRunFrames();
+            if (needsRunFrameAlignment) NormalizeRunFrames();
             Build();
         }
     }
@@ -46,7 +55,8 @@ public static class BuildHeroDirectionalAnimations
     {
         Directory.CreateDirectory(ClipsRoot);
 
-        AnimationClip idle = CreateClip("Hero_Idle", "Idle", 1, 1f, true);
+        AnimationClip sheathe = CreateClip("Hero_Sheathe", "Sheathe", 8, SheatheFps, false);
+        AnimationClip idleHold = CreateClip("Hero_IdleHoldInkEcho", "IdleHoldInkEcho", 12, IdleHoldFps, true);
         AnimationClip run = CreateClip("Hero_Run", "Run", 12, RunFps, true);
         AnimationClip runUp = CreateClip("Hero_RunUp", "RunUp", 12, RunFps, true);
         AnimationClip runDown = CreateClip("Hero_RunDown", "RunDown", 12, RunFps, true);
@@ -63,13 +73,14 @@ public static class BuildHeroDirectionalAnimations
         controller.parameters = new[]
         {
             Float("Speed"), Int("VerticalDirection"), Trigger("NormalAttack"), Trigger("DashAttack"),
-            Trigger("Roll"), Trigger("Hurt"), Bool("IsDead")
+            Trigger("Roll"), Trigger("Hurt"), Trigger("Sheathe"), Bool("IsDead")
         };
 
         AnimatorStateMachine machine = controller.layers[0].stateMachine;
         foreach (ChildAnimatorState child in machine.states) machine.RemoveState(child.state);
 
-        AnimatorState idleState = State(machine, "Idle", idle, 200, 0);
+        AnimatorState idleState = State(machine, "Idle Hold Ink Echo", idleHold, 200, 0);
+        AnimatorState sheatheState = State(machine, "Sheathe", sheathe, 200, 100);
         AnimatorState runState = State(machine, "Run", run, 450, 0);
         AnimatorState runUpState = State(machine, "Run Up", runUp, 450, 80);
         AnimatorState runDownState = State(machine, "Run Down", runDown, 450, 160);
@@ -85,6 +96,9 @@ public static class BuildHeroDirectionalAnimations
         AddMovementTransition(idleState, runState, AnimatorConditionMode.Equals, 0f);
         AddMovementTransition(idleState, runUpState, AnimatorConditionMode.Equals, 1f);
         AddMovementTransition(idleState, runDownState, AnimatorConditionMode.Equals, -1f);
+        AddMovementTransition(sheatheState, runState, AnimatorConditionMode.Equals, 0f);
+        AddMovementTransition(sheatheState, runUpState, AnimatorConditionMode.Equals, 1f);
+        AddMovementTransition(sheatheState, runDownState, AnimatorConditionMode.Equals, -1f);
         AddStopTransition(runState, idleState);
         AddStopTransition(runUpState, idleState);
         AddStopTransition(runDownState, idleState);
@@ -101,7 +115,9 @@ public static class BuildHeroDirectionalAnimations
         AddAnyTransition(machine, dashState, "DashAttack");
         AddAnyTransition(machine, rollState, "Roll");
         AddAnyTransition(machine, hurtState, "Hurt");
+        AddAnyTransition(machine, sheatheState, "Sheathe", transitionDuration: 0f);
         AddAnyTransition(machine, deathState, "IsDead");
+        AddExit(sheatheState, idleState);
         AddExit(attackState, idleState); AddExit(attackUpState, idleState); AddExit(attackDownState, idleState);
         AddExit(dashState, idleState); AddExit(rollState, idleState); AddExit(hurtState, idleState);
 
@@ -111,24 +127,34 @@ public static class BuildHeroDirectionalAnimations
         Debug.Log("Hero directional animations and Animator Controller rebuilt.");
     }
 
-    [MenuItem("Tools/NewMini/Hero/Normalize Directional Run Frames")]
+    [MenuItem("Tools/NewMini/Hero/Normalize Run Frames")]
     public static void NormalizeRunFrames()
     {
-        NormalizeFolder("RunUp", 12);
-        NormalizeFolder("RunDown", 12);
+        NormalizeFolderIfNeeded("Run", 12, HorizontalRunAlignmentVersion, true);
+        NormalizeFolderIfNeeded("RunUp", 12, DirectionalAlignmentVersion);
+        NormalizeFolderIfNeeded("RunDown", 12, DirectionalAlignmentVersion);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("Directional run frames aligned to a shared foot anchor.");
+        Debug.Log("Hero run frames aligned to shared center and foot anchors.");
     }
 
     private static bool NeedsRunFrameAlignment()
     {
-        var importer = AssetImporter.GetAtPath($"{ArtRoot}/RunUp/RunUp_00.png");
-        return importer == null || importer.userData != AlignmentVersion;
+        return NeedsFolderAlignment("Run", HorizontalRunAlignmentVersion)
+            || NeedsFolderAlignment("RunUp", DirectionalAlignmentVersion)
+            || NeedsFolderAlignment("RunDown", DirectionalAlignmentVersion);
     }
 
-    private static void NormalizeFolder(string folder, int frameCount)
+    private static bool NeedsFolderAlignment(string folder, string version)
     {
+        var importer = AssetImporter.GetAtPath($"{ArtRoot}/{folder}/{folder}_00.png");
+        return importer == null || importer.userData != version;
+    }
+
+    private static void NormalizeFolderIfNeeded(string folder, int frameCount, string version, bool useVisualCenter = false)
+    {
+        if (!NeedsFolderAlignment(folder, version)) return;
+
         for (int index = 0; index < frameCount; index++)
         {
             string path = $"{ArtRoot}/{folder}/{folder}_{index:00}.png";
@@ -138,8 +164,8 @@ public static class BuildHeroDirectionalAnimations
                 throw new InvalidOperationException($"Unable to read directional hero sprite: {path}");
 
             Color32[] pixels = source.GetPixels32();
-            FindOpaqueBounds(pixels, source.width, source.height, out int left, out int footY, out int right);
-            int currentCenterX = Mathf.RoundToInt((left + right) * .5f);
+            FindOpaqueBounds(pixels, source.width, source.height, out int left, out int footY, out int right, out int visualCenterX);
+            int currentCenterX = useVisualCenter ? visualCenterX : Mathf.RoundToInt((left + right) * .5f);
             int shiftX = RunAnchorX - currentCenterX;
             int shiftY = RunAnchorFootY - footY;
             var aligned = new Color32[pixels.Length];
@@ -161,13 +187,15 @@ public static class BuildHeroDirectionalAnimations
             UnityEngine.Object.DestroyImmediate(output);
             AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
             var importer = AssetImporter.GetAtPath(path);
-            if (importer != null) { importer.userData = AlignmentVersion; EditorUtility.SetDirty(importer); }
+            if (importer != null) { importer.userData = version; EditorUtility.SetDirty(importer); }
         }
     }
 
-    private static void FindOpaqueBounds(Color32[] pixels, int width, int height, out int left, out int footY, out int right)
+    private static void FindOpaqueBounds(Color32[] pixels, int width, int height, out int left, out int footY, out int right, out int visualCenterX)
     {
         left = width; right = -1; footY = height;
+        long weightedX = 0;
+        long alphaSum = 0;
         for (int y = 0; y < height; y++)
         for (int x = 0; x < width; x++)
         {
@@ -175,8 +203,11 @@ public static class BuildHeroDirectionalAnimations
             left = Mathf.Min(left, x);
             right = Mathf.Max(right, x);
             footY = Mathf.Min(footY, y);
+            weightedX += (long)x * pixels[y * width + x].a;
+            alphaSum += pixels[y * width + x].a;
         }
         if (right < left) throw new InvalidOperationException("Directional hero frame contains no visible pixels.");
+        visualCenterX = Mathf.RoundToInt(weightedX / (float)alphaSum);
     }
 
     private static AnimationClip CreateClip(string name, string folder, int count, float fps, bool loop)
@@ -210,6 +241,6 @@ public static class BuildHeroDirectionalAnimations
     private static void AddMovementTransition(AnimatorState from, AnimatorState to, AnimatorConditionMode verticalMode, float vertical) { var t = from.AddTransition(to); t.hasExitTime = false; t.duration = .08f; t.AddCondition(AnimatorConditionMode.Greater, .1f, "Speed"); t.AddCondition(verticalMode, vertical, "VerticalDirection"); }
     private static void AddStopTransition(AnimatorState from, AnimatorState to) { var t = from.AddTransition(to); t.hasExitTime = false; t.duration = .08f; t.AddCondition(AnimatorConditionMode.Less, .1f, "Speed"); }
     private static void AddRunDirectionTransition(AnimatorState from, AnimatorState to, float vertical) { var t = from.AddTransition(to); t.hasExitTime = false; t.duration = .08f; t.AddCondition(AnimatorConditionMode.Equals, vertical, "VerticalDirection"); }
-    private static void AddAnyTransition(AnimatorStateMachine m, AnimatorState to, string trigger, float vertical = 0f, string verticalParameter = null) { var t = m.AddAnyStateTransition(to); t.hasExitTime = false; t.duration = .04f; t.AddCondition(AnimatorConditionMode.If, 0f, trigger); if (verticalParameter != null) t.AddCondition(AnimatorConditionMode.Equals, vertical, verticalParameter); }
+    private static void AddAnyTransition(AnimatorStateMachine m, AnimatorState to, string trigger, float vertical = 0f, string verticalParameter = null, float transitionDuration = .04f) { var t = m.AddAnyStateTransition(to); t.hasExitTime = false; t.duration = transitionDuration; t.AddCondition(AnimatorConditionMode.If, 0f, trigger); if (verticalParameter != null) t.AddCondition(AnimatorConditionMode.Equals, vertical, verticalParameter); }
     private static void AddExit(AnimatorState from, AnimatorState to) { var t = from.AddTransition(to); t.hasExitTime = true; t.exitTime = 1f; t.duration = .05f; }
 }
