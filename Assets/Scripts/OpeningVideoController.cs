@@ -12,6 +12,7 @@ using UnityEngine.Video;
 public sealed class OpeningVideoController : MonoBehaviour
 {
     private const string PlayedKeyPrefix = "opening-video.played.";
+    private const string BuildStampResourcePath = "Build/OpeningVideoBuildStamp";
 
     [Header("Authored Video UI")]
     [SerializeField] private GameObject videoRoot;
@@ -23,10 +24,23 @@ public sealed class OpeningVideoController : MonoBehaviour
     [SerializeField, Min(0f)] private float fadeDuration = 1.25f;
 
     public bool WillPlayOnThisLaunch { get; private set; }
-    public static bool ShouldPlayForCurrentBuild => !PlayerPrefs.HasKey(PlayedKeyPrefix + Application.buildGUID);
+    public static bool ShouldPlayForCurrentBuild => !PlayerPrefs.HasKey(CurrentBuildPlayedKey);
     public event Action Finished;
 
     private bool finishing;
+    private PresentationSession performanceSession;
+
+    private static string CurrentBuildPlayedKey
+    {
+        get
+        {
+            TextAsset buildStamp = Resources.Load<TextAsset>(BuildStampResourcePath);
+            string buildId = buildStamp != null && !string.IsNullOrWhiteSpace(buildStamp.text)
+                ? buildStamp.text.Trim()
+                : Application.buildGUID;
+            return PlayedKeyPrefix + buildId;
+        }
+    }
 
     private void Awake()
     {
@@ -37,7 +51,6 @@ public sealed class OpeningVideoController : MonoBehaviour
             return;
         }
 
-        GameAudioManager.SetMusicSuppressed(true);
         if (videoRoot != null) videoRoot.SetActive(true);
         if (videoCanvasGroup != null)
         {
@@ -66,16 +79,25 @@ public sealed class OpeningVideoController : MonoBehaviour
 
     private void OnDestroy()
     {
+        performanceSession?.Dispose();
+        performanceSession = null;
         if (videoPlayer == null) return;
         videoPlayer.loopPointReached -= HandleVideoFinished;
         videoPlayer.errorReceived -= HandleVideoError;
         videoPlayer.prepareCompleted -= HandleVideoPrepared;
     }
 
+    private void OnDisable()
+    {
+        performanceSession?.Dispose();
+        performanceSession = null;
+    }
+
     private void HandleVideoPrepared(VideoPlayer source)
     {
+        performanceSession ??= DialoguePerformanceManager.BeginPerformance(this, "Opening Video");
         source.Play();
-        PlayerPrefs.SetInt(PlayedKeyPrefix + Application.buildGUID, 1);
+        PlayerPrefs.SetInt(CurrentBuildPlayedKey, 1);
         PlayerPrefs.Save();
     }
 
@@ -112,7 +134,8 @@ public sealed class OpeningVideoController : MonoBehaviour
 
         if (videoPlayer != null) videoPlayer.Stop();
         if (videoRoot != null) videoRoot.SetActive(false);
-        GameAudioManager.SetMusicSuppressed(false);
+        performanceSession?.Dispose();
+        performanceSession = null;
         Finished?.Invoke();
     }
 }

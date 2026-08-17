@@ -18,7 +18,7 @@ public sealed class ArenaWaveSpawner : MonoBehaviour
         public EnemySpawner.EnemyType enemyType;
         [Tooltip("Enemy prefab with an EnemyAgent component.")]
         public GameObject enemyPrefab;
-        [Tooltip("Enemy positions in this entry. The count is distributed across these points in order.")]
+        [Tooltip("Enemy positions in this entry. Each valid point is used at most once per wave.")]
         public Transform[] spawnPoints;
         [Min(1)] public int count = 1;
     }
@@ -125,10 +125,13 @@ public sealed class ArenaWaveSpawner : MonoBehaviour
         foreach (SpawnEntry entry in wave.spawns)
         {
             if (entry == null || entry.enemyPrefab == null || entry.spawnPoints == null || entry.spawnPoints.Length == 0) continue;
-            for (int index = 0; index < entry.count; index++)
+
+            int spawnedCount = 0;
+            for (int pointIndex = 0; pointIndex < entry.spawnPoints.Length && spawnedCount < entry.count; pointIndex++)
             {
-                Transform point = entry.spawnPoints[index % entry.spawnPoints.Length];
+                Transform point = entry.spawnPoints[pointIndex];
                 if (point == null) continue;
+
                 GameObject instance = Instantiate(entry.enemyPrefab, point.position, point.rotation, spawnedEnemyParent);
                 if (spawnEnemiesDisabled)
                 {
@@ -136,7 +139,13 @@ public sealed class ArenaWaveSpawner : MonoBehaviour
                     if (enemy != null) enemy.enabled = false;
                 }
                 spawnedEnemies.Add(instance);
+                spawnedCount++;
             }
+
+            if (spawnedCount < entry.count)
+                Debug.LogWarning($"{name}: {wave.waveName} requested {entry.count} {entry.enemyPrefab.name} enemies, " +
+                                 $"but only {spawnedCount} valid unique spawn points are assigned. " +
+                                 "Add more spawn points or reduce Count; spawn points will not be reused.", this);
         }
     }
 

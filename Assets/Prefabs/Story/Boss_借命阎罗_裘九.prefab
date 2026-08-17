@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1015559262287778685
+--- !u!1 &8265082145260189039
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,9 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4084372507139816940}
-  - component: {fileID: 8338557352059451914}
-  - component: {fileID: 2306514922082284840}
+  - component: {fileID: 8256894575589133159}
+  - component: {fileID: 8380715768059725885}
+  - component: {fileID: 5723530476934116893}
   m_Layer: 0
   m_Name: Visual_Boss
   m_TagString: Untagged
@@ -18,13 +18,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4084372507139816940
+--- !u!4 &8256894575589133159
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1015559262287778685}
+  m_GameObject: {fileID: 8265082145260189039}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -33,14 +33,14 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6412904609548794850}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &8338557352059451914
+--- !u!212 &8380715768059725885
 SpriteRenderer:
   serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1015559262287778685}
+  m_GameObject: {fileID: 8265082145260189039}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -93,14 +93,14 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
---- !u!95 &2306514922082284840
+--- !u!95 &5723530476934116893
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1015559262287778685}
+  m_GameObject: {fileID: 8265082145260189039}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 7d46088a793c4784a9e468b043f739dc, type: 2}
@@ -202,11 +202,11 @@ PrefabInstance:
     - target: {fileID: 2004, guid: d8ffcc6e514f86047ac9f88b26e9d13b, type: 3}
       propertyPath: visualAnimator
       value: 
-      objectReference: {fileID: 2306514922082284840}
+      objectReference: {fileID: 5723530476934116893}
     - target: {fileID: 2004, guid: d8ffcc6e514f86047ac9f88b26e9d13b, type: 3}
       propertyPath: visualRenderer
       value: 
-      objectReference: {fileID: 8338557352059451914}
+      objectReference: {fileID: 8380715768059725885}
     m_RemovedComponents:
     - {fileID: 2002, guid: d8ffcc6e514f86047ac9f88b26e9d13b, type: 3}
     - {fileID: 2005, guid: d8ffcc6e514f86047ac9f88b26e9d13b, type: 3}
@@ -214,7 +214,7 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 2001, guid: d8ffcc6e514f86047ac9f88b26e9d13b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4084372507139816940}
+      addedObject: {fileID: 8256894575589133159}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 2000, guid: d8ffcc6e514f86047ac9f88b26e9d13b, type: 3}
       insertIndex: -1
@@ -268,10 +268,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca6ca8c1af417f849a9e673b0391252d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossCombatController
-  hitsBeforeCounter: 5
-  consecutiveHitGracePeriod: 3
-  counterKnockbackDistance: 2.2
-  maximumAttackCount: 3
-  followUpAttackChance: 0.72
+  hitsToDefeat: 20
+  guardChance: 0.4
+  guardDuration: 0.58
+  guardKnockbackDistance: 2.2
+  guardOpeningDurationRange: {x: 0.38, y: 0.58}
+  attackDistance: 2.05
+  preferredOpeningDistance: 2.7
+  approachSpeedMultiplier: 1.08
+  openingMoveSpeed: 2.2
+  approachWeaveStrength: 0.22
+  initialDecisionDelayRange: {x: 0.15, y: 0.32}
+  singleOpeningDurationRange: {x: 0.62, y: 0.92}
+  tripleOpeningDurationRange: {x: 1, y: 1.35}
+  dashOpeningDurationRange: {x: 1.1, y: 1.5}
+  singleAttackWeight: 0.46
+  tripleAttackWeight: 0.34
+  dashAttackWeight: 0.2
+  tripleAttackCooldown: 2.8
+  dashAttackCooldown: 4.2
+  singleHitTime: 0.36
+  singleAttackDuration: 0.78
+  tripleStrikeInterval: 0.3
+  tripleStrikeHitDelay: 0.15
+  tripleRecoveryDuration: 0.38
+  dashMinimumDistance: 2.2
+  dashMaximumDistance: 5.8
+  dashWindupDuration: 0.42
+  dashTravelDuration: 0.4
+  dashSpeed: 15
+  dashImpactNormalizedTime: 0.82
+  dashRecoveryDuration: 0.62
   meleeHitboxForwardOffset: 0.9
   meleeHitboxSize: {x: 1.9, y: 2.2}

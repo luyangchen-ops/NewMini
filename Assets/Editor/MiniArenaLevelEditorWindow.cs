@@ -835,6 +835,7 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
         respawnCollider.isTrigger = true;
         respawnCollider.radius = .5f;
         RespawnPoint respawnPoint = respawnObject.AddComponent<RespawnPoint>();
+        RespawnPointManager respawnManager = Object.FindAnyObjectByType<RespawnPointManager>(FindObjectsInactive.Include);
 
         SerializedObject serializedZone = new(zone);
         SerializedProperty gateProperty = serializedZone.FindProperty("boundaryGates");
@@ -844,8 +845,18 @@ public sealed class MiniArenaLevelEditorWindow : EditorWindow
 
         SerializedObject serializedRespawn = new(respawnPoint);
         serializedRespawn.FindProperty("pointId").stringValue = $"{arenaName}_checkpoint";
-        serializedRespawn.FindProperty("activeOnLevelStart").boolValue = true;
+        serializedRespawn.FindProperty("activeOnLevelStart").boolValue = respawnManager == null || respawnManager.PointCount == 0;
         serializedRespawn.ApplyModifiedPropertiesWithoutUndo();
+
+        if (respawnManager != null)
+        {
+            SerializedObject serializedManager = new(respawnManager);
+            SerializedProperty pointSequence = serializedManager.FindProperty("respawnPoints");
+            int pointIndex = pointSequence.arraySize;
+            pointSequence.InsertArrayElementAtIndex(pointIndex);
+            pointSequence.GetArrayElementAtIndex(pointIndex).objectReferenceValue = respawnPoint;
+            serializedManager.ApplyModifiedPropertiesWithoutUndo();
+        }
 
         Selection.activeGameObject = root;
         EditorSceneManager.MarkSceneDirty(root.scene);

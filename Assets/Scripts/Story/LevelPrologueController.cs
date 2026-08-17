@@ -47,6 +47,7 @@ public sealed class LevelPrologueController : MonoBehaviour
     private bool startRequested;
     private bool waitingForOpeningVideo;
     private bool banditEntranceStarted;
+    private PresentationSession performanceSession;
 
     private void Awake()
     {
@@ -97,6 +98,7 @@ public sealed class LevelPrologueController : MonoBehaviour
     {
         if (waitingForOpeningVideo || startRequested || state != PrologueState.MainMenu) return;
         startRequested = true;
+        performanceSession = DialoguePerformanceManager.BeginPerformance(this, "Level Prologue");
         StartCoroutine(RunOpening());
     }
 
@@ -327,6 +329,8 @@ public sealed class LevelPrologueController : MonoBehaviour
             openingBandit.enabled = true;
         }
         if (gameplayHudRoot != null) gameplayHudRoot.SetActive(true);
+        performanceSession?.Dispose();
+        performanceSession = null;
     }
 
     private void HandleOpeningBanditDied(EnemyAgent enemy)
@@ -364,6 +368,8 @@ public sealed class LevelPrologueController : MonoBehaviour
 
     private void OnDisable()
     {
+        performanceSession?.Dispose();
+        performanceSession = null;
         if (openingDialogue != null)
         {
             openingDialogue.DialogueFinished -= HandleDialogueFinished;

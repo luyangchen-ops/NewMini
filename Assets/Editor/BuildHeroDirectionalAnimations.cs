@@ -11,6 +11,7 @@ public static class BuildHeroDirectionalAnimations
 {
     private const string ArtRoot = "Assets/Resources/InkWuxiaHero/Art/Sprites";
     private const string ClipsRoot = "Assets/Resources/InkWuxiaHero/Animations/Clips";
+    private const string NewRunClipsRoot = ClipsRoot + "/New Run";
     private const string ControllerPath = "Assets/Resources/InkWuxiaHero/Animations/Controller/Hero_InkWuxia.controller";
     private const float RunFps = 14f;
     private const float AttackFps = 16f;
@@ -57,9 +58,9 @@ public static class BuildHeroDirectionalAnimations
 
         AnimationClip sheathe = CreateClip("Hero_Sheathe", "Sheathe", 8, SheatheFps, false);
         AnimationClip idleHold = CreateClip("Hero_IdleHoldInkEcho", "IdleHoldInkEcho", 12, IdleHoldFps, true);
-        AnimationClip run = CreateClip("Hero_Run", "Run", 12, RunFps, true);
-        AnimationClip runUp = CreateClip("Hero_RunUp", "RunUp", 12, RunFps, true);
-        AnimationClip runDown = CreateClip("Hero_RunDown", "RunDown", 12, RunFps, true);
+        AnimationClip run = LoadPreferredRunClip("Hero_RunV2") ?? CreateClip("Hero_Run", "Run", 12, RunFps, true);
+        AnimationClip runUp = LoadPreferredRunClip("Hero_RunUpV2") ?? CreateClip("Hero_RunUp", "RunUp", 12, RunFps, true);
+        AnimationClip runDown = LoadPreferredRunClip("Hero_RunDownV2") ?? CreateClip("Hero_RunDown", "RunDown", 12, RunFps, true);
         AnimationClip attack = CreateClip("Hero_NormalAttack", "NormalAttack", 8, AttackFps, false);
         AnimationClip attackUp = CreateClip("Hero_NormalAttackUp", "NormalAttackUp", 8, AttackFps, false);
         AnimationClip attackDown = CreateClip("Hero_NormalAttackDown", "NormalAttackDown", 8, AttackFps, false);
@@ -233,6 +234,8 @@ public static class BuildHeroDirectionalAnimations
     }
 
     private static AnimationClip LoadClip(string name) => AssetDatabase.LoadAssetAtPath<AnimationClip>($"{ClipsRoot}/{name}.anim");
+    private static AnimationClip LoadPreferredRunClip(string name) =>
+        AssetDatabase.LoadAssetAtPath<AnimationClip>($"{NewRunClipsRoot}/{name}.anim");
     private static AnimatorControllerParameter Float(string name) => new AnimatorControllerParameter { name = name, type = AnimatorControllerParameterType.Float };
     private static AnimatorControllerParameter Int(string name) => new AnimatorControllerParameter { name = name, type = AnimatorControllerParameterType.Int };
     private static AnimatorControllerParameter Trigger(string name) => new AnimatorControllerParameter { name = name, type = AnimatorControllerParameterType.Trigger };

@@ -1,70 +1,341 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
+
+public enum BossNodeStatus
+{
+    Running,
+    Success,
+    Failure
+}
+
+public abstract class BossBehaviorNode
+{
+    public abstract BossNodeStatus Tick();
+    public virtual void Reset() { }
+}
+
+public sealed class BossConditionNode : BossBehaviorNode
+{
+    private readonly Func<bool> condition;
+
+    public BossConditionNode(Func<bool> condition) => this.condition = condition;
+
+    public override BossNodeStatus Tick() => condition()
+        ? BossNodeStatus.Success
+        : BossNodeStatus.Failure;
+}
+
+public sealed class BossActionNode : BossBehaviorNode
+{
+    private readonly Func<BossNodeStatus> action;
+    private readonly Action reset;
+
+    public BossActionNode(Func<BossNodeStatus> action, Action reset = null)
+    {
+        this.action = action;
+        this.reset = reset;
+    }
+
+    public override BossNodeStatus Tick() => action();
+    public override void Reset() => reset?.Invoke();
+}
+
+public sealed class BossSequenceNode : BossBehaviorNode
+{
+    private readonly IReadOnlyList<BossBehaviorNode> children;
+    private int currentIndex;
+
+    public BossSequenceNode(params BossBehaviorNode[] children) => this.children = children;
+
+    public override BossNodeStatus Tick()
+    {
+        while (currentIndex < children.Count)
+        {
+            BossNodeStatus status = children[currentIndex].Tick();
+            if (status == BossNodeStatus.Running) return status;
+            if (status == BossNodeStatus.Failure)
+            {
+                Reset();
+                return status;
+            }
+
+            currentIndex++;
+        }
+
+        Reset();
+        return BossNodeStatus.Success;
+    }
+
+    public override void Reset()
+    {
+        foreach (BossBehaviorNode child in children) child.Reset();
+        currentIndex = 0;
+    }
+}
+
+public sealed class BossPrioritySelectorNode : BossBehaviorNode
+{
+    private readonly IReadOnlyList<BossBehaviorNode> children;
+    private int runningIndex = -1;
+
+    public BossPrioritySelectorNode(params BossBehaviorNode[] children) => this.children = children;
+
+    public override BossNodeStatus Tick()
+    {
+        for (int i = 0; i < children.Count; i++)
+        {
+            BossNodeStatus status = children[i].Tick();
+            if (status == BossNodeStatus.Failure) continue;
+
+            if (runningIndex != i)
+            {
+                if (runningIndex >= 0) children[runningIndex].Reset();
+                runningIndex = status == BossNodeStatus.Running ? i : -1;
+            }
+            else if (status != BossNodeStatus.Running)
+            {
+                runningIndex = -1;
+            }
+
+            return status;
+        }
+
+        runningIndex = -1;
+        return BossNodeStatus.Failure;
+    }
+
+    public override void Reset()
+    {
+        foreach (BossBehaviorNode child in children) child.Reset();
+        runningIndex = -1;
+    }
+}
+
+public enum BossHitResolution
+{
+    Guarded,
+    Damaged,
+    Lethal
+}
 
 /// <summary>
-/// Boss-only combat rules. This intentionally does not use shield-facing logic:
-/// every fifth accepted player hit is answered with an all-direction counter block.
+/// Boss-specific behavior tree and combat blackboard. The tree gives reactive guarding
+/// priority over committed attacks, then alternates pressure, attacks, and readable openings.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class BossCombatController : MonoBehaviour
 {
-    [Header("Five-hit counter")]
-    [SerializeField, Min(1)] private int hitsBeforeCounter = 5;
-    [Tooltip("Maximum interval between successive player hits needed to trigger the counter.")]
-    [SerializeField, Min(.05f)] private float consecutiveHitGracePeriod = 3f;
-    [SerializeField, Min(0f)] private float counterKnockbackDistance = 2.2f;
+    private enum CombatAction
+    {
+        None,
+        SingleAttack,
+        TripleAttack,
+        DashAttack
+    }
 
-    [Header("Aggressive combo")]
-    [SerializeField, Range(1, 3)] private int maximumAttackCount = 3;
-    [SerializeField, Range(0f, 1f)] private float followUpAttackChance = .72f;
-    [Tooltip("Forward offset of the melee hitbox from the Boss body centre.")]
+    [Header("Standalone Boss Vitals")]
+    [Tooltip("Hit count required to defeat a standalone Boss. Story Bosses keep using Borrowed Life instead.")]
+    [SerializeField, Min(1)] private int hitsToDefeat = 20;
+
+    [Header("Reactive Guard")]
+    [SerializeField, Range(0f, 1f)] private float guardChance = .4f;
+    [SerializeField, Min(.05f)] private float guardDuration = .58f;
+    [SerializeField, Min(0f)] private float guardKnockbackDistance = 2.2f;
+    [SerializeField] private Vector2 guardOpeningDurationRange = new(.38f, .58f);
+
+    [Header("Pressure Loop")]
+    [SerializeField, Min(.1f)] private float attackDistance = 2.05f;
+    [SerializeField, Min(.1f)] private float preferredOpeningDistance = 2.7f;
+    [SerializeField, Min(0f)] private float approachSpeedMultiplier = 1.08f;
+    [SerializeField, Min(0f)] private float openingMoveSpeed = 2.2f;
+    [SerializeField, Range(0f, 1f)] private float approachWeaveStrength = .22f;
+    [SerializeField] private Vector2 initialDecisionDelayRange = new(.15f, .32f);
+    [SerializeField] private Vector2 singleOpeningDurationRange = new(.62f, .92f);
+    [SerializeField] private Vector2 tripleOpeningDurationRange = new(1f, 1.35f);
+    [SerializeField] private Vector2 dashOpeningDurationRange = new(1.1f, 1.5f);
+
+    [Header("Attack Selection")]
+    [SerializeField, Range(0f, 1f)] private float singleAttackWeight = .46f;
+    [SerializeField, Range(0f, 1f)] private float tripleAttackWeight = .34f;
+    [SerializeField, Range(0f, 1f)] private float dashAttackWeight = .2f;
+    [SerializeField, Min(0f)] private float tripleAttackCooldown = 2.8f;
+    [SerializeField, Min(0f)] private float dashAttackCooldown = 4.2f;
+
+    [Header("Single Attack")]
+    [SerializeField, Min(.01f)] private float singleHitTime = .36f;
+    [SerializeField, Min(.05f)] private float singleAttackDuration = .78f;
+
+    [Header("Fast Triple Attack")]
+    [SerializeField, Min(.05f)] private float tripleStrikeInterval = .3f;
+    [SerializeField, Min(.01f)] private float tripleStrikeHitDelay = .15f;
+    [SerializeField, Min(.05f)] private float tripleRecoveryDuration = .38f;
+
+    [Header("Dash Attack")]
+    [SerializeField, Min(.1f)] private float dashMinimumDistance = 2.2f;
+    [SerializeField, Min(.1f)] private float dashMaximumDistance = 5.8f;
+    [SerializeField, Min(.05f)] private float dashWindupDuration = .42f;
+    [SerializeField, Min(.05f)] private float dashTravelDuration = .4f;
+    [SerializeField, Min(0f)] private float dashSpeed = 15f;
+    [SerializeField, Range(0f, 1f)] private float dashImpactNormalizedTime = .82f;
+    [SerializeField, Min(0f)] private float dashRecoveryDuration = .62f;
+
+    [Header("Melee Hitbox")]
     [SerializeField, Min(0f)] private float meleeHitboxForwardOffset = .9f;
-    [Tooltip("World-space size of the melee hitbox. Damage is dealt only when it overlaps the player collider.")]
     [SerializeField] private Vector2 meleeHitboxSize = new(1.9f, 2.2f);
 
     private EnemyAgent agent;
     private Animator visualAnimator;
     private PlayerCharacterController player;
-    private int receivedHitCount;
-    private int attackCount;
-    private float lastHitTime = float.NegativeInfinity;
+    private BossBehaviorNode behaviorTree;
+    private CombatAction currentAction;
+    private CombatAction previousAction;
+    private int receivedDamageCount;
+    private int tripleStrikeIndex;
+    private float actionElapsed;
+    private float openingEndTime;
+    private float decisionReadyTime;
+    private float guardEndTime;
+    private float tripleReadyTime;
+    private float dashReadyTime;
+    private float activeDashTravelDuration;
+    private float openingStrafeSign = 1f;
+    private bool actionDamageDealt;
     private Vector2 swingDirection = Vector2.right;
+    private Vector2 dashDirection = Vector2.right;
+    private Vector3 startingPosition;
+    private Quaternion startingRotation;
+    private bool supportsGuardAnimation;
+    private bool supportsTripleAnimation;
+    private bool supportsDashAnimation;
 
     private static readonly int Attack = Animator.StringToHash("Attack");
+    private static readonly int Guard = Animator.StringToHash("Guard");
+    private static readonly int TripleAttack = Animator.StringToHash("TripleAttack");
+    private static readonly int DashAttack = Animator.StringToHash("DashAttack");
+
+    public bool UsesBehaviorTree => true;
+    public bool IsGuarding => Time.time < guardEndTime;
+    public bool IsCounterGuarding => IsGuarding;
+
+    private bool HasTarget => agent != null && agent.HasTarget && player != null && !agent.IsDead;
+    private float TargetDistance => HasTarget
+        ? Vector2.Distance(agent.Body.position, player.transform.position)
+        : float.PositiveInfinity;
 
     private void Awake()
     {
         agent = GetComponent<EnemyAgent>();
         visualAnimator = GetComponentInChildren<Animator>();
         player = FindAnyObjectByType<PlayerCharacterController>();
+        startingPosition = transform.position;
+        startingRotation = transform.rotation;
+        CacheAnimatorParameters();
+        BuildBehaviorTree();
+        decisionReadyTime = Time.time + RandomRange(initialDecisionDelayRange);
     }
 
-    /// <summary>Called only when a player strike has actually reached the boss.</summary>
-    public bool TryCounterPlayerHit()
+    private void Start()
     {
-        if (Time.time - lastHitTime > consecutiveHitGracePeriod) receivedHitCount = 0;
-        lastHitTime = Time.time;
-        receivedHitCount++;
-        if (receivedHitCount < hitsBeforeCounter) return false;
+        if (RespawnPointManager.Instance != null)
+            RespawnPointManager.Instance.PlayerRespawned += ResetForCheckpointRetry;
+    }
 
-        receivedHitCount = 0;
-        TriggerCounterBlock();
+    private void Update()
+    {
+        if (agent == null || agent.IsDead) return;
+        player ??= FindAnyObjectByType<PlayerCharacterController>();
+        if (!HasTarget)
+        {
+            agent.SetDesiredVelocity(Vector2.zero);
+            return;
+        }
+
+        behaviorTree.Tick();
+    }
+
+    private void OnDestroy()
+    {
+        if (RespawnPointManager.Instance != null)
+            RespawnPointManager.Instance.PlayerRespawned -= ResetForCheckpointRetry;
+    }
+
+    private void BuildBehaviorTree()
+    {
+        BossBehaviorNode guardBranch = new BossSequenceNode(
+            new BossConditionNode(() => IsGuarding),
+            new BossActionNode(TickGuard));
+
+        BossBehaviorNode committedActionBranch = new BossSequenceNode(
+            new BossConditionNode(() => currentAction != CombatAction.None),
+            new BossActionNode(TickCommittedAction));
+
+        BossBehaviorNode openingBranch = new BossSequenceNode(
+            new BossConditionNode(() => Time.time < openingEndTime),
+            new BossActionNode(TickOpening));
+
+        BossBehaviorNode decisionPauseBranch = new BossSequenceNode(
+            new BossConditionNode(() => Time.time < decisionReadyTime),
+            new BossActionNode(TickDecisionPause));
+
+        BossBehaviorNode approachBranch = new BossSequenceNode(
+            new BossConditionNode(ShouldApproach),
+            new BossActionNode(TickApproach));
+
+        BossBehaviorNode combatSelector = new BossPrioritySelectorNode(
+            guardBranch,
+            committedActionBranch,
+            openingBranch,
+            decisionPauseBranch,
+            approachBranch,
+            new BossActionNode(ChooseNextAttack));
+
+        behaviorTree = new BossSequenceNode(
+            new BossConditionNode(() => HasTarget),
+            combatSelector);
+    }
+
+    /// <summary>Resolves defense and standalone health at the actual player-hit boundary.</summary>
+    public BossHitResolution ResolvePlayerAttack(Vector2 attackerPosition, bool allowGuard)
+    {
+        if (allowGuard && TryGuardPlayerAttack(attackerPosition)) return BossHitResolution.Guarded;
+        if (GetComponent<BorrowedLifeBossController>() != null) return BossHitResolution.Lethal;
+
+        receivedDamageCount++;
+        return receivedDamageCount >= hitsToDefeat
+            ? BossHitResolution.Lethal
+            : BossHitResolution.Damaged;
+    }
+
+    private bool TryGuardPlayerAttack(Vector2 attackerPosition)
+    {
+        if (agent == null || agent.IsDead || IsGuarding || Random.value >= guardChance) return false;
+
+        CancelCurrentAction();
+        guardEndTime = Time.time + guardDuration;
+        agent.CancelBossBehaviorAttack();
+        TriggerGuardAnimation();
+
+        player ??= FindAnyObjectByType<PlayerCharacterController>();
+        if (player != null)
+        {
+            Vector2 awayFromBoss = attackerPosition - (Vector2)transform.position;
+            if (awayFromBoss.sqrMagnitude <= .0001f)
+                awayFromBoss = player.transform.position.x < transform.position.x ? Vector2.left : Vector2.right;
+            player.ReceiveKnockback(awayFromBoss.normalized, guardKnockbackDistance);
+        }
+
+        behaviorTree.Reset();
         return true;
     }
 
-    public void BeginAttackSequence() => attackCount = 1;
-
-    /// <summary>Locks this swing's facing direction before its damaging frame.</summary>
     public void BeginMeleeSwing()
     {
-        player ??= FindAnyObjectByType<PlayerCharacterController>();
-        if (player == null) return;
-
-        swingDirection = player.transform.position.x < transform.position.x
-            ? Vector2.left
-            : Vector2.right;
+        if (!HasTarget) return;
+        swingDirection = player.transform.position.x < transform.position.x ? Vector2.left : Vector2.right;
     }
 
-    /// <summary>Returns true only while the current sword-swing hitbox overlaps the player collider.</summary>
     public bool IsCurrentMeleeSwingHittingPlayer(PlayerCharacterController targetPlayer)
     {
         if (targetPlayer == null || agent?.Body == null) return false;
@@ -73,38 +344,334 @@ public sealed class BossCombatController : MonoBehaviour
         Vector2 center = agent.Body.position + swingDirection * meleeHitboxForwardOffset;
         foreach (Collider2D hit in Physics2D.OverlapBoxAll(center, size, 0f))
         {
-            // The player's body collider lives on the controller object. Do not let
-            // any child trigger used for presentation extend the attack reach.
-            if (hit != null && hit.GetComponent<PlayerCharacterController>() == targetPlayer)
-                return true;
+            if (hit != null && hit.GetComponent<PlayerCharacterController>() == targetPlayer) return true;
         }
 
         return false;
     }
 
-    public bool TryContinueAttackSequence()
-    {
-        if (agent == null || agent.IsDead || attackCount >= maximumAttackCount) return false;
-        if (Random.value > followUpAttackChance) return false;
+    // Legacy generic-melee entry points remain no-ops because Boss attack chaining
+    // is now owned entirely by the behavior tree.
+    public void BeginAttackSequence() { }
+    public bool TryContinueAttackSequence() => false;
 
-        attackCount++;
-        return true;
+    private BossNodeStatus TickGuard()
+    {
+        agent.SetDesiredVelocity(Vector2.zero);
+        agent.FaceTarget();
+        if (IsGuarding) return BossNodeStatus.Running;
+
+        BeginOpening(guardOpeningDurationRange);
+        return BossNodeStatus.Success;
     }
 
-    private void TriggerCounterBlock()
+    private BossNodeStatus TickCommittedAction()
     {
-        if (visualAnimator != null)
+        return currentAction switch
         {
-            // The supplied attack clip is deliberately reused as the counter pose.
+            CombatAction.SingleAttack => TickSingleAttack(),
+            CombatAction.TripleAttack => TickTripleAttack(),
+            CombatAction.DashAttack => TickDashAttack(),
+            _ => BossNodeStatus.Failure
+        };
+    }
+
+    private BossNodeStatus TickSingleAttack()
+    {
+        actionElapsed += agent.EnemyDeltaTime;
+        agent.SetDesiredVelocity(Vector2.zero);
+        agent.FaceTarget();
+
+        if (!actionDamageDealt && actionElapsed >= singleHitTime)
+        {
+            actionDamageDealt = true;
+            agent.PerformMeleeAttack();
+        }
+
+        if (actionElapsed < singleAttackDuration) return BossNodeStatus.Running;
+        agent.CompleteMeleeAttack();
+        FinishAction(singleOpeningDurationRange);
+        return BossNodeStatus.Success;
+    }
+
+    private BossNodeStatus TickTripleAttack()
+    {
+        actionElapsed += agent.EnemyDeltaTime;
+        agent.SetDesiredVelocity(Vector2.zero);
+        agent.FaceTarget();
+
+        float strikeStartTime = tripleStrikeIndex * tripleStrikeInterval;
+        if (!actionDamageDealt && actionElapsed >= strikeStartTime + tripleStrikeHitDelay)
+        {
+            actionDamageDealt = true;
+            agent.PerformMeleeAttack();
+        }
+
+        if (tripleStrikeIndex < 2 && actionElapsed >= (tripleStrikeIndex + 1) * tripleStrikeInterval)
+        {
+            tripleStrikeIndex++;
+            actionDamageDealt = false;
+            agent.BeginBossBehaviorAttack(tripleStrikeHitDelay, .2f, !supportsTripleAnimation);
+        }
+
+        float finishTime = tripleStrikeInterval * 2f + tripleStrikeHitDelay + tripleRecoveryDuration;
+        if (actionElapsed < finishTime) return BossNodeStatus.Running;
+        agent.CompleteMeleeAttack();
+        tripleReadyTime = Time.time + tripleAttackCooldown;
+        FinishAction(tripleOpeningDurationRange);
+        return BossNodeStatus.Success;
+    }
+
+    private BossNodeStatus TickDashAttack()
+    {
+        actionElapsed += agent.EnemyDeltaTime;
+        float travelElapsed = actionElapsed - dashWindupDuration;
+        if (travelElapsed < 0f)
+        {
+            agent.SetDesiredVelocity(Vector2.zero);
+            agent.FaceTarget();
+            return BossNodeStatus.Running;
+        }
+
+        if (travelElapsed < activeDashTravelDuration)
+        {
+            agent.SetDesiredVelocity(dashDirection * dashSpeed);
+            float impactTime = activeDashTravelDuration * dashImpactNormalizedTime;
+            if (!actionDamageDealt && travelElapsed >= impactTime)
+            {
+                actionDamageDealt = true;
+                agent.PerformMeleeAttack();
+            }
+            return BossNodeStatus.Running;
+        }
+
+        agent.SetDesiredVelocity(Vector2.zero);
+        if (travelElapsed < activeDashTravelDuration + dashRecoveryDuration) return BossNodeStatus.Running;
+
+        agent.CompleteMeleeAttack();
+        dashReadyTime = Time.time + dashAttackCooldown;
+        FinishAction(dashOpeningDurationRange);
+        return BossNodeStatus.Success;
+    }
+
+    private BossNodeStatus TickOpening()
+    {
+        if (Time.time >= openingEndTime)
+        {
+            agent.SetDesiredVelocity(Vector2.zero);
+            decisionReadyTime = Time.time + Random.Range(.08f, .18f);
+            return BossNodeStatus.Success;
+        }
+
+        Vector2 away = ((Vector2)agent.Body.position - (Vector2)player.transform.position).normalized;
+        if (away.sqrMagnitude <= .0001f) away = Vector2.left;
+        Vector2 tangent = new(-away.y, away.x);
+        float retreatStrength = TargetDistance < preferredOpeningDistance ? 1f : .22f;
+        Vector2 openingDirection = (away * retreatStrength + tangent * openingStrafeSign * .52f).normalized;
+        agent.SetDesiredVelocity(openingDirection * openingMoveSpeed);
+        agent.FaceTarget();
+        return BossNodeStatus.Running;
+    }
+
+    private BossNodeStatus TickDecisionPause()
+    {
+        agent.SetDesiredVelocity(Vector2.zero);
+        agent.FaceTarget();
+        return Time.time < decisionReadyTime ? BossNodeStatus.Running : BossNodeStatus.Success;
+    }
+
+    private BossNodeStatus TickApproach()
+    {
+        Vector2 towardPlayer = ((Vector2)player.transform.position - agent.Body.position).normalized;
+        float weave = Mathf.Sin(Time.time * 3.1f) * approachWeaveStrength;
+        Vector2 approach = new Vector2(towardPlayer.x, towardPlayer.y + weave).normalized;
+        agent.SetDesiredVelocity(approach * agent.Data.MoveSpeed * approachSpeedMultiplier);
+        return TargetDistance > attackDistance ? BossNodeStatus.Running : BossNodeStatus.Success;
+    }
+
+    private BossNodeStatus ChooseNextAttack()
+    {
+        CombatAction chosen = RollAttack();
+        StartAction(chosen);
+        return BossNodeStatus.Running;
+    }
+
+    private bool ShouldApproach()
+    {
+        float distance = TargetDistance;
+        if (distance <= attackDistance) return false;
+
+        bool canDashNow = Time.time >= dashReadyTime
+            && distance >= dashMinimumDistance
+            && distance <= dashMaximumDistance;
+        return !canDashNow;
+    }
+
+    private CombatAction RollAttack()
+    {
+        float distance = TargetDistance;
+        float singleWeight = distance <= attackDistance + .1f ? Mathf.Max(0f, singleAttackWeight) : 0f;
+        float tripleWeight = Time.time >= tripleReadyTime && distance <= attackDistance + .35f
+            ? Mathf.Max(0f, tripleAttackWeight)
+            : 0f;
+        float dashWeight = Time.time >= dashReadyTime
+            && distance >= dashMinimumDistance
+            && distance <= dashMaximumDistance
+                ? Mathf.Max(0f, dashAttackWeight)
+                : 0f;
+
+        // Memory prevents identical specials from producing a mechanical repeating loop.
+        if (previousAction == CombatAction.TripleAttack) tripleWeight *= .2f;
+        if (previousAction == CombatAction.DashAttack) dashWeight *= .1f;
+
+        float total = singleWeight + tripleWeight + dashWeight;
+        if (total <= .0001f) return CombatAction.SingleAttack;
+        float roll = Random.value * total;
+        if (roll < dashWeight) return CombatAction.DashAttack;
+        if (roll < dashWeight + tripleWeight) return CombatAction.TripleAttack;
+        return CombatAction.SingleAttack;
+    }
+
+    private void StartAction(CombatAction action)
+    {
+        currentAction = action;
+        actionElapsed = 0f;
+        actionDamageDealt = false;
+        tripleStrikeIndex = 0;
+
+        switch (action)
+        {
+            case CombatAction.SingleAttack:
+                agent.BeginBossBehaviorAttack(singleHitTime, .24f, true);
+                break;
+            case CombatAction.TripleAttack:
+                agent.BeginBossBehaviorAttack(tripleStrikeHitDelay, .2f, false);
+                TriggerTripleAnimation();
+                break;
+            case CombatAction.DashAttack:
+                dashDirection = ((Vector2)player.transform.position - agent.Body.position).normalized;
+                if (dashDirection.sqrMagnitude <= .0001f) dashDirection = Vector2.right;
+                swingDirection = dashDirection.x < 0f ? Vector2.left : Vector2.right;
+                float requestedTravelDistance = TargetDistance + meleeHitboxForwardOffset * .35f;
+                activeDashTravelDuration = Mathf.Clamp(
+                    requestedTravelDistance / Mathf.Max(.01f, dashSpeed),
+                    .12f,
+                    dashTravelDuration);
+                agent.BeginBossBehaviorAttack(
+                    dashWindupDuration + activeDashTravelDuration * dashImpactNormalizedTime,
+                    .24f,
+                    false);
+                TriggerDashAnimation();
+                break;
+        }
+    }
+
+    private void FinishAction(Vector2 openingRange)
+    {
+        previousAction = currentAction;
+        currentAction = CombatAction.None;
+        BeginOpening(openingRange);
+    }
+
+    private void CancelCurrentAction()
+    {
+        currentAction = CombatAction.None;
+        actionElapsed = 0f;
+        actionDamageDealt = false;
+        tripleStrikeIndex = 0;
+        activeDashTravelDuration = 0f;
+    }
+
+    private void BeginOpening(Vector2 durationRange)
+    {
+        openingStrafeSign = Random.value < .5f ? -1f : 1f;
+        openingEndTime = Time.time + RandomRange(durationRange);
+    }
+
+    private void TriggerGuardAnimation()
+    {
+        if (visualAnimator == null) return;
+        visualAnimator.ResetTrigger(Attack);
+        if (supportsTripleAnimation) visualAnimator.ResetTrigger(TripleAttack);
+        if (supportsDashAnimation) visualAnimator.ResetTrigger(DashAttack);
+        if (supportsGuardAnimation)
+        {
+            visualAnimator.ResetTrigger(Guard);
+            visualAnimator.SetTrigger(Guard);
+        }
+        else
+        {
+            visualAnimator.SetTrigger(Attack);
+        }
+    }
+
+    private void TriggerTripleAnimation()
+    {
+        if (visualAnimator == null) return;
+        if (supportsTripleAnimation)
+        {
+            visualAnimator.ResetTrigger(Attack);
+            visualAnimator.ResetTrigger(TripleAttack);
+            visualAnimator.SetTrigger(TripleAttack);
+        }
+        else
+        {
             visualAnimator.ResetTrigger(Attack);
             visualAnimator.SetTrigger(Attack);
         }
+    }
 
-        player ??= FindAnyObjectByType<PlayerCharacterController>();
-        if (player == null) return;
+    private void TriggerDashAnimation()
+    {
+        if (visualAnimator == null) return;
+        if (supportsTripleAnimation) visualAnimator.ResetTrigger(TripleAttack);
+        if (supportsDashAnimation)
+        {
+            visualAnimator.ResetTrigger(DashAttack);
+            visualAnimator.SetTrigger(DashAttack);
+        }
+        else
+        {
+            visualAnimator.ResetTrigger(Attack);
+            visualAnimator.SetTrigger(Attack);
+        }
+    }
 
-        Vector2 direction = (Vector2)player.transform.position - (Vector2)transform.position;
-        if (direction.sqrMagnitude <= .0001f) direction = Vector2.right;
-        player.ReceiveKnockback(direction.normalized, counterKnockbackDistance);
+    private void CacheAnimatorParameters()
+    {
+        if (visualAnimator == null) return;
+        foreach (AnimatorControllerParameter parameter in visualAnimator.parameters)
+        {
+            if (parameter.nameHash == Guard && parameter.type == AnimatorControllerParameterType.Trigger)
+                supportsGuardAnimation = true;
+            else if (parameter.nameHash == TripleAttack && parameter.type == AnimatorControllerParameterType.Trigger)
+                supportsTripleAnimation = true;
+            else if (parameter.nameHash == DashAttack && parameter.type == AnimatorControllerParameterType.Trigger)
+                supportsDashAnimation = true;
+        }
+    }
+
+    private void ResetForCheckpointRetry()
+    {
+        receivedDamageCount = 0;
+        currentAction = CombatAction.None;
+        previousAction = CombatAction.None;
+        actionElapsed = 0f;
+        guardEndTime = openingEndTime = tripleReadyTime = dashReadyTime = 0f;
+        decisionReadyTime = Time.time + RandomRange(initialDecisionDelayRange);
+        transform.SetPositionAndRotation(startingPosition, startingRotation);
+        behaviorTree.Reset();
+
+        agent?.CancelBossBehaviorAttack();
+        if (visualAnimator == null) return;
+        visualAnimator.Rebind();
+        visualAnimator.Update(0f);
+    }
+
+    private static float RandomRange(Vector2 range)
+    {
+        float minimum = Mathf.Min(range.x, range.y);
+        float maximum = Mathf.Max(range.x, range.y);
+        return Random.Range(Mathf.Max(0f, minimum), Mathf.Max(0f, maximum));
     }
 }

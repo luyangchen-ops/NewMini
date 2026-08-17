@@ -1,3 +1,4 @@
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
@@ -56,7 +57,7 @@ public static class GameStateUiSceneBuilder
     {
         EnsureEventSystem(scene);
 
-        GameObject root = NewUi(RootName, null, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster), typeof(GameStateUIController));
+        GameObject root = NewUi(RootName, null, typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster), typeof(GameStateUIController), typeof(RespawnPointManager));
         Canvas canvas = root.GetComponent<Canvas>(); canvas.renderMode = RenderMode.ScreenSpaceOverlay; canvas.sortingOrder = 200;
         CanvasScaler scaler = root.GetComponent<CanvasScaler>(); scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize; scaler.referenceResolution = new Vector2(1920f, 1080f); scaler.matchWidthOrHeight = .5f;
 
@@ -115,11 +116,25 @@ public static class GameStateUiSceneBuilder
         Button deathMenu = ButtonNode("Btn_DeathMainMenu", death.transform, new Vector2(0f, -205f), "返回主菜单");
 
         GameStateUIController controller = root.GetComponent<GameStateUIController>();
+        RespawnPointManager respawnManager = root.GetComponent<RespawnPointManager>();
         UnityEventTools.AddPersistentListener(pauseContinue.onClick, controller.ContinueFromCheckpoint); UnityEventTools.AddPersistentListener(pauseHelp.onClick, controller.ShowHelp); UnityEventTools.AddPersistentListener(pauseMenu.onClick, controller.ReturnToMainMenu); UnityEventTools.AddPersistentListener(previous.onClick, controller.PreviousHelpPage); UnityEventTools.AddPersistentListener(next.onClick, controller.NextHelpPage); UnityEventTools.AddPersistentListener(helpBack.onClick, controller.CloseHelp); UnityEventTools.AddPersistentListener(deathContinue.onClick, controller.ContinueFromCheckpoint); UnityEventTools.AddPersistentListener(deathMenu.onClick, controller.ReturnToMainMenu);
+        PlayerCharacterController player = Object.FindAnyObjectByType<PlayerCharacterController>();
         SerializedObject serialized = new SerializedObject(controller);
-        serialized.FindProperty("player").objectReferenceValue = Object.FindAnyObjectByType<PlayerCharacterController>(); serialized.FindProperty("gameplayHudRoot").objectReferenceValue = GameObject.Find("Root_角色战斗HUD"); serialized.FindProperty("panelPause").objectReferenceValue = pause; serialized.FindProperty("panelHelp").objectReferenceValue = help; serialized.FindProperty("panelDeath").objectReferenceValue = death; serialized.FindProperty("pauseContinueButton").objectReferenceValue = pauseContinue; serialized.FindProperty("helpPreviousButton").objectReferenceValue = previous; serialized.FindProperty("helpNextButton").objectReferenceValue = next; serialized.FindProperty("helpPageIndicator").objectReferenceValue = pageIndicator; serialized.FindProperty("helpPages").arraySize = pages.Length;
+        serialized.FindProperty("player").objectReferenceValue = player; serialized.FindProperty("respawnPointManager").objectReferenceValue = respawnManager; serialized.FindProperty("gameplayHudRoot").objectReferenceValue = GameObject.Find("Root_角色战斗HUD"); serialized.FindProperty("panelPause").objectReferenceValue = pause; serialized.FindProperty("panelHelp").objectReferenceValue = help; serialized.FindProperty("panelDeath").objectReferenceValue = death; serialized.FindProperty("pauseContinueButton").objectReferenceValue = pauseContinue; serialized.FindProperty("helpPreviousButton").objectReferenceValue = previous; serialized.FindProperty("helpNextButton").objectReferenceValue = next; serialized.FindProperty("helpPageIndicator").objectReferenceValue = pageIndicator; serialized.FindProperty("helpPages").arraySize = pages.Length;
         for (int i = 0; i < pages.Length; i++) serialized.FindProperty("helpPages").GetArrayElementAtIndex(i).objectReferenceValue = pages[i];
         serialized.FindProperty("deathContinueButton").objectReferenceValue = deathContinue; serialized.ApplyModifiedPropertiesWithoutUndo();
+
+        RespawnPoint[] orderedPoints = Object.FindObjectsByType<RespawnPoint>(FindObjectsInactive.Include)
+            .Where(point => point.gameObject.scene == scene)
+            .OrderBy(point => point.PointId, System.StringComparer.Ordinal)
+            .ToArray();
+        SerializedObject serializedManager = new(respawnManager);
+        serializedManager.FindProperty("player").objectReferenceValue = player;
+        SerializedProperty pointSequence = serializedManager.FindProperty("respawnPoints");
+        pointSequence.arraySize = orderedPoints.Length;
+        for (int i = 0; i < orderedPoints.Length; i++) pointSequence.GetArrayElementAtIndex(i).objectReferenceValue = orderedPoints[i];
+        serializedManager.FindProperty("startingPointIndex").intValue = 0;
+        serializedManager.ApplyModifiedPropertiesWithoutUndo();
         pause.SetActive(false); help.SetActive(false); death.SetActive(false); EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene); AssetDatabase.SaveAssets();
     }
 

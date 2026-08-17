@@ -2288,6 +2288,7 @@ GameObject:
   - component: {fileID: 631101893}
   - component: {fileID: 631101892}
   - component: {fileID: 631101891}
+  - component: {fileID: 910000003}
   m_Layer: 5
   m_Name: "Root_\u6E38\u620F\u72B6\u6001UI"
   m_TagString: Untagged
@@ -2308,6 +2309,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameStateUIController
   player: {fileID: 1641396735}
+  respawnPointManager: {fileID: 910000003}
   gameplayHudRoot: {fileID: 1980113120}
   panelPause: {fileID: 1839630283}
   panelHelp: {fileID: 1763506383}
@@ -2324,6 +2326,22 @@ MonoBehaviour:
   helpPageIndicator: {fileID: 1543514057}
   deathContinueButton: {fileID: 149124603}
   mainMenuSceneName: Begin
+--- !u!114 &910000003
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 631101890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1892f4b33be94dc495b5f927001661c3, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::RespawnPointManager
+  player: {fileID: 1641396735}
+  respawnPoints:
+  - {fileID: 3000102}
+  startingPointIndex: 0
 --- !u!114 &631101892
 MonoBehaviour:
   m_ObjectHideFlags: 0

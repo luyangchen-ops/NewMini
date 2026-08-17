@@ -7168,6 +7168,7 @@ GameObject:
   - component: {fileID: 248873404}
   - component: {fileID: 248873403}
   - component: {fileID: 248873402}
+  - component: {fileID: 910000001}
   m_Layer: 5
   m_Name: "Root_\u6E38\u620F\u72B6\u6001UI"
   m_TagString: Untagged
@@ -7188,6 +7189,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameStateUIController
   player: {fileID: 1408464640}
+  respawnPointManager: {fileID: 910000001}
   gameplayHudRoot: {fileID: 1663311233}
   panelPause: {fileID: 809440435}
   panelHelp: {fileID: 1432105686}
@@ -7207,6 +7209,26 @@ MonoBehaviour:
   victoryRestartButton: {fileID: 1163896331}
   mainMenuSceneName: Level_LD
   sceneFlow: {fileID: 1805794917}
+--- !u!114 &910000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248873401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1892f4b33be94dc495b5f927001661c3, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::RespawnPointManager
+  player: {fileID: 1408464640}
+  respawnPoints:
+  - {fileID: 1179852421}
+  - {fileID: 588903794}
+  - {fileID: 427735360}
+  - {fileID: 1679384262}
+  - {fileID: 1428799865}
+  startingPointIndex: 0
 --- !u!114 &248873403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15795,7 +15817,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e109a7e085e653c428949def33fcbeab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RespawnPoint
-  pointId: Arena_01_checkpoint
+  pointId: Arena_02_checkpoint
   activeOnLevelStart: 0
   activateOnPlayerEnter: 1
   activationTrigger: {fileID: 588903795}
@@ -36108,7 +36130,7 @@ Transform:
   m_GameObject: {fileID: 1428799863}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.24, y: -20.05, z: 0}
+  m_LocalPosition: {x: -0.24, y: -25.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -38193,6 +38215,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1496808808}
     m_Modifications:
+    - target: {fileID: 2893371066064739229, guid: 111d363f536c9014f88723fef1bffd66, type: 3}
+      propertyPath: m_Size.y
+      value: 9.571578
+      objectReference: {fileID: 0}
+    - target: {fileID: 2893371066064739229, guid: 111d363f536c9014f88723fef1bffd66, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.17758894
+      objectReference: {fileID: 0}
     - target: {fileID: 4872513106292292692, guid: 111d363f536c9014f88723fef1bffd66, type: 3}
       propertyPath: m_Name
       value: 31_SnowyTreePair
@@ -38254,7 +38284,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 5256444785274851803, guid: 111d363f536c9014f88723fef1bffd66, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 111d363f536c9014f88723fef1bffd66, type: 3}
@@ -42068,7 +42099,7 @@ Transform:
   m_GameObject: {fileID: 1679384260}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -29.97, y: -5.55, z: 0}
+  m_LocalPosition: {x: -29.52, y: -5.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

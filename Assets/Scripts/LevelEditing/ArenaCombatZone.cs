@@ -45,6 +45,7 @@ public sealed class ArenaCombatZone : MonoBehaviour
     public Collider2D ZoneCollider => zoneCollider;
     public UnityEvent ZoneClearedEvent => onZoneCleared;
     public UnityEvent ZoneLockedEvent => onZoneLocked;
+    public event Action ZoneReset;
     public void SetResetOnCheckpointRetry(bool enabled) => resetOnCheckpointRetry = enabled;
 
 #if UNITY_EDITOR
@@ -195,7 +196,7 @@ public sealed class ArenaCombatZone : MonoBehaviour
         int count = 0;
         foreach (EnemyAgent enemy in FindObjectsByType<EnemyAgent>(FindObjectsInactive.Exclude))
         {
-            if (enemy != null && IsInsideZone(enemy.transform.position)) count++;
+            if (enemy != null && !enemy.IsDead && IsInsideZone(enemy.transform.position)) count++;
         }
 
         RemainingEnemyCount = count;
@@ -222,6 +223,7 @@ public sealed class ArenaCombatZone : MonoBehaviour
     [ContextMenu("Reset Zone")]
     public void ResetZone()
     {
+        ZoneReset?.Invoke();
         IsActive = false;
         IsCleared = false;
         RemainingEnemyCount = 0;

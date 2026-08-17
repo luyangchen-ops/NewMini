@@ -9,6 +9,7 @@ public sealed class GameStateUIController : MonoBehaviour
 {
     [Header("Scene References")]
     [SerializeField] private PlayerCharacterController player;
+    [SerializeField] private RespawnPointManager respawnPointManager;
     [SerializeField] private GameObject gameplayHudRoot;
     [SerializeField] private GameObject panelPause;
     [SerializeField] private GameObject panelHelp;
@@ -25,7 +26,6 @@ public sealed class GameStateUIController : MonoBehaviour
     [SerializeField] private string mainMenuSceneName = "Begin";
     [SerializeField] private SceneFlowController sceneFlow;
 
-    private Vector3 levelStartPosition;
     private float previousTimeScale = 1f;
     private bool isPauseShown;
     private bool isHelpShown;
@@ -38,8 +38,8 @@ public sealed class GameStateUIController : MonoBehaviour
     private void Awake()
     {
         player ??= FindAnyObjectByType<PlayerCharacterController>();
+        respawnPointManager ??= FindAnyObjectByType<RespawnPointManager>();
         sceneFlow ??= FindAnyObjectByType<SceneFlowController>();
-        if (player != null) levelStartPosition = player.transform.position;
         if (gameplayHudRoot == null) gameplayHudRoot = GameObject.Find("Root_角色战斗HUD");
         panelPause?.SetActive(false); panelHelp?.SetActive(false); panelDeath?.SetActive(false);
         RefreshHelpPages();
@@ -53,12 +53,13 @@ public sealed class GameStateUIController : MonoBehaviour
         if (isDeathShown || isVictoryShown || Keyboard.current?.escapeKey.wasPressedThisFrame != true) return;
         if (isHelpShown) CloseHelp();
         else if (isPauseShown) ClosePause();
-        else if (!DialogueIsPlaying()) ShowPause();
+        else if (!DialoguePerformanceManager.IsAnyPresentationActive) ShowPause();
     }
 
     public void ShowPause()
     {
-        if (isPauseShown || isHelpShown || isDeathShown || isVictoryShown) return;
+        if (isPauseShown || isHelpShown || isDeathShown || isVictoryShown
+            || DialoguePerformanceManager.IsAnyPresentationActive) return;
         isPauseShown = true; EnterFrozenUiState(); panelPause?.SetActive(true); Select(pauseContinueButton);
     }
 
@@ -111,12 +112,16 @@ public sealed class GameStateUIController : MonoBehaviour
 
     public void ContinueFromCheckpoint()
     {
-        Vector3 position = RespawnPoint.TryGetActivePosition(out Vector3 checkpoint) ? checkpoint : levelStartPosition;
+        respawnPointManager ??= RespawnPointManager.Instance;
+        if (respawnPointManager == null || !respawnPointManager.RespawnPlayerAtCurrentPoint())
+        {
+            Debug.LogError("Cannot continue because the scene has no usable RespawnPointManager.", this);
+            return;
+        }
+
         panelPause?.SetActive(false); panelHelp?.SetActive(false); panelDeath?.SetActive(false); panelVictory?.SetActive(false);
         isPauseShown = false; isHelpShown = false; isDeathShown = false; isVictoryShown = false; returnToPauseAfterHelp = false;
         RestoreTimeAndHud();
-        ArenaCombatZone.ResetIncompleteZonesForRetry();
-        player?.RespawnAt(position);
         EventSystem.current?.SetSelectedGameObject(null);
     }
 
@@ -169,6 +174,5 @@ public sealed class GameStateUIController : MonoBehaviour
 
     private void EnterFrozenUiState() { previousTimeScale = Time.timeScale; Time.timeScale = 0f; if (gameplayHudRoot == null) return; hudWasActive = gameplayHudRoot.activeSelf; gameplayHudRoot.SetActive(false); }
     private void RestoreTimeAndHud() { Time.timeScale = previousTimeScale <= 0f ? 1f : previousTimeScale; if (gameplayHudRoot != null) gameplayHudRoot.SetActive(hudWasActive); }
-    private static bool DialogueIsPlaying() { ClickDialogueSystem dialogue = FindAnyObjectByType<ClickDialogueSystem>(); return dialogue != null && dialogue.IsDialoguePlaying; }
     private static void Select(Selectable selectable) { if (EventSystem.current != null && selectable != null) EventSystem.current.SetSelectedGameObject(selectable.gameObject); }
 }

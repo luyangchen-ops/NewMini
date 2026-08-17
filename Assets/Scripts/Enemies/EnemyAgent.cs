@@ -4,6 +4,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public sealed class EnemyAgent : MonoBehaviour
 {
+    public enum PlayerAttackResult { Ignored, Guarded, Damaged, Defeated }
+
     public enum EnemyVisualStyle
     {
         Auto,
@@ -25,7 +27,6 @@ public sealed class EnemyAgent : MonoBehaviour
     [SerializeField] private Camera worldCamera;
     [SerializeField] private Animator visualAnimator;
     [SerializeField] private SpriteRenderer visualRenderer;
-    [SerializeField] private AudioSource attackSfxSource;
     [SerializeField, Min(0f)] private float boundaryPadding = 0.5f;
 
     private Rigidbody2D body;
@@ -45,6 +46,7 @@ public sealed class EnemyAgent : MonoBehaviour
     private Vector2 spearThrustStartPosition;
     private bool isSpearWindupAnimating;
     private EnemyStateMachine stateMachine;
+    private BossCombatController bossCombatController;
 
     private static readonly int Attack = Animator.StringToHash("Attack");
     private static readonly int Death = Animator.StringToHash("Death");
@@ -70,12 +72,13 @@ public sealed class EnemyAgent : MonoBehaviour
         && fireCooldown <= 0f
         && IsWithinRangedAttackRange();
     public bool CanMeleeAttack => !IsDead && data != null && data.Archetype == EnemyArchetype.Melee
-        && (fireCooldown <= 0f || IsBossCombatant);
+        && (fireCooldown <= 0f || IsBossCombatant)
+        && !(bossCombatController?.IsGuarding ?? false);
     public bool CanSpearAttack => !IsDead && data != null && data.Archetype == EnemyArchetype.Spearman && fireCooldown <= 0f;
     public bool IsMeleeCombatant => data != null && (data.Archetype == EnemyArchetype.Melee || data.Archetype == EnemyArchetype.Spearman);
     public bool IsDead { get; private set; }
     public bool IsShieldBearer => GetVisualStyle() == EnemyVisualStyle.ShieldBearer;
-    public bool IsBossCombatant => GetComponent<BossCombatController>() != null;
+    public bool IsBossCombatant => bossCombatController != null;
     public bool IsShieldAttackExposed { get; private set; }
     public bool IsMeleeAttackRecovering => Time.time < meleeAttackRecoveryEndTime;
     public bool IsWaitingToEngageInMelee => Time.time < meleeEngagementStartTime;
@@ -104,6 +107,7 @@ public sealed class EnemyAgent : MonoBehaviour
     private void Awake()
     {
         body = GetComponent<Rigidbody2D>();
+        bossCombatController = GetComponent<BossCombatController>();
         bodyColliders = GetComponentsInChildren<Collider2D>(true);
         body.gravityScale = 0f;
         body.freezeRotation = true;
@@ -161,6 +165,8 @@ public sealed class EnemyAgent : MonoBehaviour
         }
 
         fireCooldown = Mathf.Max(0f, fireCooldown - Time.deltaTime * PlayerCharacterController.EnemyTimeScale);
+        if (bossCombatController != null && bossCombatController.UsesBehaviorTree) return;
+
         if (PlayerCharacterController.EnemyTimeScale > 0f)
         {
             stateMachine.Tick();
@@ -174,7 +180,8 @@ public sealed class EnemyAgent : MonoBehaviour
             return;
         }
 
-        stateMachine.FixedTick();
+        if (bossCombatController == null || !bossCombatController.UsesBehaviorTree)
+            stateMachine.FixedTick();
         Vector2 currentPosition = body.position;
         Vector2 clampedPosition = CameraBounds.Clamp(worldCamera, currentPosition, boundaryPadding, transform.position.z);
         if ((clampedPosition - currentPosition).sqrMagnitude > 0.000001f)
@@ -467,6 +474,34 @@ public sealed class EnemyAgent : MonoBehaviour
         PlayAttackSfx();
     }
 
+    /// <summary>Starts a behavior-tree-authored Boss strike with an explicit dodge window.</summary>
+    public void BeginBossBehaviorAttack(float perfectDodgeDelay, float perfectDodgeDuration, bool triggerDefaultAnimation)
+    {
+        if (!CanMeleeAttack) return;
+
+        FaceTarget();
+        SetDesiredVelocity(Vector2.zero);
+        SetAnimationState(EnemyAnimationState.Attack);
+        bossCombatController?.BeginMeleeSwing();
+        meleePerfectDodgeStartTime = Time.time + Mathf.Max(0f, perfectDodgeDelay);
+        meleePerfectDodgeEndTime = meleePerfectDodgeStartTime + Mathf.Max(0f, perfectDodgeDuration);
+        if (triggerDefaultAnimation && supportsAttack)
+        {
+            visualAnimator.ResetTrigger(Attack);
+            visualAnimator.SetTrigger(Attack);
+        }
+        PlayAttackSfx();
+    }
+
+    public void CancelBossBehaviorAttack()
+    {
+        desiredVelocity = Vector2.zero;
+        meleePerfectDodgeStartTime = 0f;
+        meleePerfectDodgeEndTime = 0f;
+        if (body != null) body.linearVelocity = Vector2.zero;
+        SetMovementAnimation(false);
+    }
+
     public void PerformMeleeAttack()
     {
         if (!CanMeleeAttack)
@@ -693,12 +728,26 @@ public sealed class EnemyAgent : MonoBehaviour
 
     public float EnemyDeltaTime => Time.deltaTime * PlayerCharacterController.EnemyTimeScale;
 
+    public PlayerAttackResult ReceivePlayerAttack(Vector2 attackerPosition, bool allowBossGuard = true)
+    {
+        if (IsDead) return PlayerAttackResult.Ignored;
+
+        if (bossCombatController != null)
+        {
+            BossHitResolution resolution = bossCombatController.ResolvePlayerAttack(attackerPosition, allowBossGuard);
+            if (resolution == BossHitResolution.Guarded) return PlayerAttackResult.Guarded;
+            if (resolution == BossHitResolution.Damaged) return PlayerAttackResult.Damaged;
+        }
+
+        Die();
+        return IsDead ? PlayerAttackResult.Defeated : PlayerAttackResult.Damaged;
+    }
+
     public void Die()
     {
         if (IsDead) return;
 
-        BossCombatController bossCombat = GetComponent<BossCombatController>();
-        if (bossCombat != null && bossCombat.TryCounterPlayerHit()) return;
+        BossCombatController bossCombat = bossCombatController;
 
         BorrowedLifeBossController borrowedLife = GetComponent<BorrowedLifeBossController>();
         if (borrowedLife != null && borrowedLife.TryAbsorbLethalHit()) return;
@@ -726,11 +775,12 @@ public sealed class EnemyAgent : MonoBehaviour
         {
             visualAnimator.ResetTrigger(Attack);
             visualAnimator.SetTrigger(Death);
-            StartCoroutine(DestroyAfterDeathAnimation(GetDeathAnimationDuration()));
+            if (bossCombat == null)
+                StartCoroutine(DestroyAfterDeathAnimation(GetDeathAnimationDuration()));
             return;
         }
 
-        Destroy(gameObject);
+        if (bossCombat == null) Destroy(gameObject);
     }
 
     private System.Collections.IEnumerator DestroyAfterDeathAnimation(float duration)
@@ -785,7 +835,7 @@ public sealed class EnemyAgent : MonoBehaviour
             : null;
         if (player == null) return;
 
-        BossCombatController bossCombat = IsBossCombatant ? GetComponent<BossCombatController>() : null;
+        BossCombatController bossCombat = bossCombatController;
         if (bossCombat != null && !bossCombat.IsCurrentMeleeSwingHittingPlayer(player)) return;
 
         // Resolve the perfect-dodge window before any invulnerability or damage checks.

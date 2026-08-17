@@ -4,11 +4,13 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Scene-authored first-level boss handoff: the final regular wave summons Qiu Jiu,
-/// his 99 borrowed lives are presented on the HUD, and his defeat starts the epilogue.
+/// his borrowed lives are presented on the HUD, and his defeat starts the epilogue.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class LevelBossEncounterController : MonoBehaviour
 {
+    private const string BossDialogueSpeakerName = "\u88D8\u4E5D";
+
     [Header("Authored Boss Spawn")]
     [SerializeField] private GameObject bossPrefab;
     [SerializeField] private Transform bossSpawnPoint;
@@ -47,10 +49,12 @@ public sealed class LevelBossEncounterController : MonoBehaviour
     private bool bossDefeated;
     private bool arenaCleared;
     private bool epilogueStarted;
+    private Coroutine epilogueRoutine;
 
     private void Awake()
     {
         if (bossHudRoot != null) bossHudRoot.SetActive(false);
+        if (arenaCombatZone != null) arenaCombatZone.ZoneReset += ResetEncounterForRetry;
     }
 
     /// <summary>Persistent event target for Arena 05's first wave.</summary>
@@ -128,21 +132,34 @@ public sealed class LevelBossEncounterController : MonoBehaviour
     {
         if (epilogueStarted || !bossDefeated || !arenaCleared) return;
         epilogueStarted = true;
-        StartCoroutine(PlayPostBossDialogue());
+        epilogueRoutine = StartCoroutine(PlayPostBossDialogue());
     }
 
     private IEnumerator PlayPostBossDialogue()
     {
-        if (postBossDialogueDelay > 0f) yield return new WaitForSeconds(postBossDialogueDelay);
+        if (postBossDialogueDelay > 0f) yield return new WaitForSecondsRealtime(postBossDialogueDelay);
         gameStateUi ??= FindAnyObjectByType<GameStateUIController>();
-        if (dialogueSystem == null)
+        if (dialogueSystem == null || postBossDialogue == null)
         {
             gameStateUi?.ShowVictory();
+            epilogueRoutine = null;
             yield break;
         }
 
         dialogueSystem.DialogueFinished += ShowVictoryAfterEpilogue;
-        dialogueSystem.StartDialogueAtLowerScreen(postBossDialogue, playerSpeaker, npcSpeakerAnchor);
+        Transform bossCorpse = activeBoss != null ? activeBoss.transform : npcSpeakerAnchor;
+        bool dialogueStarted = dialogueSystem.StartDialogueWithOffscreenSpeakerAtLowerScreen(
+            postBossDialogue,
+            playerSpeaker,
+            npcSpeakerAnchor,
+            BossDialogueSpeakerName,
+            bossCorpse);
+        epilogueRoutine = null;
+        if (dialogueStarted) yield break;
+
+        dialogueSystem.DialogueFinished -= ShowVictoryAfterEpilogue;
+        Debug.LogError("Boss epilogue dialogue could not start; showing victory as a fallback.", this);
+        gameStateUi?.ShowVictory();
     }
 
     private void ShowVictoryAfterEpilogue()
@@ -151,9 +168,38 @@ public sealed class LevelBossEncounterController : MonoBehaviour
         gameStateUi?.ShowVictory();
     }
 
+    private void ResetEncounterForRetry()
+    {
+        if (epilogueRoutine != null) StopCoroutine(epilogueRoutine);
+        epilogueRoutine = null;
+        if (dialogueSystem != null) dialogueSystem.DialogueFinished -= ShowVictoryAfterEpilogue;
+
+        if (activeBoss != null)
+        {
+            activeBoss.Died -= HandleBossDied;
+            Destroy(activeBoss.gameObject);
+        }
+        activeBoss = null;
+
+        foreach (EnemyAgent guardArcher in guardArchers)
+            if (guardArcher != null) Destroy(guardArcher.gameObject);
+        guardArchers.Clear();
+
+        bossSpawned = false;
+        bossDefeated = false;
+        arenaCleared = false;
+        epilogueStarted = false;
+        if (bossHudRoot != null) bossHudRoot.SetActive(false);
+    }
+
     private void OnDisable()
     {
         if (activeBoss != null) activeBoss.Died -= HandleBossDied;
         if (dialogueSystem != null) dialogueSystem.DialogueFinished -= ShowVictoryAfterEpilogue;
+    }
+
+    private void OnDestroy()
+    {
+        if (arenaCombatZone != null) arenaCombatZone.ZoneReset -= ResetEncounterForRetry;
     }
 }

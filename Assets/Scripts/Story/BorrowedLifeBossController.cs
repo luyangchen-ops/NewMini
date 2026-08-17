@@ -4,17 +4,12 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Makes a lethal hit consume one authored borrowed-life contract instead.
-/// On the 99th hit the final contract breaks and that same strike is allowed to kill the boss.
+/// When the final contract breaks, that same strike is allowed to kill the boss.
 /// </summary>
 [DisallowMultipleComponent]
 public sealed class BorrowedLifeBossController : MonoBehaviour
 {
     [SerializeField, Min(1)] private int startingContracts = 99;
-#if UNITY_EDITOR
-    // Keep iteration fast in the Editor without changing the authored value
-    // used by player builds.
-    private const int EditorTestStartingContracts = 10;
-#endif
     [SerializeField] private Text contractCountText;
     [SerializeField] private UnityEvent<int> onContractCountChanged = new UnityEvent<int>();
     [SerializeField] private UnityEvent<int> onPhaseChanged = new UnityEvent<int>();
@@ -25,17 +20,8 @@ public sealed class BorrowedLifeBossController : MonoBehaviour
 
     private void Awake()
     {
-        RemainingContracts = Mathf.Max(1, GetStartingContracts());
+        RemainingContracts = Mathf.Max(1, startingContracts);
         RefreshPresentation();
-    }
-
-    private int GetStartingContracts()
-    {
-#if UNITY_EDITOR
-        return EditorTestStartingContracts;
-#else
-        return startingContracts;
-#endif
     }
 
     public void ConfigurePresentation(Text countText)
@@ -49,7 +35,10 @@ public sealed class BorrowedLifeBossController : MonoBehaviour
         if (!enabled || RemainingContracts <= 0) return false;
 
         RemainingContracts--;
-        int nextPhase = RemainingContracts > 66 ? 1 : RemainingContracts > 33 ? 2 : 3;
+        int contractTotal = Mathf.Max(1, startingContracts);
+        int nextPhase = RemainingContracts * 3 > contractTotal * 2 ? 1
+            : RemainingContracts * 3 > contractTotal ? 2
+            : 3;
         if (nextPhase != Phase)
         {
             Phase = nextPhase;

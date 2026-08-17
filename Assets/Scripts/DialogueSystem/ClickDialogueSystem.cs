@@ -45,9 +45,10 @@ public sealed class ClickDialogueSystem : MonoBehaviour
 
     private readonly struct DialogueLine
     {
-        public DialogueLine(SpeakerKind speaker, string content, Transform followTarget = null, string interruptionCue = null)
-        { Speaker = speaker; Content = content; FollowTarget = followTarget; InterruptionCue = interruptionCue; }
+        public DialogueLine(SpeakerKind speaker, string speakerName, string content, Transform followTarget = null, string interruptionCue = null)
+        { Speaker = speaker; SpeakerName = speakerName; Content = content; FollowTarget = followTarget; InterruptionCue = interruptionCue; }
         public SpeakerKind Speaker { get; }
+        public string SpeakerName { get; }
         public string Content { get; }
         public Transform FollowTarget { get; }
         public string InterruptionCue { get; }
@@ -107,10 +108,14 @@ public sealed class ClickDialogueSystem : MonoBehaviour
     private bool activeBubbleWasVisibleBeforeInterruption;
     private bool gameplayHudWasActive;
     private bool useLowerScreenDialoguePlacement;
+    private string conditionalLowerScreenSpeakerName;
+    private Transform conditionalLowerScreenSpeaker;
     private Coroutine bubbleAnimation;
     private float lineAutoAdvanceAt = float.PositiveInfinity;
     private float remainingLineReadTime = float.PositiveInfinity;
     private PlayableDirector activeInterruptionDirector;
+    private PresentationSession dialogueSession;
+    private PresentationSession interruptionPerformanceSession;
     private Vector2 topShownPosition;
     private Vector2 bottomShownPosition;
     private RectTransform TopLetterboxRect => topLetterbox != null ? topLetterbox.transform as RectTransform : null;
@@ -202,6 +207,8 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         if (!isDialoguePlaying || isTransitioning || isInterruptedForPerformance) return false;
 
         isInterruptedForPerformance = true;
+        interruptionPerformanceSession?.Dispose();
+        interruptionPerformanceSession = DialoguePerformanceManager.BeginPerformance(this, "Dialogue Interruption");
         remainingLineReadTime = float.IsPositiveInfinity(lineAutoAdvanceAt)
             ? float.PositiveInfinity
             : Mathf.Max(0f, lineAutoAdvanceAt - Time.unscaledTime);
@@ -221,6 +228,8 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         if (!isDialoguePlaying || !isInterruptedForPerformance) return false;
 
         isInterruptedForPerformance = false;
+        interruptionPerformanceSession?.Dispose();
+        interruptionPerformanceSession = null;
         lineAutoAdvanceAt = float.IsPositiveInfinity(remainingLineReadTime)
             ? float.PositiveInfinity
             : Time.unscaledTime + remainingLineReadTime;
@@ -293,6 +302,31 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         return started;
     }
 
+    /// <summary>
+    /// Keeps the normal presentation for every line except one named speaker,
+    /// whose bubble moves to the lower screen only while that speaker is outside the camera view.
+    /// </summary>
+    public bool StartDialogueWithOffscreenSpeakerAtLowerScreen(
+        TextAsset csv,
+        Transform characterSpeaker,
+        Transform npcSpeaker,
+        string offscreenSpeakerName,
+        Transform offscreenSpeaker)
+    {
+        if (isDialoguePlaying || isTransitioning || csv == null || string.IsNullOrWhiteSpace(offscreenSpeakerName))
+            return false;
+
+        conditionalLowerScreenSpeakerName = offscreenSpeakerName;
+        conditionalLowerScreenSpeaker = offscreenSpeaker;
+        bool started = StartDialogue(csv, characterSpeaker, npcSpeaker);
+        if (!started)
+        {
+            conditionalLowerScreenSpeakerName = null;
+            conditionalLowerScreenSpeaker = null;
+        }
+        return started;
+    }
+
     private bool BeginDialoguePresentation(bool showFirstLineWhenReady)
     {
         if (isDialoguePlaying || isTransitioning || dialogueLines.Count == 0) return false;
@@ -310,6 +344,8 @@ public sealed class ClickDialogueSystem : MonoBehaviour
 
         isTransitioning = true;
         isDialoguePlaying = true;
+        dialogueSession?.Dispose();
+        dialogueSession = DialoguePerformanceManager.BeginDialogue(this, dialogueCsv != null ? dialogueCsv.name : name);
         DialogueStarted?.Invoke();
         if (advanceInputLayer != null) advanceInputLayer.SetActive(true);
         HideGameplayHud();
@@ -380,8 +416,17 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         else if (line.Speaker == SpeakerKind.Character) { activeSpeaker = character; activeWorldOffset = characterOffset; }
         else if (line.Speaker == SpeakerKind.Soldier) { activeSpeaker = soldier; activeWorldOffset = soldierOffset; }
 
+        bool isConditionalLowerScreenSpeaker = !string.IsNullOrEmpty(conditionalLowerScreenSpeakerName)
+            && string.Equals(line.SpeakerName, conditionalLowerScreenSpeakerName, StringComparison.Ordinal);
+        if (isConditionalLowerScreenSpeaker)
+        {
+            activeSpeaker = conditionalLowerScreenSpeaker;
+            activeWorldOffset = soldierOffset;
+        }
+
         bool systemPresentation = line.Speaker == SpeakerKind.System && line.FollowTarget == null;
-        bool lowerScreenPresentation = useLowerScreenDialoguePlacement;
+        bool lowerScreenPresentation = useLowerScreenDialoguePlacement
+            || isConditionalLowerScreenSpeaker && IsOutsideCameraView(activeSpeaker, activeWorldOffset);
         if (lowerScreenPresentation) activeSpeaker = null;
         Vector2 target = lowerScreenPresentation
             ? GetLowerScreenBubblePosition()
@@ -411,8 +456,12 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         isInterruptedForPerformance = false;
         advanceAfterActiveInterruption = false;
         useLowerScreenDialoguePlacement = false;
+        conditionalLowerScreenSpeakerName = null;
+        conditionalLowerScreenSpeaker = null;
         isDialoguePlaying = false;
         isTransitioning = false;
+        dialogueSession?.Dispose();
+        dialogueSession = null;
         DialogueFinished?.Invoke();
     }
 
@@ -525,7 +574,7 @@ public sealed class ClickDialogueSystem : MonoBehaviour
             foreach (LegacyDialogueLine line in lines)
             {
                 if (line == null || string.IsNullOrWhiteSpace(line.content)) continue;
-                dialogueLines.Add(new DialogueLine(SpeakerKind.Character, line.content, line.speaker));
+                dialogueLines.Add(new DialogueLine(SpeakerKind.Character, null, line.content, line.speaker));
             }
             return;
         }
@@ -538,7 +587,7 @@ public sealed class ClickDialogueSystem : MonoBehaviour
                 ? SpeakerKind.System
                 : speaker == "角色" ? SpeakerKind.Character : SpeakerKind.Soldier;
             string cue = rows[i].Count > 2 ? rows[i][2].Trim() : null;
-            dialogueLines.Add(new DialogueLine(kind, rows[i][1].Trim(), null, cue));
+            dialogueLines.Add(new DialogueLine(kind, speaker, rows[i][1].Trim(), null, cue));
         }
     }
 
@@ -617,6 +666,15 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         return local;
     }
 
+    private bool IsOutsideCameraView(Transform speaker, Vector2 offset)
+    {
+        Camera cameraToUse = worldCamera != null ? worldCamera : Camera.main;
+        if (cameraToUse == null || speaker == null) return true;
+
+        Vector3 viewport = cameraToUse.WorldToViewportPoint(speaker.position + (Vector3)offset);
+        return viewport.z <= 0f || viewport.x < 0f || viewport.x > 1f || viewport.y < 0f || viewport.y > 1f;
+    }
+
     private Vector2 GetLowerScreenBubblePosition()
     {
         if (bubbleContainer == null) return Vector2.zero;
@@ -665,11 +723,32 @@ public sealed class ClickDialogueSystem : MonoBehaviour
 
     private void OnDisable()
     {
+        StopAllCoroutines();
         if (interruptionDirector != null) interruptionDirector.stopped -= HandleInterruptionStopped;
         if (activeInterruptionDirector != null) activeInterruptionDirector.stopped -= HandleInterruptionStopped;
         activeInterruptionDirector = null;
-        if (!isDialoguePlaying) return;
-        RestoreGameplayHud();
-        ResumeGameplay();
+        interruptionPerformanceSession?.Dispose();
+        interruptionPerformanceSession = null;
+        dialogueSession?.Dispose();
+        dialogueSession = null;
+        if (isDialoguePlaying)
+        {
+            RestoreGameplayHud();
+            ResumeGameplay();
+        }
+        isDialoguePlaying = false;
+        isInterruptedForPerformance = false;
+        isTransitioning = false;
+        isWaitingForFirstLine = false;
+        isWaitingForDeferredLine = false;
+        currentLine = -1;
+        if (advanceInputLayer != null) advanceInputLayer.SetActive(false);
+        if (activeBubble != null)
+        {
+            Destroy(activeBubble.gameObject);
+            activeBubble = null;
+        }
+        activeSpeaker = null;
+        SetLetterboxImmediate(false);
     }
 }

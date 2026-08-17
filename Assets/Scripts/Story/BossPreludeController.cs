@@ -6,6 +6,8 @@ using UnityEngine.Playables;
 [DisallowMultipleComponent]
 public sealed class BossPreludeController : MonoBehaviour
 {
+    private const string BossDialogueSpeakerName = "\u88D8\u4E5D";
+
     [SerializeField] private ArenaCombatZone arena;
     [SerializeField] private LevelBossEncounterController encounter;
     [SerializeField] private ClickDialogueSystem dialogue;
@@ -24,6 +26,8 @@ public sealed class BossPreludeController : MonoBehaviour
     private bool cinematicCameraObjectWasActive;
     private AudioListener mainAudioListener;
     private AudioListener cinematicAudioListener;
+    private PresentationSession performanceSession;
+    private bool musicStoppedForDialogue;
 
     private void Awake()
     {
@@ -41,20 +45,30 @@ public sealed class BossPreludeController : MonoBehaviour
             if (cinematicAudioListener != null) cinematicAudioListener.enabled = false;
         }
         arena?.SetWavesDeferred(true);
+        if (arena != null) arena.ZoneReset += HandleArenaReset;
     }
 
     public void BeginPrelude()
     {
         if (started) return;
         started = true;
+        performanceSession = DialoguePerformanceManager.BeginPerformance(this, "Boss Prelude");
         arena?.SetWavesDeferred(true);
         arena?.ResetDeferredWaves();
         encounter?.SpawnBoss();
         SwitchToCinematicCamera();
         if (dialogue != null && bossBeforeDialogue != null)
         {
+            dialogue.DialogueStarted += HandleBossDialogueStarted;
             dialogue.DialogueFinished += FinishPrelude;
-            dialogue.StartDialogue(bossBeforeDialogue, player != null ? player.transform : null, null);
+            Transform bossSpeaker = encounter != null ? encounter.ActiveBossTransform : null;
+            if (!dialogue.StartDialogueWithOffscreenSpeakerAtLowerScreen(
+                    bossBeforeDialogue,
+                    player != null ? player.transform : null,
+                    bossSpeaker,
+                    BossDialogueSpeakerName,
+                    bossSpeaker))
+                FinishPrelude();
         }
         else FinishPrelude();
     }
@@ -99,7 +113,9 @@ public sealed class BossPreludeController : MonoBehaviour
         {
             Vector3 start = player.transform.position;
             Vector2 direction = incenseDestination.position - start;
-            player.SetPresentationLocomotion(true, direction);
+            // Presentation movement now uses the same directional run set as gameplay.
+            // The destination vector selects Run, Run Up, or Run Down in the hero Animator.
+            player.SetPresentationLocomotion(true, direction.normalized);
             for (float t = 0f; t < heroRunDuration; t += Time.unscaledDeltaTime)
             {
                 player.transform.position = Vector3.Lerp(start, incenseDestination.position, Mathf.SmoothStep(0f, 1f, t / heroRunDuration));
@@ -118,9 +134,22 @@ public sealed class BossPreludeController : MonoBehaviour
         dialogue?.ShowDeferredDialogueLine();
     }
 
+    private void HandleBossDialogueStarted()
+    {
+        if (!started) return;
+        if (dialogue != null) dialogue.DialogueStarted -= HandleBossDialogueStarted;
+        GameAudioManager.StopMusicForDialogue();
+        musicStoppedForDialogue = true;
+    }
+
     private void FinishPrelude()
     {
-        if (dialogue != null) dialogue.DialogueFinished -= FinishPrelude;
+        if (dialogue != null)
+        {
+            dialogue.DialogueStarted -= HandleBossDialogueStarted;
+            dialogue.DialogueFinished -= FinishPrelude;
+        }
+        musicStoppedForDialogue = false;
         GameAudioManager.PlayBossMusic();
         encounter?.ActivateGuardArchers();
         encounter?.ShowBossHud();
@@ -129,17 +158,57 @@ public sealed class BossPreludeController : MonoBehaviour
         arena?.BeginDeferredWaves();
         cameraFollow?.ClearCinematicOverride(this);
         RestoreMainCamera();
+        performanceSession?.Dispose();
+        performanceSession = null;
+    }
+
+    private void HandleArenaReset()
+    {
+        StopAllCoroutines();
+        started = false;
+        performanceSession?.Dispose();
+        performanceSession = null;
+        if (dialogue != null)
+        {
+            dialogue.DialogueStarted -= HandleBossDialogueStarted;
+            dialogue.DialogueFinished -= FinishPrelude;
+        }
+        RestoreMusicAfterInterruptedDialogue();
+        if (bossEntranceDirector != null)
+        {
+            bossEntranceDirector.Stop();
+            bossEntranceDirector.time = 0d;
+        }
+        if (player != null) player.SetPresentationLocomotion(false, Vector2.zero);
+        cameraFollow?.ClearCinematicOverride(this);
+        RestoreMainCamera();
     }
 
     private void OnDisable()
     {
+        performanceSession?.Dispose();
+        performanceSession = null;
         if (dialogue != null)
         {
             dialogue.DialogueLineShouldWait -= HandleDialogueBreakpoint;
             dialogue.DialogueInterruptionShouldPlay -= HandleDialogueInterruption;
+            dialogue.DialogueStarted -= HandleBossDialogueStarted;
             dialogue.DialogueFinished -= FinishPrelude;
         }
+        RestoreMusicAfterInterruptedDialogue();
         RestoreMainCamera();
+    }
+
+    private void RestoreMusicAfterInterruptedDialogue()
+    {
+        if (!musicStoppedForDialogue) return;
+        musicStoppedForDialogue = false;
+        GameAudioManager.ResumeSceneMusic();
+    }
+
+    private void OnDestroy()
+    {
+        if (arena != null) arena.ZoneReset -= HandleArenaReset;
     }
 
     private void ResolvePresentationCameras()

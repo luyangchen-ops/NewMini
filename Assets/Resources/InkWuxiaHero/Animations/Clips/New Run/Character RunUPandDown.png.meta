@@ -1,0 +1,639 @@
+fileFormatVersion: 2
+guid: 87ce6bbbc9945cc44a9ea374c15d499f
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6171084816142822498
+    second: Character RunUPandDown_0
+  - first:
+      213: 4584551553173348457
+    second: Character RunUPandDown_1
+  - first:
+      213: 5078624041085159634
+    second: Character RunUPandDown_2
+  - first:
+      213: 3316459135081304375
+    second: Character RunUPandDown_3
+  - first:
+      213: 4525800660042340311
+    second: Character RunUPandDown_4
+  - first:
+      213: 1881243743093359295
+    second: Character RunUPandDown_5
+  - first:
+      213: -6209285845742652085
+    second: Character RunUPandDown_6
+  - first:
+      213: 3410125524547323701
+    second: Character RunUPandDown_7
+  - first:
+      213: -6075621707651504703
+    second: Character RunUPandDown_8
+  - first:
+      213: 4364830431522386529
+    second: Character RunUPandDown_9
+  - first:
+      213: -5383823123018772712
+    second: Character RunUPandDown_10
+  - first:
+      213: 4851825776936278491
+    second: Character RunUPandDown_11
+  - first:
+      213: 5488633710032978490
+    second: Character RunUPandDown_12
+  - first:
+      213: 3751683542057036964
+    second: Character RunUPandDown_13
+  - first:
+      213: -1433203277261874394
+    second: Character RunUPandDown_14
+  - first:
+      213: -1557603007695255376
+    second: Character RunUPandDown_15
+  - first:
+      213: -8148667223664894942
+    second: Character RunUPandDown_16
+  - first:
+      213: -5674350126878252906
+    second: Character RunUPandDown_17
+  - first:
+      213: -221422189907157055
+    second: Character RunUPandDown_18
+  - first:
+      213: 837595462428521214
+    second: Character RunUPandDown_19
+  - first:
+      213: -5142555117518257745
+    second: Character RunUPandDown_20
+  - first:
+      213: -400686793480769388
+    second: Character RunUPandDown_21
+  - first:
+      213: 2694953264265564031
+    second: Character RunUPandDown_22
+  - first:
+      213: -1616245823383742947
+    second: Character RunUPandDown_23
+  - first:
+      213: 6256648859503041382
+    second: Character RunUPandDown_24
+  - first:
+      213: -6496312836505942003
+    second: Character RunUPandDown_25
+  - first:
+      213: 1527590444211453268
+    second: Character RunUPandDown_26
+  - first:
+      213: -1560154768156363115
+    second: Character RunUPandDown_27
+  - first:
+      213: 6749832035993283613
+    second: Character RunUPandDown_28
+  - first:
+      213: -2560132002369750880
+    second: Character RunUPandDown_29
+  - first:
+      213: -3028357884974014072
+    second: Character RunUPandDown_30
+  - first:
+      213: 6574652009422627528
+    second: Character RunUPandDown_31
+  - first:
+      213: -1210256174462765931
+    second: Character RunUPandDown_32
+  - first:
+      213: -7535800559780474591
+    second: Character RunUPandDown_33
+  - first:
+      213: 8996802862171630823
+    second: Character RunUPandDown_34
+  - first:
+      213: -3368329936039263945
+    second: Character RunUPandDown_35
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Character RunUPandDown_1
+      rect:
+        serializedVersion: 2
+        x: 62
+        y: 401
+        width: 143
+        height: 225
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 960ec5df8599f9f30800000000000000
+      internalID: 4584551553173348457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_8
+      rect:
+        serializedVersion: 2
+        x: 253
+        y: 403
+        width: 145
+        height: 228
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1c5a7c53f3e0faba0800000000000000
+      internalID: -6075621707651504703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_9
+      rect:
+        serializedVersion: 2
+        x: 436
+        y: 404
+        width: 143
+        height: 229
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 162f4bfc62ef29c30800000000000000
+      internalID: 4364830431522386529
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_10
+      rect:
+        serializedVersion: 2
+        x: 617
+        y: 403
+        width: 140
+        height: 223
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81f8ee2f461d845b0800000000000000
+      internalID: -5383823123018772712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_12
+      rect:
+        serializedVersion: 2
+        x: 811
+        y: 403
+        width: 141
+        height: 222
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a3200cc774b8b2c40800000000000000
+      internalID: 5488633710032978490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_14
+      rect:
+        serializedVersion: 2
+        x: 998
+        y: 386
+        width: 142
+        height: 239
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62b51e7763d3c1ce0800000000000000
+      internalID: -1433203277261874394
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_15
+      rect:
+        serializedVersion: 2
+        x: 1190
+        y: 403
+        width: 144
+        height: 228
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 2}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b88e392158426ae0800000000000000
+      internalID: -1557603007695255376
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_16
+      rect:
+        serializedVersion: 2
+        x: 1368
+        y: 403
+        width: 141
+        height: 222
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 22cd594655e1aee80800000000000000
+      internalID: -8148667223664894942
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_20
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 79
+        width: 148
+        height: 220
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fa10576fd59f1a8b0800000000000000
+      internalID: -5142555117518257745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_21
+      rect:
+        serializedVersion: 2
+        x: 277
+        y: 75
+        width: 147
+        height: 224
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4907368fb79707af0800000000000000
+      internalID: -400686793480769388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_22
+      rect:
+        serializedVersion: 2
+        x: 459
+        y: 82
+        width: 144
+        height: 217
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7f04d227b5666520800000000000000
+      internalID: 2694953264265564031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_23
+      rect:
+        serializedVersion: 2
+        x: 645
+        y: 75
+        width: 139
+        height: 224
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d16d083acf0f199e0800000000000000
+      internalID: -1616245823383742947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_24
+      rect:
+        serializedVersion: 2
+        x: 843
+        y: 79
+        width: 148
+        height: 220
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 66b18031df414d650800000000000000
+      internalID: 6256648859503041382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_25
+      rect:
+        serializedVersion: 2
+        x: 1025
+        y: 82
+        width: 144
+        height: 217
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d08c046e4e578d5a0800000000000000
+      internalID: -6496312836505942003
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_26
+      rect:
+        serializedVersion: 2
+        x: 1206
+        y: 79
+        width: 145
+        height: 220
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 45d318d5a67133510800000000000000
+      internalID: 1527590444211453268
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Character RunUPandDown_27
+      rect:
+        serializedVersion: 2
+        x: 1391
+        y: 75
+        width: 150
+        height: 224
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 59678612187395ae0800000000000000
+      internalID: -1560154768156363115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e7457de01aa1ac42b3430be724ca9b6
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Character RunUPandDown_0: -6171084816142822498
+      Character RunUPandDown_1: 4584551553173348457
+      Character RunUPandDown_10: -5383823123018772712
+      Character RunUPandDown_11: 4851825776936278491
+      Character RunUPandDown_12: 5488633710032978490
+      Character RunUPandDown_13: 3751683542057036964
+      Character RunUPandDown_14: -1433203277261874394
+      Character RunUPandDown_15: -1557603007695255376
+      Character RunUPandDown_16: -8148667223664894942
+      Character RunUPandDown_17: -5674350126878252906
+      Character RunUPandDown_18: -221422189907157055
+      Character RunUPandDown_19: 837595462428521214
+      Character RunUPandDown_2: 5078624041085159634
+      Character RunUPandDown_20: -5142555117518257745
+      Character RunUPandDown_21: -400686793480769388
+      Character RunUPandDown_22: 2694953264265564031
+      Character RunUPandDown_23: -1616245823383742947
+      Character RunUPandDown_24: 6256648859503041382
+      Character RunUPandDown_25: -6496312836505942003
+      Character RunUPandDown_26: 1527590444211453268
+      Character RunUPandDown_27: -1560154768156363115
+      Character RunUPandDown_28: 6749832035993283613
+      Character RunUPandDown_29: -2560132002369750880
+      Character RunUPandDown_3: 3316459135081304375
+      Character RunUPandDown_30: -3028357884974014072
+      Character RunUPandDown_31: 6574652009422627528
+      Character RunUPandDown_32: -1210256174462765931
+      Character RunUPandDown_33: -7535800559780474591
+      Character RunUPandDown_34: 8996802862171630823
+      Character RunUPandDown_35: -3368329936039263945
+      Character RunUPandDown_4: 4525800660042340311
+      Character RunUPandDown_5: 1881243743093359295
+      Character RunUPandDown_6: -6209285845742652085
+      Character RunUPandDown_7: 3410125524547323701
+      Character RunUPandDown_8: -6075621707651504703
+      Character RunUPandDown_9: 4364830431522386529
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

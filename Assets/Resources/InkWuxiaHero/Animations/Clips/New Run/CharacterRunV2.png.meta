@@ -1,0 +1,356 @@
+fileFormatVersion: 2
+guid: 1c82514decb4d9945979e351c52e4c81
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 3931901684347609295
+    second: CharacterRunV2_0
+  - first:
+      213: 8896837949181265042
+    second: CharacterRunV2_1
+  - first:
+      213: 7971238430595562108
+    second: CharacterRunV2_2
+  - first:
+      213: 1369058709332814728
+    second: CharacterRunV2_3
+  - first:
+      213: -5861174810977105357
+    second: CharacterRunV2_4
+  - first:
+      213: -8270215908674439832
+    second: CharacterRunV2_5
+  - first:
+      213: -7208406386256225434
+    second: CharacterRunV2_6
+  - first:
+      213: 2966303766416607775
+    second: CharacterRunV2_7
+  - first:
+      213: 7805646954343047796
+    second: CharacterRunV2_8
+  - first:
+      213: 7762747696425709802
+    second: CharacterRunV2_9
+  - first:
+      213: -5041486382764470757
+    second: CharacterRunV2_10
+  - first:
+      213: 1651350175470597348
+    second: CharacterRunV2_11
+  - first:
+      213: 7250645279594827578
+    second: CharacterRunV2_12
+  - first:
+      213: 2499287982523529550
+    second: CharacterRunV2_13
+  - first:
+      213: -1568678948324307131
+    second: CharacterRunV2_14
+  - first:
+      213: 6116417209873638573
+    second: CharacterRunV2_15
+  - first:
+      213: 2663451840392155895
+    second: CharacterRunV2_16
+  - first:
+      213: 6653765835693253473
+    second: CharacterRunV2_17
+  - first:
+      213: 7343791145673814636
+    second: CharacterRunV2_18
+  - first:
+      213: -9022610197462828296
+    second: CharacterRunV2_19
+  - first:
+      213: -7396307375912808108
+    second: CharacterRunV2_20
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: CharacterRunV2_1
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 337
+        width: 132
+        height: 148
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7a37938e178f9e60800000000000000
+      internalID: 7971238430595562108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CharacterRunV2_2
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 344
+        width: 148
+        height: 146
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88bef6e74afdff210800000000000000
+      internalID: 1369058709332814728
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CharacterRunV2_3
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 181
+        width: 139
+        height: 147
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 865fca3d27a4a3d80800000000000000
+      internalID: -8270215908674439832
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CharacterRunV2_4
+      rect:
+        serializedVersion: 2
+        x: 224
+        y: 181
+        width: 147
+        height: 144
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae0bf6ea6e1dabb60800000000000000
+      internalID: 7762747696425709802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CharacterRunV2_5
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 29
+        width: 137
+        height: 140
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54f0f76ceceea3ae0800000000000000
+      internalID: -1568678948324307131
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: CharacterRunV2_6
+      rect:
+        serializedVersion: 2
+        x: 228
+        y: 16
+        width: 144
+        height: 155
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f25fe6565b76f420800000000000000
+      internalID: 2663451840392155895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: f8cafb7433e35c34d9c9596fda8880a4
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      CharacterRunV2_0: 3931901684347609295
+      CharacterRunV2_1: 7971238430595562108
+      CharacterRunV2_10: -5041486382764470757
+      CharacterRunV2_11: 1651350175470597348
+      CharacterRunV2_12: 7250645279594827578
+      CharacterRunV2_13: 2499287982523529550
+      CharacterRunV2_15: 6116417209873638573
+      CharacterRunV2_17: 6653765835693253473
+      CharacterRunV2_18: 7343791145673814636
+      CharacterRunV2_19: -9022610197462828296
+      CharacterRunV2_2: 1369058709332814728
+      CharacterRunV2_20: -7396307375912808108
+      CharacterRunV2_3: -8270215908674439832
+      CharacterRunV2_4: 7762747696425709802
+      CharacterRunV2_5: -1568678948324307131
+      CharacterRunV2_6: 2663451840392155895
+      CharacterRunV2_7: 2966303766416607775
+      CharacterRunV2_8: 7805646954343047796
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

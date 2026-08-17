@@ -18,6 +18,7 @@ public sealed class TimelineDialogueCuePlayer : MonoBehaviour
     [SerializeField] private Transform npcSpeaker;
 
     private bool isWaitingForDialogue;
+    private PresentationSession performanceSession;
 
     /// <summary>Persistent SignalReceiver event target. Pauses the active Timeline at this signal.</summary>
     public void PlayDialogueAndResumeTimeline()
@@ -32,7 +33,7 @@ public sealed class TimelineDialogueCuePlayer : MonoBehaviour
             return;
         }
 
-        if (dialogueSystem.IsDialoguePlaying)
+        if (DialoguePerformanceManager.IsDialogueActive)
         {
             Debug.LogWarning("Timeline dialogue cue cannot start while another dialogue session is active.", this);
             return;
@@ -40,6 +41,10 @@ public sealed class TimelineDialogueCuePlayer : MonoBehaviour
 
         if (director != null) director.Pause();
         isWaitingForDialogue = true;
+        string sessionName = director != null && director.playableAsset != null
+            ? director.playableAsset.name
+            : "Timeline Dialogue Cue";
+        performanceSession = DialoguePerformanceManager.BeginPerformance(this, sessionName);
         dialogueSystem.DialogueFinished += ResumeTimeline;
         if (!dialogueSystem.StartDialogue(dialogueCsv, characterSpeaker, npcSpeaker)) ResumeTimeline();
     }
@@ -49,6 +54,8 @@ public sealed class TimelineDialogueCuePlayer : MonoBehaviour
         if (!isWaitingForDialogue) return;
 
         isWaitingForDialogue = false;
+        performanceSession?.Dispose();
+        performanceSession = null;
         if (dialogueSystem != null) dialogueSystem.DialogueFinished -= ResumeTimeline;
         if (director != null && director.state == PlayState.Paused) director.Play();
     }
@@ -57,5 +64,7 @@ public sealed class TimelineDialogueCuePlayer : MonoBehaviour
     {
         if (dialogueSystem != null) dialogueSystem.DialogueFinished -= ResumeTimeline;
         isWaitingForDialogue = false;
+        performanceSession?.Dispose();
+        performanceSession = null;
     }
 }
