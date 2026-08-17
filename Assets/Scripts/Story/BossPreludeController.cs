@@ -121,6 +121,7 @@ public sealed class BossPreludeController : MonoBehaviour
     private void FinishPrelude()
     {
         if (dialogue != null) dialogue.DialogueFinished -= FinishPrelude;
+        GameAudioManager.PlayBossMusic();
         encounter?.ActivateGuardArchers();
         encounter?.ShowBossHud();
         // Ordinary arena enemies do not exist during the cinematic. Start the

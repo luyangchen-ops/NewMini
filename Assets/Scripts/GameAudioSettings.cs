@@ -136,6 +136,7 @@ public enum GameSfx
 public sealed class GameAudioManager : MonoBehaviour
 {
     private const string BattleMusicResourcePath = "Audio/BG/BGM_InkWuxia_MistBlade_RapidCombat_Loop";
+    private const string BossMusicResourcePath = "Audio/BG/Boss BG";
 
     private static readonly HashSet<string> BattleSceneNames = new()
     {
@@ -164,6 +165,7 @@ public sealed class GameAudioManager : MonoBehaviour
     private AudioSource sfxSource;
     private AudioSource musicSource;
     private AudioClip battleMusicClip;
+    private AudioClip bossMusicClip;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
@@ -188,6 +190,15 @@ public sealed class GameAudioManager : MonoBehaviour
     {
         AudioClip clip = GetClip(sound);
         PlaySfx(clip, volumeScale);
+    }
+
+    /// <summary>Switches the shared looping music source to the final Boss theme.</summary>
+    public static void PlayBossMusic()
+    {
+        if (musicSuppressed) return;
+
+        GameAudioManager manager = EnsureInstance();
+        manager.PlayMusic(ref manager.bossMusicClip, BossMusicResourcePath);
     }
 
     /// <summary>Temporarily silences shared music without changing the player's settings.</summary>
@@ -331,16 +342,22 @@ public sealed class GameAudioManager : MonoBehaviour
 
     private void PlayBattleMusic()
     {
-        if (musicSource == null || musicSource.isPlaying) return;
+        PlayMusic(ref battleMusicClip, BattleMusicResourcePath);
+    }
 
-        battleMusicClip ??= Resources.Load<AudioClip>(BattleMusicResourcePath);
-        if (battleMusicClip == null)
+    private void PlayMusic(ref AudioClip clip, string resourcePath)
+    {
+        if (musicSource == null) return;
+
+        clip ??= Resources.Load<AudioClip>(resourcePath);
+        if (clip == null)
         {
-            Debug.LogWarning($"GameAudioManager could not load Resources/{BattleMusicResourcePath}.");
+            Debug.LogWarning($"GameAudioManager could not load Resources/{resourcePath}.");
             return;
         }
 
-        musicSource.clip = battleMusicClip;
+        if (musicSource.clip == clip && musicSource.isPlaying) return;
+        musicSource.clip = clip;
         musicSource.Play();
     }
 }
