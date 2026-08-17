@@ -19,6 +19,8 @@ public sealed class ArenaCombatZone : MonoBehaviour
     [SerializeField] private bool activateWhenPlayerEnters = true;
     [SerializeField] private bool lockOnStart;
     [SerializeField] private bool oneShot = true;
+    [Tooltip("When disabled, death retries leave this encounter untouched. Use this for Boss arenas with their own encounter state.")]
+    [SerializeField] private bool resetOnCheckpointRetry = true;
     [SerializeField, Min(0f)] private float clearCheckDelay = .15f;
     [Tooltip("Distance the player must move inside the zone after crossing its boundary before its gates can close.")]
     [SerializeField, Min(0f)] private float entryConfirmationDistance = .6f;
@@ -43,6 +45,7 @@ public sealed class ArenaCombatZone : MonoBehaviour
     public Collider2D ZoneCollider => zoneCollider;
     public UnityEvent ZoneClearedEvent => onZoneCleared;
     public UnityEvent ZoneLockedEvent => onZoneLocked;
+    public void SetResetOnCheckpointRetry(bool enabled) => resetOnCheckpointRetry = enabled;
 
 #if UNITY_EDITOR
     /// <summary>Editor-only shortcut used by play-mode level skipping.</summary>
@@ -98,13 +101,20 @@ public sealed class ArenaCombatZone : MonoBehaviour
 
     /// <summary>
     /// Restores every uncleared arena to its pre-entry state for a checkpoint retry.
+    /// An arena that was active when the player died is immediately restarted: the
+    /// respawn point can be inside its trigger, so waiting for another enter event
+    /// would otherwise leave its newly cleared enemy list empty forever.
     /// Cleared arenas deliberately remain open and completed.
     /// </summary>
     public static void ResetIncompleteZonesForRetry()
     {
         foreach (ArenaCombatZone zone in FindObjectsByType<ArenaCombatZone>(FindObjectsInactive.Exclude))
         {
-            if (zone != null && !zone.IsCleared) zone.ResetZone();
+            if (zone == null || zone.IsCleared || !zone.resetOnCheckpointRetry) continue;
+
+            bool wasActive = zone.IsActive;
+            zone.ResetZone();
+            if (wasActive) zone.ActivateZone();
         }
     }
 

@@ -456,6 +456,7 @@ public sealed class EnemyAgent : MonoBehaviour
 
         SetDesiredVelocity(Vector2.zero);
         SetAnimationState(EnemyAnimationState.Attack);
+        if (IsBossCombatant) GetComponent<BossCombatController>()?.BeginMeleeSwing();
         meleePerfectDodgeStartTime = Time.time + data.MeleePerfectDodgeDelay;
         meleePerfectDodgeEndTime = meleePerfectDodgeStartTime + data.MeleePerfectDodgeDuration;
         if (supportsAttack)
@@ -489,6 +490,7 @@ public sealed class EnemyAgent : MonoBehaviour
     {
         FaceTarget();
         SetDesiredVelocity(Vector2.zero);
+        GetComponent<BossCombatController>()?.BeginMeleeSwing();
         meleePerfectDodgeStartTime = Time.time + data.MeleePerfectDodgeDelay;
         meleePerfectDodgeEndTime = meleePerfectDodgeStartTime + data.MeleePerfectDodgeDuration;
         if (supportsAttack)
@@ -782,6 +784,9 @@ public sealed class EnemyAgent : MonoBehaviour
             ? target.GetComponentInParent<PlayerCharacterController>()
             : null;
         if (player == null) return;
+
+        BossCombatController bossCombat = IsBossCombatant ? GetComponent<BossCombatController>() : null;
+        if (bossCombat != null && !bossCombat.IsCurrentMeleeSwingHittingPlayer(player)) return;
 
         // Resolve the perfect-dodge window before any invulnerability or damage checks.
         // Dodging itself is invulnerable, so checking IsInvulnerable first would skip

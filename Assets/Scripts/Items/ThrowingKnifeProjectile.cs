@@ -81,8 +81,11 @@ public sealed class ThrowingKnifeProjectile : MonoBehaviour
         }
         else
         {
-            SpecialItemDropSpawner.TryDropFromEnemy(enemy.transform.position);
-            Destroy(enemy.gameObject);
+            // Go through the shared death gateway so Boss-specific mechanics
+            // (borrowed lives and the five-hit counter) can intercept the hit.
+            enemy.Die();
+            if (enemy.IsDead)
+                SpecialItemDropSpawner.TryDropFromEnemy(enemy.transform.position);
         }
         Destroy(gameObject);
     }

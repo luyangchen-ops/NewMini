@@ -245,6 +245,7 @@ MonoBehaviour:
   activateWhenPlayerEnters: 1
   lockOnStart: 0
   oneShot: 1
+  resetOnCheckpointRetry: 1
   clearCheckDelay: 0.15
   entryConfirmationDistance: 0.6
   boundaryGates:
@@ -8060,6 +8061,7 @@ MonoBehaviour:
   activateWhenPlayerEnters: 1
   lockOnStart: 0
   oneShot: 1
+  resetOnCheckpointRetry: 1
   clearCheckDelay: 0.15
   entryConfirmationDistance: 0.6
   boundaryGates:
@@ -13162,6 +13164,7 @@ MonoBehaviour:
   activateWhenPlayerEnters: 1
   lockOnStart: 0
   oneShot: 1
+  resetOnCheckpointRetry: 1
   clearCheckDelay: 0.15
   entryConfirmationDistance: 0.6
   boundaryGates:
@@ -22939,6 +22942,7 @@ MonoBehaviour:
   activateWhenPlayerEnters: 1
   lockOnStart: 0
   oneShot: 1
+  resetOnCheckpointRetry: 0
   clearCheckDelay: 0.15
   entryConfirmationDistance: 0.6
   boundaryGates:
@@ -25221,6 +25225,7 @@ MonoBehaviour:
   activateWhenPlayerEnters: 1
   lockOnStart: 0
   oneShot: 1
+  resetOnCheckpointRetry: 1
   clearCheckDelay: 0.15
   entryConfirmationDistance: 0.6
   boundaryGates:

@@ -1,12 +1,12 @@
 using UnityEditor;
 using UnityEngine;
 
-/// <summary>Applies the new boss visual prefab to the existing boss gameplay root.</summary>
+/// <summary>Applies the default swordsman visual to the existing boss gameplay root.</summary>
 [InitializeOnLoad]
 public static class BossPrefabAuthoring
 {
     private const string BossPrefabPath = "Assets/Prefabs/Story/Boss_借命阎罗_裘九.prefab";
-    private const string BossVisualPrefabPath = "Assets/Resources/Animation/Boss/Boss.prefab";
+    private const string SwordsmanVisualPrefabPath = "Assets/Prefabs/Enemy/刀兵.prefab";
     private const string MeleeDataPath = "Assets/Data/Enemies/MeleeEnemyData.asset";
     private const string BossDataPath = "Assets/Data/Enemies/BossEnemyData.asset";
 
@@ -22,8 +22,8 @@ public static class BossPrefabAuthoring
     public static GameObject BuildOrUpgrade()
     {
         EnsureBossData();
-        GameObject visualSource = AssetDatabase.LoadAssetAtPath<GameObject>(BossVisualPrefabPath);
-        if (visualSource == null) throw new System.InvalidOperationException("Boss visual prefab is missing.");
+        GameObject visualSource = AssetDatabase.LoadAssetAtPath<GameObject>(SwordsmanVisualPrefabPath);
+        if (visualSource == null) throw new System.InvalidOperationException("Swordsman visual prefab is missing.");
 
         string sourcePath = AssetDatabase.LoadAssetAtPath<GameObject>(BossPrefabPath) != null
             ? BossPrefabPath
@@ -32,31 +32,28 @@ public static class BossPrefabAuthoring
         root.name = "Boss_借命阎罗_裘九";
 
         Transform existingVisual = root.transform.Find("Visual_Boss");
-        GameObject visual;
-        SpriteRenderer newRenderer;
-        if (existingVisual != null)
-        {
-            visual = existingVisual.gameObject;
-            newRenderer = visual.GetComponentInChildren<SpriteRenderer>(true);
-        }
-        else
-        {
-            SpriteRenderer oldRenderer = root.GetComponent<SpriteRenderer>();
-            float previousVisualSize = oldRenderer != null ? Mathf.Max(oldRenderer.bounds.size.x, oldRenderer.bounds.size.y) : 0f;
-            if (oldRenderer != null) Object.DestroyImmediate(oldRenderer);
-            Animator oldAnimator = root.GetComponent<Animator>();
-            if (oldAnimator != null) Object.DestroyImmediate(oldAnimator);
+        if (existingVisual != null) Object.DestroyImmediate(existingVisual.gameObject);
 
-            visual = (GameObject)PrefabUtility.InstantiatePrefab(visualSource);
-            visual.name = "Visual_Boss";
-            visual.transform.SetParent(root.transform, false);
-            newRenderer = visual.GetComponentInChildren<SpriteRenderer>(true);
-            if (previousVisualSize > 0f && newRenderer != null)
-            {
-                float newVisualSize = Mathf.Max(newRenderer.bounds.size.x, newRenderer.bounds.size.y);
-                if (newVisualSize > .001f) visual.transform.localScale *= previousVisualSize / newVisualSize;
-            }
-        }
+        SpriteRenderer swordsmanRenderer = visualSource.GetComponent<SpriteRenderer>();
+        Animator swordsmanAnimator = visualSource.GetComponent<Animator>();
+        if (swordsmanRenderer == null || swordsmanAnimator == null)
+            throw new System.InvalidOperationException("Swordsman prefab needs a SpriteRenderer and Animator.");
+
+        GameObject visual = new("Visual_Boss");
+        visual.transform.SetParent(root.transform, false);
+        // The standard swordsman uses a .6 scale. Apply the requested 1.1x
+        // visual size without changing the Boss root's combat body or logic.
+        visual.transform.localScale = Vector3.one * .66f;
+
+        SpriteRenderer newRenderer = visual.AddComponent<SpriteRenderer>();
+        newRenderer.sprite = swordsmanRenderer.sprite;
+        newRenderer.sharedMaterial = swordsmanRenderer.sharedMaterial;
+        newRenderer.sortingLayerID = swordsmanRenderer.sortingLayerID;
+        newRenderer.sortingOrder = swordsmanRenderer.sortingOrder;
+        newRenderer.color = new Color(1f, .22f, .22f, 1f);
+
+        Animator newAnimator = visual.AddComponent<Animator>();
+        newAnimator.runtimeAnimatorController = swordsmanAnimator.runtimeAnimatorController;
 
         EnemyAgent agent = root.GetComponent<EnemyAgent>();
         if (agent == null) agent = root.AddComponent<EnemyAgent>();
@@ -65,8 +62,8 @@ public static class BossPrefabAuthoring
 
         SerializedObject serializedAgent = new SerializedObject(agent);
         serializedAgent.FindProperty("data").objectReferenceValue = AssetDatabase.LoadAssetAtPath<EnemyData>(BossDataPath);
-        serializedAgent.FindProperty("visualStyle").enumValueIndex = (int)EnemyAgent.EnemyVisualStyle.Auto;
-        serializedAgent.FindProperty("visualAnimator").objectReferenceValue = visual.GetComponentInChildren<Animator>(true);
+        serializedAgent.FindProperty("visualStyle").enumValueIndex = (int)EnemyAgent.EnemyVisualStyle.Swordsman;
+        serializedAgent.FindProperty("visualAnimator").objectReferenceValue = newAnimator;
         serializedAgent.FindProperty("visualRenderer").objectReferenceValue = newRenderer;
         serializedAgent.ApplyModifiedPropertiesWithoutUndo();
 

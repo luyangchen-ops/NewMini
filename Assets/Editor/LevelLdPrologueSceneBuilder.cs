@@ -401,6 +401,12 @@ public static class LevelLdPrologueSceneBuilder
         if (finalWaves == null || combatZone == null)
             throw new System.InvalidOperationException("Root_Arena_05 needs its authored wave spawner and combat zone.");
 
+        // Boss encounter state (Boss, guards, dialogue, and HUD) is owned by
+        // LevelBossEncounterController, so checkpoint death must not reset it.
+        SerializedObject serializedCombatZone = new SerializedObject(combatZone);
+        serializedCombatZone.FindProperty("resetOnCheckpointRetry").boolValue = false;
+        serializedCombatZone.ApplyModifiedPropertiesWithoutUndo();
+
         GameObject root = NewWorld("Root_BossEncounter", arena05.transform);
         LevelBossEncounterController encounter = root.AddComponent<LevelBossEncounterController>();
         BossPreludeController prelude = root.AddComponent<BossPreludeController>();

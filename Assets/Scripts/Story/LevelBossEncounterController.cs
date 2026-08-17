@@ -142,7 +142,7 @@ public sealed class LevelBossEncounterController : MonoBehaviour
         }
 
         dialogueSystem.DialogueFinished += ShowVictoryAfterEpilogue;
-        dialogueSystem.StartDialogue(postBossDialogue, playerSpeaker, npcSpeakerAnchor);
+        dialogueSystem.StartDialogueAtLowerScreen(postBossDialogue, playerSpeaker, npcSpeakerAnchor);
     }
 
     private void ShowVictoryAfterEpilogue()

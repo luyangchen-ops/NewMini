@@ -10,6 +10,11 @@ using UnityEngine.UI;
 public sealed class BorrowedLifeBossController : MonoBehaviour
 {
     [SerializeField, Min(1)] private int startingContracts = 99;
+#if UNITY_EDITOR
+    // Keep iteration fast in the Editor without changing the authored value
+    // used by player builds.
+    private const int EditorTestStartingContracts = 10;
+#endif
     [SerializeField] private Text contractCountText;
     [SerializeField] private UnityEvent<int> onContractCountChanged = new UnityEvent<int>();
     [SerializeField] private UnityEvent<int> onPhaseChanged = new UnityEvent<int>();
@@ -20,8 +25,17 @@ public sealed class BorrowedLifeBossController : MonoBehaviour
 
     private void Awake()
     {
-        RemainingContracts = Mathf.Max(1, startingContracts);
+        RemainingContracts = Mathf.Max(1, GetStartingContracts());
         RefreshPresentation();
+    }
+
+    private int GetStartingContracts()
+    {
+#if UNITY_EDITOR
+        return EditorTestStartingContracts;
+#else
+        return startingContracts;
+#endif
     }
 
     public void ConfigurePresentation(Text countText)

@@ -9,12 +9,17 @@ public sealed class BossCombatController : MonoBehaviour
 {
     [Header("Five-hit counter")]
     [SerializeField, Min(1)] private int hitsBeforeCounter = 5;
-    [SerializeField, Min(.05f)] private float consecutiveHitGracePeriod = 1.35f;
+    [Tooltip("Maximum interval between successive player hits needed to trigger the counter.")]
+    [SerializeField, Min(.05f)] private float consecutiveHitGracePeriod = 3f;
     [SerializeField, Min(0f)] private float counterKnockbackDistance = 2.2f;
 
     [Header("Aggressive combo")]
     [SerializeField, Range(1, 3)] private int maximumAttackCount = 3;
     [SerializeField, Range(0f, 1f)] private float followUpAttackChance = .72f;
+    [Tooltip("Forward offset of the melee hitbox from the Boss body centre.")]
+    [SerializeField, Min(0f)] private float meleeHitboxForwardOffset = .9f;
+    [Tooltip("World-space size of the melee hitbox. Damage is dealt only when it overlaps the player collider.")]
+    [SerializeField] private Vector2 meleeHitboxSize = new(1.9f, 2.2f);
 
     private EnemyAgent agent;
     private Animator visualAnimator;
@@ -22,6 +27,7 @@ public sealed class BossCombatController : MonoBehaviour
     private int receivedHitCount;
     private int attackCount;
     private float lastHitTime = float.NegativeInfinity;
+    private Vector2 swingDirection = Vector2.right;
 
     private static readonly int Attack = Animator.StringToHash("Attack");
 
@@ -46,6 +52,35 @@ public sealed class BossCombatController : MonoBehaviour
     }
 
     public void BeginAttackSequence() => attackCount = 1;
+
+    /// <summary>Locks this swing's facing direction before its damaging frame.</summary>
+    public void BeginMeleeSwing()
+    {
+        player ??= FindAnyObjectByType<PlayerCharacterController>();
+        if (player == null) return;
+
+        swingDirection = player.transform.position.x < transform.position.x
+            ? Vector2.left
+            : Vector2.right;
+    }
+
+    /// <summary>Returns true only while the current sword-swing hitbox overlaps the player collider.</summary>
+    public bool IsCurrentMeleeSwingHittingPlayer(PlayerCharacterController targetPlayer)
+    {
+        if (targetPlayer == null || agent?.Body == null) return false;
+
+        Vector2 size = new(Mathf.Max(.01f, meleeHitboxSize.x), Mathf.Max(.01f, meleeHitboxSize.y));
+        Vector2 center = agent.Body.position + swingDirection * meleeHitboxForwardOffset;
+        foreach (Collider2D hit in Physics2D.OverlapBoxAll(center, size, 0f))
+        {
+            // The player's body collider lives on the controller object. Do not let
+            // any child trigger used for presentation extend the attack reach.
+            if (hit != null && hit.GetComponent<PlayerCharacterController>() == targetPlayer)
+                return true;
+        }
+
+        return false;
+    }
 
     public bool TryContinueAttackSequence()
     {

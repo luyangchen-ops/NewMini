@@ -106,6 +106,7 @@ public sealed class ClickDialogueSystem : MonoBehaviour
     private bool advanceAfterActiveInterruption;
     private bool activeBubbleWasVisibleBeforeInterruption;
     private bool gameplayHudWasActive;
+    private bool useLowerScreenDialoguePlacement;
     private Coroutine bubbleAnimation;
     private float lineAutoAdvanceAt = float.PositiveInfinity;
     private float remainingLineReadTime = float.PositiveInfinity;
@@ -278,6 +279,20 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         return StartDialogue();
     }
 
+    /// <summary>
+    /// Plays an authored dialogue sequence in the lower visible screen area.
+    /// This is intended for endings where the speaker is outside the camera view.
+    /// </summary>
+    public bool StartDialogueAtLowerScreen(TextAsset csv, Transform characterSpeaker, Transform npcSpeaker)
+    {
+        if (isDialoguePlaying || isTransitioning || csv == null) return false;
+
+        useLowerScreenDialoguePlacement = true;
+        bool started = StartDialogue(csv, characterSpeaker, npcSpeaker);
+        if (!started) useLowerScreenDialoguePlacement = false;
+        return started;
+    }
+
     private bool BeginDialoguePresentation(bool showFirstLineWhenReady)
     {
         if (isDialoguePlaying || isTransitioning || dialogueLines.Count == 0) return false;
@@ -366,7 +381,11 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         else if (line.Speaker == SpeakerKind.Soldier) { activeSpeaker = soldier; activeWorldOffset = soldierOffset; }
 
         bool systemPresentation = line.Speaker == SpeakerKind.System && line.FollowTarget == null;
-        Vector2 target = systemPresentation ? systemPosition : GetWorldBubblePosition(activeSpeaker, activeWorldOffset);
+        bool lowerScreenPresentation = useLowerScreenDialoguePlacement;
+        if (lowerScreenPresentation) activeSpeaker = null;
+        Vector2 target = lowerScreenPresentation
+            ? GetLowerScreenBubblePosition()
+            : systemPresentation ? systemPosition : GetWorldBubblePosition(activeSpeaker, activeWorldOffset);
         Vector2 start = systemPresentation ? target + Vector2.up * (Screen.height * .55f) : target + Vector2.up * 36f;
         bubbleAnimation = StartCoroutine(AnimateBubble(start, target));
     }
@@ -391,6 +410,7 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         firstLineRevealRequested = false;
         isInterruptedForPerformance = false;
         advanceAfterActiveInterruption = false;
+        useLowerScreenDialoguePlacement = false;
         isDialoguePlaying = false;
         isTransitioning = false;
         DialogueFinished?.Invoke();
@@ -595,6 +615,40 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         Vector2 screen = cameraToUse.WorldToScreenPoint(speaker.position + (Vector3)offset);
         RectTransformUtility.ScreenPointToLocalPointInRectangle(bubbleContainer, screen, null, out Vector2 local);
         return local;
+    }
+
+    private Vector2 GetLowerScreenBubblePosition()
+    {
+        if (bubbleContainer == null) return Vector2.zero;
+
+        float lowerVisibleEdge = 0f;
+        if (bottomLetterbox != null && bottomLetterbox.activeInHierarchy)
+        {
+            RectTransform bottomRect = BottomLetterboxRect;
+            if (bottomRect != null)
+            {
+                Vector3[] corners = new Vector3[4];
+                bottomRect.GetWorldCorners(corners);
+                Camera canvasCamera = GetCanvasCamera();
+                foreach (Vector3 corner in corners)
+                    lowerVisibleEdge = Mathf.Max(lowerVisibleEdge,
+                        RectTransformUtility.WorldToScreenPoint(canvasCamera, corner).y);
+            }
+        }
+
+        // Place the bubble near the bottom of the usable image area, but leave
+        // enough room for the entire bubble above the lower letterbox bar.
+        float targetScreenY = Mathf.Lerp(lowerVisibleEdge, Screen.height, .2f);
+        Vector2 screen = new(Screen.width * .5f, targetScreenY);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            bubbleContainer, screen, GetCanvasCamera(), out Vector2 local);
+        return local;
+    }
+
+    private Camera GetCanvasCamera()
+    {
+        Canvas canvas = bubbleContainer != null ? bubbleContainer.GetComponentInParent<Canvas>() : null;
+        return canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay ? canvas.worldCamera : null;
     }
 
     private void CacheLetterboxPositions()
