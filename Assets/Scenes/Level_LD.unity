@@ -48346,7 +48346,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba14433ea9ac8ea4fb30d83c9e66d34d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelBossEncounterController
-  bossPrefab: {fileID: 6412904609548794851, guid: bbae39cb82e9ef449ad4a0245c20f68f, type: 3}
+  bossPrefab: {fileID: 2775541693963204491, guid: 34204f8f834b50340a0ed6dbde59b31a, type: 3}
   bossSpawnPoint: {fileID: 1307964923}
   spawnedBossParent: {fileID: 1139408460}
   guardArcherPrefab: {fileID: 1000, guid: ac76861895f1dac48981520d119d1d0e, type: 3}

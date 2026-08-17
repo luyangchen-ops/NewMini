@@ -109,7 +109,11 @@ public class PlayerCharacterController : MonoBehaviour
     private Vector2 dashStart;
     private Vector2 dashTarget;
     private Vector2 killDashDirection;
+    private Vector2 bossGuardKnockbackStart;
+    private Vector2 bossGuardKnockbackTarget;
     private float dashElapsed;
+    private float bossGuardKnockbackElapsed;
+    private float bossGuardKnockbackDuration;
     private float activeDashDuration;
     private float dashReadyTime;
     private float normalAttackReadyTime;
@@ -123,6 +127,8 @@ public class PlayerCharacterController : MonoBehaviour
     private int killChainCount;
     private float currentHealth;
     private bool isDead;
+    private bool bossGuardControlLocked;
+    private bool bossGuardKnockbackActive;
     private int currentMomentum;
     private int ultimateExecutionIndex;
     private int ultimateExecutedKills;
@@ -161,6 +167,7 @@ public class PlayerCharacterController : MonoBehaviour
     public bool IsDodging => stateMachine != null && stateMachine.Is(PlayerStateId.Dodge);
     public bool IsKillChainActive => stateMachine != null && IsKillChainState(stateMachine.Current);
     public bool IsUltimateActive => stateMachine != null && IsUltimateState(stateMachine.Current);
+    public bool IsBossGuardLocked => bossGuardControlLocked;
     public bool IsInvulnerable => IsDodging || IsKillChainActive || IsUltimateActive || Time.unscaledTime < exitProtectionUntil;
     public int KillChainCount => killChainCount;
     public float MaximumHealth => maximumHealth;
@@ -286,7 +293,7 @@ public class PlayerCharacterController : MonoBehaviour
         input.Tick();
         if (isDead) return;
 
-        switch (State)
+        if (!bossGuardControlLocked) switch (State)
         {
             case PlayerStateId.Locomotion:
                 HandleLocomotionInput();
@@ -331,6 +338,12 @@ public class PlayerCharacterController : MonoBehaviour
     private void FixedUpdate()
     {
         if (isDead) return;
+        if (bossGuardKnockbackActive)
+        {
+            UpdateBossGuardKnockback();
+            return;
+        }
+        if (bossGuardControlLocked) return;
         if (IsUltimateActive) return;
 
         if (State == PlayerStateId.Dodge)
@@ -899,6 +912,7 @@ public class PlayerCharacterController : MonoBehaviour
         }
 
         isDead = true;
+        CancelBossGuardReaction();
         body.linearVelocity = Vector2.zero;
         visualAnimator?.SetBool(IsDeadAnimatorParam, true);
         Died?.Invoke();
@@ -907,6 +921,7 @@ public class PlayerCharacterController : MonoBehaviour
     public void RespawnAt(Vector3 position)
     {
         isDead = false;
+        CancelBossGuardReaction();
         transform.position = position;
         body.position = position;
         body.linearVelocity = Vector2.zero;
@@ -919,17 +934,62 @@ public class PlayerCharacterController : MonoBehaviour
         cameraController?.RestoreImmediately();
     }
 
+    /// <summary>Locks player input while the Boss holds the guard pose.</summary>
+    public void BeginBossGuardStun()
+    {
+        if (isDead) return;
+
+        if (IsUltimateActive) EndUltimate(false);
+        bossGuardControlLocked = true;
+        bossGuardKnockbackActive = false;
+        bossGuardKnockbackElapsed = 0f;
+        body.linearVelocity = Vector2.zero;
+        visualAnimator?.SetFloat(Speed, 0f);
+        visualAnimator?.SetTrigger(Hurt);
+    }
+
     /// <summary>Used by boss counter attacks. It displaces without dealing health damage.</summary>
-    public void ReceiveKnockback(Vector2 direction, float distance)
+    public void ReceiveKnockback(Vector2 direction, float distance, float duration = .18f)
     {
         if (isDead || direction.sqrMagnitude <= .0001f || distance <= 0f) return;
 
-        Vector2 destination = cameraController != null
+        bossGuardControlLocked = true;
+        bossGuardKnockbackActive = true;
+        bossGuardKnockbackElapsed = 0f;
+        bossGuardKnockbackDuration = Mathf.Max(.01f, duration);
+        bossGuardKnockbackStart = body.position;
+        bossGuardKnockbackTarget = cameraController != null
             ? cameraController.Clamp(body.position + direction.normalized * distance, Padding, transform.position.z)
             : body.position + direction.normalized * distance;
-        body.position = destination;
         body.linearVelocity = Vector2.zero;
         visualAnimator?.SetTrigger(Hurt);
+    }
+
+    private void UpdateBossGuardKnockback()
+    {
+        bossGuardKnockbackElapsed += Time.fixedDeltaTime;
+        float progress = Mathf.Clamp01(bossGuardKnockbackElapsed / bossGuardKnockbackDuration);
+        body.MovePosition(Vector2.LerpUnclamped(
+            bossGuardKnockbackStart,
+            bossGuardKnockbackTarget,
+            EaseOutCubic(progress)));
+
+        if (progress < 1f) return;
+
+        body.position = bossGuardKnockbackTarget;
+        bossGuardKnockbackActive = false;
+        bossGuardControlLocked = false;
+        body.linearVelocity = Vector2.zero;
+        if (stateMachine != null) stateMachine.Change(PlayerStateId.Locomotion);
+    }
+
+    /// <summary>Clears a pending Boss guard reaction during death, respawn, or Boss removal.</summary>
+    public void CancelBossGuardReaction()
+    {
+        bossGuardControlLocked = false;
+        bossGuardKnockbackActive = false;
+        bossGuardKnockbackElapsed = 0f;
+        if (body != null) body.linearVelocity = Vector2.zero;
     }
 
     /// <summary>
@@ -1410,6 +1470,11 @@ public class PlayerCharacterController : MonoBehaviour
     private void UpdateVisuals()
     {
         if (visualAnimator == null) return;
+        if (bossGuardControlLocked)
+        {
+            visualAnimator.SetFloat(Speed, 0f);
+            return;
+        }
         if (presentationLocomotionActive)
         {
             UpdateFacing(presentationLocomotionDirection);
@@ -1576,6 +1641,7 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void OnDisable()
     {
+        CancelBossGuardReaction();
         RestoreAllUltimateTargetColors();
         RestoreUltimateLinePresentation();
         ultimateTargets.Clear();

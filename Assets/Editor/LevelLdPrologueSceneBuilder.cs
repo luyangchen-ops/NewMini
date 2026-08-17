@@ -24,11 +24,9 @@ public static class LevelLdPrologueSceneBuilder
     private const string DialoguePath = "Assets/Resources/Dialogue/Story/Level01_Opening.csv";
     private const string BossDialoguePath = "Assets/Resources/Dialogue/Story/Level01_BossClear.csv";
     private const string HealthUiFontPath = "Assets/Fonts/NotoSerifCJKsc-Regular.otf";
-    private const string BossPrefabFolder = "Assets/Prefabs/Story";
-    private const string BossPrefabPath = BossPrefabFolder + "/Boss_借命阎罗_裘九.prefab";
+    private const string BossPrefabPath = "Assets/Prefabs/Enemy/Boss.prefab";
     private const string PlayerPrefabGuid = "434d88b041492e74fa49bf21dc3af3e9";
     private const string SwordsmanPrefabGuid = "7513f6c33541e8440a486e9d12ff20c5";
-    private const string ShieldPrefabGuid = "d8ffcc6e514f86047ac9f88b26e9d13b";
     private const float WalkDuration = 3f;
 
     private static readonly (string PageName, string ArtworkPath, string ImageName)[] TutorialArtwork =
@@ -499,24 +497,12 @@ public static class LevelLdPrologueSceneBuilder
 
     private static GameObject BuildBossPrefab(Scene scene)
     {
-        if (Application.isEditor) return BossPrefabAuthoring.BuildOrUpgrade();
-        EnsureFolder(BossPrefabFolder);
-        string shieldPath = AssetDatabase.GUIDToAssetPath(ShieldPrefabGuid);
-        GameObject shieldPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(shieldPath);
-        if (shieldPrefab == null) throw new System.InvalidOperationException("Shield enemy prefab is required for the Qiu Jiu gameplay prototype.");
-
-        GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(shieldPrefab, scene);
-        instance.name = "Boss_借命阎罗_裘九";
-        instance.transform.localScale = Vector3.one * 1.28f;
-        BorrowedLifeBossController borrowedLife = instance.GetComponent<BorrowedLifeBossController>();
-        if (borrowedLife == null) borrowedLife = instance.AddComponent<BorrowedLifeBossController>();
-        foreach (SpriteRenderer renderer in instance.GetComponentsInChildren<SpriteRenderer>(true))
-            renderer.color = new Color(.78f, .62f, .62f, 1f);
-
-        GameObject saved = PrefabUtility.SaveAsPrefabAsset(instance, BossPrefabPath);
-        Object.DestroyImmediate(instance);
-        if (saved == null) throw new System.InvalidOperationException("Failed to save the borrowed-life boss prefab.");
-        return saved;
+        GameObject bossPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(BossPrefabPath);
+        if (bossPrefab == null) throw new System.InvalidOperationException($"Boss prefab is missing at '{BossPrefabPath}'.");
+        if (bossPrefab.GetComponent<EnemyAgent>() == null) throw new System.InvalidOperationException("Boss prefab needs EnemyAgent.");
+        if (bossPrefab.GetComponent<BossCombatController>() == null) throw new System.InvalidOperationException("Boss prefab needs BossCombatController.");
+        if (bossPrefab.GetComponent<BorrowedLifeBossController>() == null) throw new System.InvalidOperationException("Boss prefab needs BorrowedLifeBossController.");
+        return bossPrefab;
     }
 
     private static GameObject BuildBossHud(Scene scene, out Text contractCount)

@@ -1,0 +1,507 @@
+fileFormatVersion: 2
+guid: 2941aa5b51e1427469d23a284a0e8d1b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8200953236027281624
+    second: BossGuard_00
+  - first:
+      213: -1591313904576497099
+    second: BossGuard_01
+  - first:
+      213: -4433401920694668783
+    second: BossGuard_02
+  - first:
+      213: 8513639177974902585
+    second: BossGuard_03
+  - first:
+      213: 5337384571236534888
+    second: BossGuard_04
+  - first:
+      213: 7780302680413446462
+    second: BossGuard_05
+  - first:
+      213: -8559263826714787516
+    second: BossGuard_06
+  - first:
+      213: 1283906534768100989
+    second: BossGuard_07
+  - first:
+      213: 6539434172965669081
+    second: BossGuard_08
+  - first:
+      213: 6811842492140556777
+    second: BossGuard_09
+  - first:
+      213: -5638909629035298327
+    second: BossGuard_10
+  - first:
+      213: 4442735539787709804
+    second: BossGuard_11
+  - first:
+      213: -7549182445673672359
+    second: BossGuard_12
+  - first:
+      213: 311642835119660585
+    second: BossGuard_13
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 60
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: BossGuard_00
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 489
+        width: 193
+        height: 214
+      alignment: 9
+      pivot: {x: 0.6373, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82fe00b7b7c503e80800000000000000
+      internalID: -8200953236027281624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_01
+      rect:
+        serializedVersion: 2
+        x: 211
+        y: 489
+        width: 214
+        height: 171
+      alignment: 9
+      pivot: {x: 0.6776, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53af3975f648ae9e0800000000000000
+      internalID: -1591313904576497099
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_02
+      rect:
+        serializedVersion: 2
+        x: 460
+        y: 489
+        width: 207
+        height: 205
+      alignment: 9
+      pivot: {x: 0.5217, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 112b57a31746972c0800000000000000
+      internalID: -4433401920694668783
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_03
+      rect:
+        serializedVersion: 2
+        x: 678
+        y: 489
+        width: 175
+        height: 226
+      alignment: 9
+      pivot: {x: 0.64, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93fea05a9b5862670800000000000000
+      internalID: 8513639177974902585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_04
+      rect:
+        serializedVersion: 2
+        x: 854
+        y: 489
+        width: 184
+        height: 183
+      alignment: 9
+      pivot: {x: 0.5761, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86a44362df2321a40800000000000000
+      internalID: 5337384571236534888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_05
+      rect:
+        serializedVersion: 2
+        x: 1062
+        y: 489
+        width: 300
+        height: 179
+      alignment: 9
+      pivot: {x: 0.41, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e312017e01039fb60800000000000000
+      internalID: 7780302680413446462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_06
+      rect:
+        serializedVersion: 2
+        x: 81
+        y: 279
+        width: 257
+        height: 168
+      alignment: 9
+      pivot: {x: 0.4241, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44180d506e2673980800000000000000
+      internalID: -8559263826714787516
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_07
+      rect:
+        serializedVersion: 2
+        x: 357
+        y: 279
+        width: 267
+        height: 158
+      alignment: 9
+      pivot: {x: 0.4382, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d76c7a1e03a51d110800000000000000
+      internalID: 1283906534768100989
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_08
+      rect:
+        serializedVersion: 2
+        x: 638
+        y: 279
+        width: 292
+        height: 163
+      alignment: 9
+      pivot: {x: 0.4007, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9d84baf9bbcb0ca50800000000000000
+      internalID: 6539434172965669081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_09
+      rect:
+        serializedVersion: 2
+        x: 932
+        y: 279
+        width: 294
+        height: 167
+      alignment: 9
+      pivot: {x: 0.4524, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5703f9e7a6888e50800000000000000
+      internalID: 6811842492140556777
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_10
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 50
+        width: 363
+        height: 205
+      alignment: 9
+      pivot: {x: 0.562, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9e142d091919eb1b0800000000000000
+      internalID: -5638909629035298327
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_11
+      rect:
+        serializedVersion: 2
+        x: 406
+        y: 50
+        width: 368
+        height: 205
+      alignment: 9
+      pivot: {x: 0.4457, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6dbc005f64c7ad30800000000000000
+      internalID: 4442735539787709804
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_12
+      rect:
+        serializedVersion: 2
+        x: 792
+        y: 50
+        width: 290
+        height: 205
+      alignment: 9
+      pivot: {x: 0.3897, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 951910d109aeb3790800000000000000
+      internalID: -7549182445673672359
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossGuard_13
+      rect:
+        serializedVersion: 2
+        x: 1098
+        y: 50
+        width: 201
+        height: 164
+      alignment: 9
+      pivot: {x: 0.6318, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92e5a14e18d235400800000000000000
+      internalID: 311642835119660585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      BossGuard_00: -8200953236027281624
+      BossGuard_01: -1591313904576497099
+      BossGuard_02: -4433401920694668783
+      BossGuard_03: 8513639177974902585
+      BossGuard_04: 5337384571236534888
+      BossGuard_05: 7780302680413446462
+      BossGuard_06: -8559263826714787516
+      BossGuard_07: 1283906534768100989
+      BossGuard_08: 6539434172965669081
+      BossGuard_09: 6811842492140556777
+      BossGuard_10: -5638909629035298327
+      BossGuard_11: 4442735539787709804
+      BossGuard_12: -7549182445673672359
+      BossGuard_13: 311642835119660585
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -145,25 +145,25 @@ TextureImporter:
     second: Boss_Attack_06
   - first:
       213: 4158551119658838086
-    second: Boss_Guard_01
+    second: Boss_Hurt_01
   - first:
       213: 6978402336841748150
-    second: Boss_Guard_02
+    second: Boss_Hurt_02
   - first:
       213: 114178497664694664
-    second: Boss_Guard_03
+    second: Boss_Hurt_03
   - first:
       213: 4642370641407201403
-    second: Boss_Guard_04
+    second: Boss_Hurt_04
   - first:
       213: 5078248022365061666
-    second: Boss_Guard_05
+    second: Boss_Hurt_05
   - first:
       213: -6216203936213508945
-    second: Boss_Guard_06
+    second: Boss_Hurt_06
   - first:
       213: -3172669948352594667
-    second: Boss_Guard_07
+    second: Boss_Hurt_07
   - first:
       213: -3641547315290451323
     second: Boss_Death_01
@@ -674,7 +674,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boss_Guard_01
+      name: Boss_Hurt_01
       rect:
         serializedVersion: 2
         x: 0
@@ -696,7 +696,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boss_Guard_02
+      name: Boss_Hurt_02
       rect:
         serializedVersion: 2
         x: 250
@@ -718,7 +718,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boss_Guard_03
+      name: Boss_Hurt_03
       rect:
         serializedVersion: 2
         x: 511
@@ -740,7 +740,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boss_Guard_04
+      name: Boss_Hurt_04
       rect:
         serializedVersion: 2
         x: 769
@@ -762,7 +762,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boss_Guard_05
+      name: Boss_Hurt_05
       rect:
         serializedVersion: 2
         x: 1041
@@ -784,7 +784,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Boss_Guard_06
+      name: Boss_Hurt_06
       rect:
         serializedVersion: 2
         x: 1313
@@ -991,13 +991,13 @@ TextureImporter:
       Boss_Death_03: 6131095518613119080
       Boss_Death_04: -6355225110791061518
       Boss_Death_05: 8757867132143860450
-      Boss_Guard_01: 4158551119658838086
-      Boss_Guard_02: 6978402336841748150
-      Boss_Guard_03: 114178497664694664
-      Boss_Guard_04: 4642370641407201403
-      Boss_Guard_05: 5078248022365061666
-      Boss_Guard_06: -6216203936213508945
-      Boss_Guard_07: -3172669948352594667
+      Boss_Hurt_01: 4158551119658838086
+      Boss_Hurt_02: 6978402336841748150
+      Boss_Hurt_03: 114178497664694664
+      Boss_Hurt_04: 4642370641407201403
+      Boss_Hurt_05: 5078248022365061666
+      Boss_Hurt_06: -6216203936213508945
+      Boss_Hurt_07: -3172669948352594667
       Boss_Idle_01: -7009218963565316925
       Boss_Idle_02: 5370875538105209753
       Boss_Idle_03: -3844862164688951385

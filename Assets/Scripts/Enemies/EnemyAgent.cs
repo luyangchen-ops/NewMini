@@ -736,10 +736,15 @@ public sealed class EnemyAgent : MonoBehaviour
         {
             BossHitResolution resolution = bossCombatController.ResolvePlayerAttack(attackerPosition, allowBossGuard);
             if (resolution == BossHitResolution.Guarded) return PlayerAttackResult.Guarded;
-            if (resolution == BossHitResolution.Damaged) return PlayerAttackResult.Damaged;
+            if (resolution == BossHitResolution.Damaged)
+            {
+                bossCombatController.PlayHurtReaction();
+                return PlayerAttackResult.Damaged;
+            }
         }
 
         Die();
+        if (!IsDead) bossCombatController?.PlayHurtReaction();
         return IsDead ? PlayerAttackResult.Defeated : PlayerAttackResult.Damaged;
     }
 

@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 735977573117243612}
   - component: {fileID: 610000000000000003}
   - component: {fileID: 610000000000000004}
+  - component: {fileID: 610000000000000005}
   - component: {fileID: 2941067009189899845}
   - component: {fileID: 8707404260880117148}
   m_Layer: 0
@@ -39,33 +40,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!50 &610000000000000001
-Rigidbody2D:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2775541693963204491}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 2
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 0
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 4
 --- !u!212 &4062274186801740401
 SpriteRenderer:
   serializedVersion: 3
@@ -115,7 +89,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -7009218963565316925, guid: 45cb6ecc827ce2c4584ea33d904a7418, type: 3}
+  m_Sprite: {fileID: -8200953236027281624, guid: 2941aa5b51e1427469d23a284a0e8d1b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -126,6 +100,33 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!50 &610000000000000001
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2775541693963204491}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 2
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 1
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 4
 --- !u!114 &610000000000000002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -136,7 +137,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b3f04f8e27745a6bc991cc6e7f89b0c, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAgent
   data: {fileID: 11400000, guid: 4168849d8aad4614583f2d70389aa9ad, type: 2}
   visualStyle: 5
@@ -202,8 +203,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 1.65}
-  m_Size: {x: 1.55, y: 3.2}
+  m_Offset: {x: 0, y: 1.7610443}
+  m_Size: {x: 1.55, y: 3.4220889}
   m_Direction: 0
 --- !u!114 &610000000000000004
 MonoBehaviour:
@@ -215,11 +216,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ca6ca8c1af417f849a9e673b0391252d, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossCombatController
   hitsToDefeat: 20
+  hurtDuration: 0.6
   guardChance: 0.4
-  guardDuration: 0.58
+  guardDuration: 1.2
+  guardKnockbackDelay: 0.9
+  guardKnockbackDuration: 0.18
   guardKnockbackDistance: 2.2
   guardOpeningDurationRange: {x: 0.38, y: 0.58}
   attackDistance: 2.05
@@ -227,7 +231,8 @@ MonoBehaviour:
   approachSpeedMultiplier: 1.08
   openingMoveSpeed: 2.2
   approachWeaveStrength: 0.22
-  initialDecisionDelayRange: {x: 0.15, y: 0.32}
+  initialDecisionDelayRange: {x: 0.65, y: 0.95}
+  postOpeningIdleDurationRange: {x: 0.7, y: 1.05}
   singleOpeningDurationRange: {x: 0.62, y: 0.92}
   tripleOpeningDurationRange: {x: 1, y: 1.35}
   dashOpeningDurationRange: {x: 1.1, y: 1.5}
@@ -246,10 +251,33 @@ MonoBehaviour:
   dashWindupDuration: 0.42
   dashTravelDuration: 0.4
   dashSpeed: 15
-  dashImpactNormalizedTime: 0.82
+  dashImpactNormalizedTime: 1
   dashRecoveryDuration: 0.62
   meleeHitboxForwardOffset: 0.9
   meleeHitboxSize: {x: 1.9, y: 2.2}
+--- !u!114 &610000000000000005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2775541693963204491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f57b281f5ae10664496f31c95ac3e08c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BorrowedLifeBossController
+  startingContracts: 99
+  contractCountText: {fileID: 0}
+  onContractCountChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onPhaseChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  onAllContractsBroken:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!82 &2941067009189899845
 AudioSource:
   m_ObjectHideFlags: 0
