@@ -28,6 +28,7 @@ public sealed class BossPreludeController : MonoBehaviour
     private AudioListener cinematicAudioListener;
     private PresentationSession performanceSession;
     private bool musicStoppedForDialogue;
+    private bool skipPreludeOnRetry;
 
     private void Awake()
     {
@@ -52,10 +53,19 @@ public sealed class BossPreludeController : MonoBehaviour
     {
         if (started) return;
         started = true;
+        if (skipPreludeOnRetry)
+        {
+            skipPreludeOnRetry = false;
+            RestartBossCombatWithoutPrelude();
+            return;
+        }
+
         performanceSession = DialoguePerformanceManager.BeginPerformance(this, "Boss Prelude");
         arena?.SetWavesDeferred(true);
         arena?.ResetDeferredWaves();
+        player?.SetPresentationIdle(true);
         encounter?.SpawnBoss();
+        encounter?.SetBossPresentationIdle(true);
         SwitchToCinematicCamera();
         if (dialogue != null && bossBeforeDialogue != null)
         {
@@ -112,10 +122,10 @@ public sealed class BossPreludeController : MonoBehaviour
         if (player != null && incenseDestination != null)
         {
             Vector3 start = player.transform.position;
-            Vector2 direction = incenseDestination.position - start;
-            // Presentation movement now uses the same directional run set as gameplay.
-            // The destination vector selects Run, Run Up, or Run Down in the hero Animator.
-            player.SetPresentationLocomotion(true, direction.normalized);
+            // This authored entrance always travels upward and explicitly selects the
+            // current Run Up state instead of briefly entering the horizontal run state.
+            player.SetPresentationIdle(false);
+            player.SetPresentationLocomotion(true, Vector2.up);
             for (float t = 0f; t < heroRunDuration; t += Time.unscaledDeltaTime)
             {
                 player.transform.position = Vector3.Lerp(start, incenseDestination.position, Mathf.SmoothStep(0f, 1f, t / heroRunDuration));
@@ -123,6 +133,7 @@ public sealed class BossPreludeController : MonoBehaviour
             }
             player.transform.position = incenseDestination.position;
             player.SetPresentationLocomotion(false, Vector2.zero);
+            player.SetPresentationIdle(true);
         }
         dialogue?.ShowDeferredDialogueLine();
     }
@@ -152,6 +163,8 @@ public sealed class BossPreludeController : MonoBehaviour
         musicStoppedForDialogue = false;
         GameAudioManager.PlayBossMusic();
         encounter?.ActivateGuardArchers();
+        encounter?.SetBossPresentationIdle(false);
+        player?.SetPresentationIdle(false);
         encounter?.ShowBossHud();
         // Ordinary arena enemies do not exist during the cinematic. Start the
         // first wave only after the complete Boss-before dialogue has closed.
@@ -166,6 +179,10 @@ public sealed class BossPreludeController : MonoBehaviour
     {
         StopAllCoroutines();
         started = false;
+        // A checkpoint retry resets every combat entity and wave, but the authored
+        // introduction only plays on the first entrance. Replaying it would hide the
+        // gameplay HUD again after the death screen restores it.
+        skipPreludeOnRetry = true;
         performanceSession?.Dispose();
         performanceSession = null;
         if (dialogue != null)
@@ -179,9 +196,29 @@ public sealed class BossPreludeController : MonoBehaviour
             bossEntranceDirector.Stop();
             bossEntranceDirector.time = 0d;
         }
-        if (player != null) player.SetPresentationLocomotion(false, Vector2.zero);
+        if (player != null)
+        {
+            player.SetPresentationLocomotion(false, Vector2.zero);
+            player.SetPresentationIdle(false);
+        }
+        encounter?.SetBossPresentationIdle(false);
         cameraFollow?.ClearCinematicOverride(this);
         RestoreMainCamera();
+    }
+
+    private void RestartBossCombatWithoutPrelude()
+    {
+        arena?.SetWavesDeferred(true);
+        player?.SetPresentationLocomotion(false, Vector2.zero);
+        player?.SetPresentationIdle(false);
+        encounter?.SpawnBoss();
+        encounter?.SetBossPresentationIdle(false);
+        encounter?.ActivateGuardArchers();
+        encounter?.ShowBossHud();
+        cameraFollow?.ClearCinematicOverride(this);
+        RestoreMainCamera();
+        GameAudioManager.PlayBossMusic();
+        arena?.BeginDeferredWaves();
     }
 
     private void OnDisable()
@@ -196,6 +233,12 @@ public sealed class BossPreludeController : MonoBehaviour
             dialogue.DialogueFinished -= FinishPrelude;
         }
         RestoreMusicAfterInterruptedDialogue();
+        if (player != null)
+        {
+            player.SetPresentationLocomotion(false, Vector2.zero);
+            player.SetPresentationIdle(false);
+        }
+        encounter?.SetBossPresentationIdle(false);
         RestoreMainCamera();
     }
 

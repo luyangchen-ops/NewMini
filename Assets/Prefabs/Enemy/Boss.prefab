@@ -203,8 +203,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 1.7610443}
-  m_Size: {x: 1.55, y: 3.4220889}
+  m_Offset: {x: -0.050835744, y: 1.6560142}
+  m_Size: {x: 1.8956807, y: 3.2120283}
   m_Direction: 0
 --- !u!114 &610000000000000004
 MonoBehaviour:
@@ -220,7 +220,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossCombatController
   hitsToDefeat: 20
   hurtDuration: 0.6
-  guardChance: 0.4
+  hurtReactionsBeforeLockout: 3
+  consecutiveHurtWindow: 2
+  hurtReactionLockoutDuration: 2
+  guardChance: 0.3
   guardDuration: 1.2
   guardKnockbackDelay: 0.9
   guardKnockbackDuration: 0.18
@@ -231,8 +234,8 @@ MonoBehaviour:
   approachSpeedMultiplier: 1.08
   openingMoveSpeed: 2.2
   approachWeaveStrength: 0.22
-  initialDecisionDelayRange: {x: 0.65, y: 0.95}
-  postOpeningIdleDurationRange: {x: 0.7, y: 1.05}
+  initialDecisionDelayRange: {x: 0.35, y: 0.55}
+  postOpeningIdleDurationRange: {x: 0.25, y: 0.45}
   singleOpeningDurationRange: {x: 0.62, y: 0.92}
   tripleOpeningDurationRange: {x: 1, y: 1.35}
   dashOpeningDurationRange: {x: 1.1, y: 1.5}

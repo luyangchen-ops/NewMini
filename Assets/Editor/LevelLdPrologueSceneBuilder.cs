@@ -399,10 +399,10 @@ public static class LevelLdPrologueSceneBuilder
         if (finalWaves == null || combatZone == null)
             throw new System.InvalidOperationException("Root_Arena_05 needs its authored wave spawner and combat zone.");
 
-        // Boss encounter state (Boss, guards, dialogue, and HUD) is owned by
-        // LevelBossEncounterController, so checkpoint death must not reset it.
+        // Checkpoint death restarts the complete Boss combat state. BossPreludeController
+        // skips the already-seen introduction on retry and begins the reset waves directly.
         SerializedObject serializedCombatZone = new SerializedObject(combatZone);
-        serializedCombatZone.FindProperty("resetOnCheckpointRetry").boolValue = false;
+        serializedCombatZone.FindProperty("resetOnCheckpointRetry").boolValue = true;
         serializedCombatZone.ApplyModifiedPropertiesWithoutUndo();
 
         GameObject root = NewWorld("Root_BossEncounter", arena05.transform);
@@ -440,6 +440,29 @@ public static class LevelLdPrologueSceneBuilder
         guards.arraySize = 2;
         guards.GetArrayElementAtIndex(0).objectReferenceValue = leftGuard;
         guards.GetArrayElementAtIndex(1).objectReferenceValue = rightGuard;
+        serialized.FindProperty("bossWaveSpawner").objectReferenceValue = finalWaves;
+        SerializedProperty reinforcementPrefabs = serialized.FindProperty("reinforcementPrefabs");
+        string[] reinforcementPrefabGuids =
+        {
+            "7513f6c33541e8440a486e9d12ff20c5",
+            "ac76861895f1dac48981520d119d1d0e",
+            "d8ffcc6e514f86047ac9f88b26e9d13b",
+            "94645a7045925d448ba94f8f187219fb"
+        };
+        reinforcementPrefabs.arraySize = reinforcementPrefabGuids.Length;
+        for (int i = 0; i < reinforcementPrefabGuids.Length; i++)
+            reinforcementPrefabs.GetArrayElementAtIndex(i).objectReferenceValue =
+                AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath(reinforcementPrefabGuids[i]));
+
+        Transform[] reinforcementPoints = finalWaves.GetComponentsInChildren<Transform>(true)
+            .Where(point => point != finalWaves.transform && point.name.StartsWith("Spawn_"))
+            .ToArray();
+        SerializedProperty reinforcementSpawnPoints = serialized.FindProperty("reinforcementSpawnPoints");
+        reinforcementSpawnPoints.arraySize = reinforcementPoints.Length;
+        for (int i = 0; i < reinforcementPoints.Length; i++)
+            reinforcementSpawnPoints.GetArrayElementAtIndex(i).objectReferenceValue = reinforcementPoints[i];
+        serialized.FindProperty("reinforcementCount").intValue = 5;
+        serialized.FindProperty("reinforcementSpawnDelay").floatValue = 10f;
         serialized.FindProperty("arenaCombatZone").objectReferenceValue = combatZone;
         serialized.FindProperty("bossHudRoot").objectReferenceValue = bossHud;
         serialized.FindProperty("contractCountText").objectReferenceValue = contractCountText;

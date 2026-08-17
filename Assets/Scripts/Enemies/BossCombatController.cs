@@ -141,9 +141,12 @@ public sealed class BossCombatController : MonoBehaviour
 
     [Header("Hurt Reaction")]
     [SerializeField, Min(.05f)] private float hurtDuration = .6f;
+    [SerializeField, Min(1)] private int hurtReactionsBeforeLockout = 3;
+    [SerializeField, Min(.05f)] private float consecutiveHurtWindow = 2f;
+    [SerializeField, Min(0f)] private float hurtReactionLockoutDuration = 2f;
 
     [Header("Reactive Guard")]
-    [SerializeField, Range(0f, 1f)] private float guardChance = .4f;
+    [SerializeField, Range(0f, 1f)] private float guardChance = .3f;
     [SerializeField, Min(.05f)] private float guardDuration = 1.2f;
     [SerializeField, Min(0f)] private float guardKnockbackDelay = .9f;
     [SerializeField, Min(.01f)] private float guardKnockbackDuration = .18f;
@@ -156,9 +159,9 @@ public sealed class BossCombatController : MonoBehaviour
     [SerializeField, Min(0f)] private float approachSpeedMultiplier = 1.08f;
     [SerializeField, Min(0f)] private float openingMoveSpeed = 2.2f;
     [SerializeField, Range(0f, 1f)] private float approachWeaveStrength = .22f;
-    [SerializeField] private Vector2 initialDecisionDelayRange = new(.65f, .95f);
+    [SerializeField] private Vector2 initialDecisionDelayRange = new(.35f, .55f);
     [Tooltip("How long the Boss stands in Idle after repositioning and before resuming pursuit or attacking.")]
-    [SerializeField] private Vector2 postOpeningIdleDurationRange = new(.7f, 1.05f);
+    [SerializeField] private Vector2 postOpeningIdleDurationRange = new(.25f, .45f);
     [SerializeField] private Vector2 singleOpeningDurationRange = new(.62f, .92f);
     [SerializeField] private Vector2 tripleOpeningDurationRange = new(1f, 1.35f);
     [SerializeField] private Vector2 dashOpeningDurationRange = new(1.1f, 1.5f);
@@ -199,11 +202,14 @@ public sealed class BossCombatController : MonoBehaviour
     private CombatAction currentAction;
     private CombatAction previousAction;
     private int receivedDamageCount;
+    private int consecutiveHurtReactionCount;
     private int tripleStrikeIndex;
     private float actionElapsed;
     private float openingEndTime;
     private float decisionReadyTime;
     private float hurtEndTime;
+    private float lastHurtReactionTime = float.NegativeInfinity;
+    private float hurtReactionLockoutEndTime;
     private float guardEndTime;
     private float guardKnockbackReleaseTime;
     private float tripleReadyTime;
@@ -335,6 +341,17 @@ public sealed class BossCombatController : MonoBehaviour
     public void PlayHurtReaction()
     {
         if (agent == null || agent.IsDead) return;
+        if (Time.time < hurtReactionLockoutEndTime)
+        {
+            StartHurtLockoutCounterattack();
+            return;
+        }
+
+        if (Time.time - lastHurtReactionTime > consecutiveHurtWindow)
+            consecutiveHurtReactionCount = 0;
+
+        lastHurtReactionTime = Time.time;
+        consecutiveHurtReactionCount++;
 
         ReleaseGuardKnockback();
         CancelCurrentAction();
@@ -345,6 +362,25 @@ public sealed class BossCombatController : MonoBehaviour
         agent.CancelBossBehaviorAttack();
         TriggerHurtAnimation();
         behaviorTree.Reset();
+
+        if (consecutiveHurtReactionCount < hurtReactionsBeforeLockout) return;
+
+        consecutiveHurtReactionCount = 0;
+        hurtReactionLockoutEndTime = Time.time + hurtReactionLockoutDuration;
+    }
+
+    private void StartHurtLockoutCounterattack()
+    {
+        if (!HasTarget || currentAction != CombatAction.None) return;
+
+        ReleaseGuardKnockback();
+        hurtEndTime = 0f;
+        guardEndTime = 0f;
+        openingEndTime = 0f;
+        decisionReadyTime = 0f;
+        agent.CancelBossBehaviorAttack();
+        behaviorTree.Reset();
+        StartAction(CombatAction.SingleAttack);
     }
 
     private bool TryGuardPlayerAttack(Vector2 attackerPosition)
@@ -401,6 +437,7 @@ public sealed class BossCombatController : MonoBehaviour
 
     private BossNodeStatus TickHurt()
     {
+        if (!IsHurt) return BossNodeStatus.Success;
         agent.SetDesiredVelocity(Vector2.zero);
         agent.FaceTarget();
         return BossNodeStatus.Running;
@@ -686,7 +723,7 @@ public sealed class BossCombatController : MonoBehaviour
         if (supportsGuardAnimation) visualAnimator.ResetTrigger(Guard);
         if (supportsTripleAnimation) visualAnimator.ResetTrigger(TripleAttack);
         if (supportsDashAnimation) visualAnimator.ResetTrigger(DashAttack);
-        visualAnimator.CrossFade(Idle, .03f);
+        visualAnimator.CrossFade(Idle, .08f);
     }
 
     private void TriggerTripleAnimation()
@@ -743,10 +780,12 @@ public sealed class BossCombatController : MonoBehaviour
     {
         player?.CancelBossGuardReaction();
         receivedDamageCount = 0;
+        consecutiveHurtReactionCount = 0;
         currentAction = CombatAction.None;
         previousAction = CombatAction.None;
         actionElapsed = 0f;
-        hurtEndTime = guardEndTime = openingEndTime = tripleReadyTime = dashReadyTime = 0f;
+        hurtEndTime = hurtReactionLockoutEndTime = guardEndTime = openingEndTime = tripleReadyTime = dashReadyTime = 0f;
+        lastHurtReactionTime = float.NegativeInfinity;
         guardKnockbackReleaseTime = 0f;
         guardKnockbackReleased = true;
         decisionReadyTime = Time.time + RandomRange(initialDecisionDelayRange);

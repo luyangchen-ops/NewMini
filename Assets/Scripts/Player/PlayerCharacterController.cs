@@ -98,6 +98,8 @@ public class PlayerCharacterController : MonoBehaviour
     private readonly HashSet<Transform> targetCandidates = new HashSet<Transform>();
     private readonly List<Transform> ultimateTargets = new List<Transform>();
     private readonly HashSet<Transform> ultimateTargetSet = new HashSet<Transform>();
+    private readonly HashSet<Transform> ultimateBossesInsideSwipe = new HashSet<Transform>();
+    private readonly HashSet<Transform> ultimateBossesTouchedThisSegment = new HashSet<Transform>();
     private readonly List<Vector3> ultimateTrailPoints = new List<Vector3>();
     private readonly Dictionary<SpriteRenderer, Color> ultimateMarkedRenderers = new Dictionary<SpriteRenderer, Color>();
     private MaterialPropertyBlock feedbackProperties;
@@ -147,6 +149,7 @@ public class PlayerCharacterController : MonoBehaviour
     private Transform lastKilledTarget;
     private bool isFreeKillChainDash;
     private bool presentationLocomotionActive;
+    private bool presentationIdleActive;
     private Vector2 presentationLocomotionDirection;
     private PlayerSpecialItemInventory specialItems;
 
@@ -158,6 +161,7 @@ public class PlayerCharacterController : MonoBehaviour
     private static readonly int Hurt = Animator.StringToHash("Hurt");
     private static readonly int Sheathe = Animator.StringToHash("Sheathe");
     private static readonly int IsDeadAnimatorParam = Animator.StringToHash("IsDead");
+    private static readonly int PresentationIdle = Animator.StringToHash("Idle Hold Ink Echo");
     private static readonly int ChainWindow01 = Shader.PropertyToID("_ChainWindow01");
     private static readonly int RangeRadius01 = Shader.PropertyToID("_RangeRadius01");
     private static readonly int EffectStrength = Shader.PropertyToID("_EffectStrength");
@@ -192,11 +196,32 @@ public class PlayerCharacterController : MonoBehaviour
     /// </summary>
     public void SetPresentationLocomotion(bool moving, Vector2 direction)
     {
+        if (moving) presentationIdleActive = false;
         presentationLocomotionActive = moving;
-        presentationLocomotionDirection = direction;
+        presentationLocomotionDirection = direction.sqrMagnitude > .0001f
+            ? direction.normalized
+            : Vector2.zero;
 
-        if (moving) UpdateFacing(direction);
-        if (visualAnimator != null) visualAnimator.SetFloat(Speed, moving ? 1f : 0f);
+        if (visualAnimator == null) return;
+        if (moving) UpdateFacing(presentationLocomotionDirection);
+        else visualAnimator.SetInteger(VerticalDirection, 0);
+        visualAnimator.SetFloat(Speed, moving ? 1f : 0f);
+    }
+
+    /// <summary>Locks the authored hero presentation to its standing animation.</summary>
+    public void SetPresentationIdle(bool active)
+    {
+        presentationIdleActive = active;
+        if (!active) return;
+
+        presentationLocomotionActive = false;
+        presentationLocomotionDirection = Vector2.zero;
+        if (body != null) body.linearVelocity = Vector2.zero;
+        if (stateMachine != null) stateMachine.Change(PlayerStateId.Locomotion);
+        if (visualAnimator == null) return;
+        visualAnimator.SetFloat(Speed, 0f);
+        visualAnimator.SetInteger(VerticalDirection, 0);
+        visualAnimator.CrossFade(PresentationIdle, .05f);
     }
 
     public event Action<int> KillChainKillConfirmed;
@@ -293,7 +318,8 @@ public class PlayerCharacterController : MonoBehaviour
         input.Tick();
         if (isDead) return;
 
-        if (!bossGuardControlLocked) switch (State)
+        bool presentationControlsCharacter = presentationIdleActive || presentationLocomotionActive;
+        if (!bossGuardControlLocked && !presentationControlsCharacter) switch (State)
         {
             case PlayerStateId.Locomotion:
                 HandleLocomotionInput();
@@ -344,6 +370,7 @@ public class PlayerCharacterController : MonoBehaviour
             return;
         }
         if (bossGuardControlLocked) return;
+        if (presentationIdleActive || presentationLocomotionActive) return;
         if (IsUltimateActive) return;
 
         if (State == PlayerStateId.Dodge)
@@ -397,7 +424,7 @@ public class PlayerCharacterController : MonoBehaviour
     private void StartDodge(Vector2 direction)
     {
         dashStart = body.position;
-        dashTarget = cameraController.Clamp(dashStart + direction * DodgeDistance, Padding, transform.position.z);
+        dashTarget = PlayAreaBounds.ClampPosition(dashStart + direction * DodgeDistance, Padding);
         dashElapsed = 0f;
         activeDashDuration = Mathf.Max(.01f, DodgeDuration);
         stateMachine.Change(PlayerStateId.Dodge);
@@ -521,10 +548,9 @@ public class PlayerCharacterController : MonoBehaviour
         perfectDodgeAfterimage?.StopAndRestore();
         dashStart = body.position;
         killDashDirection = direction;
-        dashTarget = cameraController.Clamp(
+        dashTarget = PlayAreaBounds.ClampPosition(
             dashStart + direction * AttackDashDistance,
-            Padding,
-            transform.position.z);
+            Padding);
         dashElapsed = -AttackDashWindupDuration;
         activeDashDuration = Mathf.Max(.01f, AttackDashDuration);
         stateMachine.Change(PlayerStateId.KillChainDash);
@@ -596,10 +622,9 @@ public class PlayerCharacterController : MonoBehaviour
         Vector2 targetPosition = lockedDashTarget.position;
         Vector2 offset = targetPosition - dashStart;
         if (offset.sqrMagnitude > Mathf.Epsilon) killDashDirection = offset.normalized;
-        dashTarget = cameraController.Clamp(
+        dashTarget = PlayAreaBounds.ClampPosition(
             targetPosition + killDashDirection * AttackDashOvershoot,
-            Padding,
-            transform.position.z);
+            Padding);
     }
 
     private void ConfirmKill(Transform enemy)
@@ -612,7 +637,7 @@ public class PlayerCharacterController : MonoBehaviour
 
         EnemyAgent targetAgent = enemy.GetComponentInParent<EnemyAgent>();
         EnemyAgent.PlayerAttackResult hitResult = targetAgent != null
-            ? targetAgent.ReceivePlayerAttack(body.position)
+            ? targetAgent.ReceivePlayerAttack(body.position, false)
             : EnemyAgent.PlayerAttackResult.Defeated;
         if (hitResult == EnemyAgent.PlayerAttackResult.Guarded)
         {
@@ -622,6 +647,8 @@ public class PlayerCharacterController : MonoBehaviour
         }
         if (hitResult == EnemyAgent.PlayerAttackResult.Damaged)
         {
+            if (targetAgent != null && targetAgent.IsBossCombatant)
+                AwardMomentumFromBossDamage();
             PlayBloodHitEffect(enemy, killDashDirection);
             PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
             EndKillChain();
@@ -887,6 +914,8 @@ public class PlayerCharacterController : MonoBehaviour
         PlayBloodHitEffect(closestTarget, direction);
         if (hitResult == EnemyAgent.PlayerAttackResult.Damaged)
         {
+            if (enemyAgent != null && enemyAgent.IsBossCombatant)
+                AwardMomentumFromBossDamage();
             PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
             return;
         }
@@ -958,9 +987,9 @@ public class PlayerCharacterController : MonoBehaviour
         bossGuardKnockbackElapsed = 0f;
         bossGuardKnockbackDuration = Mathf.Max(.01f, duration);
         bossGuardKnockbackStart = body.position;
-        bossGuardKnockbackTarget = cameraController != null
-            ? cameraController.Clamp(body.position + direction.normalized * distance, Padding, transform.position.z)
-            : body.position + direction.normalized * distance;
+        bossGuardKnockbackTarget = PlayAreaBounds.ClampPosition(
+            body.position + direction.normalized * distance,
+            Padding);
         body.linearVelocity = Vector2.zero;
         visualAnimator?.SetTrigger(Hurt);
     }
@@ -1037,10 +1066,19 @@ public class PlayerCharacterController : MonoBehaviour
             MomentumChanged?.Invoke(currentMomentum, maximumMomentum);
     }
 
+    /// <summary>Awards momentum for a real Boss health/contract loss outside the ultimate.</summary>
+    public void AwardMomentumFromBossDamage()
+    {
+        if (IsUltimateActive) return;
+        AwardMomentum(0);
+    }
+
     private void StartUltimate()
     {
         ultimateTargets.Clear();
         ultimateTargetSet.Clear();
+        ultimateBossesInsideSwipe.Clear();
+        ultimateBossesTouchedThisSegment.Clear();
         ultimateTrailPoints.Clear();
         ultimateMarkedRenderers.Clear();
         ultimateExecutionIndex = 0;
@@ -1072,6 +1110,8 @@ public class PlayerCharacterController : MonoBehaviour
         if (input.PointerPressed)
         {
             ultimateSwipeStarted = true;
+            ultimateBossesInsideSwipe.Clear();
+            ultimateBossesTouchedThisSegment.Clear();
             ultimateTrailPoints.Clear();
             ultimateLastPointerPosition = pointerPosition;
             AddUltimateTrailPoint(pointerPosition);
@@ -1104,20 +1144,37 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void MarkUltimateTargetsAlong(Vector2 from, Vector2 to)
     {
+        ultimateBossesTouchedThisSegment.Clear();
         float distance = Vector2.Distance(from, to);
         float sampleSpacing = Mathf.Max(.05f, ultimateMarkRadius * .5f);
         int sampleCount = Mathf.Max(1, Mathf.CeilToInt(distance / sampleSpacing));
-        for (int sample = 0; sample <= sampleCount && ultimateTargets.Count < ultimateMaximumTargets; sample++)
+        for (int sample = 0; sample <= sampleCount; sample++)
         {
             Vector2 point = Vector2.Lerp(from, to, sample / (float)sampleCount);
             foreach (Collider2D hit in Physics2D.OverlapCircleAll(point, ultimateMarkRadius))
             {
                 Transform enemy = FindEnemy(hit.transform);
-                if (!IsTargetAlive(enemy) || !ultimateTargetSet.Add(enemy)) continue;
+                if (!IsTargetAlive(enemy)) continue;
+
+                bool isBoss = enemy.GetComponent<BossCombatController>() != null;
+                if (isBoss)
+                {
+                    if (!ultimateBossesTouchedThisSegment.Add(enemy)
+                        || ultimateBossesInsideSwipe.Contains(enemy)) continue;
+                }
+                else
+                {
+                    if (ultimateTargetSet.Contains(enemy)
+                        || ultimateTargetSet.Count >= ultimateMaximumTargets) continue;
+                    ultimateTargetSet.Add(enemy);
+                }
+
                 MarkUltimateTarget(enemy);
-                if (ultimateTargets.Count >= ultimateMaximumTargets) break;
             }
         }
+
+        ultimateBossesInsideSwipe.Clear();
+        ultimateBossesInsideSwipe.UnionWith(ultimateBossesTouchedThisSegment);
     }
 
     private void MarkUltimateTarget(Transform enemy)
@@ -1179,16 +1236,17 @@ public class PlayerCharacterController : MonoBehaviour
         UpdateFacing(slashDirection);
         visualAnimator?.SetTrigger(DashAttack);
         perfectDodgeAfterimage?.Play(visualRenderer != null && visualRenderer.flipX);
-        body.position = cameraController.Clamp(
+        body.position = PlayAreaBounds.ClampPosition(
             targetPosition + slashDirection * AttackDashOvershoot,
-            Padding,
-            transform.position.z);
+            Padding);
         body.linearVelocity = Vector2.zero;
         RestoreUltimateTargetColor(target);
 
         EnemyAgent targetAgent = target.GetComponentInParent<EnemyAgent>();
         EnemyAgent.PlayerAttackResult hitResult = targetAgent != null
-            ? targetAgent.ReceivePlayerAttack(body.position)
+            ? targetAgent.ReceivePlayerAttack(
+                body.position,
+                !targetAgent.IsBossCombatant)
             : EnemyAgent.PlayerAttackResult.Defeated;
         if (hitResult == EnemyAgent.PlayerAttackResult.Guarded)
         {
@@ -1239,6 +1297,8 @@ public class PlayerCharacterController : MonoBehaviour
     private void ResetUltimateSwipe()
     {
         ultimateSwipeStarted = false;
+        ultimateBossesInsideSwipe.Clear();
+        ultimateBossesTouchedThisSegment.Clear();
         ultimateTrailPoints.Clear();
         if (ultimateLine != null) ultimateLine.positionCount = 0;
     }
@@ -1348,6 +1408,8 @@ public class PlayerCharacterController : MonoBehaviour
         RestoreUltimateLinePresentation();
         ultimateTargets.Clear();
         ultimateTargetSet.Clear();
+        ultimateBossesInsideSwipe.Clear();
+        ultimateBossesTouchedThisSegment.Clear();
         ultimateTrailPoints.Clear();
         ultimateSwipeStarted = false;
         perfectDodgeAfterimage?.StopAndRestore();
@@ -1475,6 +1537,12 @@ public class PlayerCharacterController : MonoBehaviour
             visualAnimator.SetFloat(Speed, 0f);
             return;
         }
+        if (presentationIdleActive)
+        {
+            visualAnimator.SetFloat(Speed, 0f);
+            visualAnimator.SetInteger(VerticalDirection, 0);
+            return;
+        }
         if (presentationLocomotionActive)
         {
             UpdateFacing(presentationLocomotionDirection);
@@ -1550,7 +1618,7 @@ public class PlayerCharacterController : MonoBehaviour
 
     private void Move(Vector2 delta)
     {
-        body.MovePosition(cameraController.Clamp(body.position + delta, Padding, transform.position.z));
+        body.MovePosition(PlayAreaBounds.ClampPosition(body.position + delta, Padding));
     }
 
     public void IgnoreEnemyCollisions(EnemyAgent enemy)
@@ -1646,11 +1714,15 @@ public class PlayerCharacterController : MonoBehaviour
         RestoreUltimateLinePresentation();
         ultimateTargets.Clear();
         ultimateTargetSet.Clear();
+        ultimateBossesInsideSwipe.Clear();
+        ultimateBossesTouchedThisSegment.Clear();
         ultimateTrailPoints.Clear();
         EnemyTimeScale = 1f;
         enemyTimeScaleTarget = 1f;
         chainWindowRemaining = 0f;
         chainWindowDuration = 0f;
+        presentationIdleActive = false;
+        presentationLocomotionActive = false;
         if (stateMachine != null) stateMachine.Change(PlayerStateId.Locomotion);
         if (visualAnimator != null) visualAnimator.speed = animatorBaseSpeed;
         SetArrowVisible(false);

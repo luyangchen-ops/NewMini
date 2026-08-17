@@ -52,8 +52,6 @@ public sealed class PlayerCameraController
         Plane plane = new Plane(Vector3.forward, new Vector3(0f, 0f, z));
         return plane.Raycast(ray, out float distance) ? (Vector2)ray.GetPoint(distance) : fallback;
     }
-    public Vector2 Clamp(Vector2 position, float padding, float z) => CameraBounds.Clamp(Camera, position, padding, z);
-
     public void BeginKillChain(float targetZoomFactor, float targetFocusOffset, float targetResponse,
         float perfectDodgeShake, float targetMaximumShake)
     {
@@ -135,7 +133,7 @@ public sealed class PlayerCameraController
         if (Camera == null || cameraTransform == null) return;
 
         float blend = 1f - Mathf.Exp(-response * Mathf.Max(0f, unscaledDeltaTime));
-        Vector3 clampedFollowPosition = CameraBounds.ClampCameraPosition(
+        Vector3 clampedFollowPosition = PlayAreaBounds.ClampCameraPosition(
             Camera,
             hasFollowTarget ? desiredFollowPosition : baseLocalPosition);
         currentFollowPosition = Vector3.Lerp(
@@ -161,7 +159,7 @@ public sealed class PlayerCameraController
             currentOffset.x + shake.x,
             currentOffset.y + shake.y,
             0f);
-        cameraTransform.position = CameraBounds.ClampCameraPosition(Camera, finalPosition);
+        cameraTransform.position = PlayAreaBounds.ClampCameraPosition(Camera, finalPosition);
     }
 
     public void RestoreImmediately()
@@ -171,7 +169,7 @@ public sealed class PlayerCameraController
         currentOffset = desiredOffset = Vector2.zero;
         shakeAmplitude = shakeRemaining = 0f;
         Camera.orthographicSize = GetAreaTargetOrthographicSize();
-        currentFollowPosition = CameraBounds.ClampCameraPosition(
+        currentFollowPosition = PlayAreaBounds.ClampCameraPosition(
             Camera,
             hasFollowTarget ? desiredFollowPosition : baseLocalPosition);
         cameraTransform.position = currentFollowPosition;
@@ -200,7 +198,7 @@ public sealed class PlayerCameraController
             desiredFollowPosition.y += verticalOffset - Mathf.Sign(verticalOffset) * halfHeight;
         }
 
-        desiredFollowPosition = CameraBounds.ClampCameraPosition(Camera, desiredFollowPosition);
+        desiredFollowPosition = PlayAreaBounds.ClampCameraPosition(Camera, desiredFollowPosition);
     }
 
     private void AddShake(float amplitude, float duration)

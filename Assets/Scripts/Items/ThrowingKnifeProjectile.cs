@@ -75,7 +75,21 @@ public sealed class ThrowingKnifeProjectile : MonoBehaviour
 
         hasHit = true;
         PlayerCharacterController player = owner != null ? owner.GetComponent<PlayerCharacterController>() : null;
-        if (!enemy.CanBeKilledBy(player != null ? player.transform.position : transform.position, false))
+        Vector2 attackerPosition = player != null ? player.transform.position : transform.position;
+        if (enemy.IsBossCombatant)
+        {
+            // Preserve the knife's existing guard-bypass behaviour while routing the hit
+            // through Boss health/contracts so a successful loss can award momentum.
+            EnemyAgent.PlayerAttackResult result = enemy.ReceivePlayerAttack(attackerPosition, false);
+            if (result == EnemyAgent.PlayerAttackResult.Damaged)
+                player?.AwardMomentumFromBossDamage();
+            else if (result == EnemyAgent.PlayerAttackResult.Defeated)
+                SpecialItemDropSpawner.TryDropFromEnemy(enemy.transform.position);
+            Destroy(gameObject);
+            return;
+        }
+
+        if (!enemy.CanBeKilledBy(attackerPosition, false))
         {
             enemy.BlockIncomingAttack();
         }

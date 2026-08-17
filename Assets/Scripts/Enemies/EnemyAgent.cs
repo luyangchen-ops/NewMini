@@ -54,6 +54,11 @@ public sealed class EnemyAgent : MonoBehaviour
     private static readonly int Block = Animator.StringToHash("Block");
     private static readonly int IsMoving = Animator.StringToHash("IsMoving");
     private static readonly int IsRunning = Animator.StringToHash("IsRunning");
+    private static readonly int Idle = Animator.StringToHash("Idle");
+    private static readonly int Hurt = Animator.StringToHash("Hurt");
+    private static readonly int Guard = Animator.StringToHash("Guard");
+    private static readonly int DashAttack = Animator.StringToHash("DashAttack");
+    private static readonly int TripleAttack = Animator.StringToHash("TripleAttack");
 
     private bool supportsAttack;
     private bool supportsDeath;
@@ -61,6 +66,8 @@ public sealed class EnemyAgent : MonoBehaviour
     private bool supportsBlock;
     private bool supportsIsMoving;
     private bool supportsIsRunning;
+    private bool deferDeathAnimation;
+    private bool deferredDeathAnimationPending;
 
     public EnemyData Data => data;
     public Rigidbody2D Body => body;
@@ -96,6 +103,22 @@ public sealed class EnemyAgent : MonoBehaviour
     public EnemyShieldAttackState ShieldAttackState => shieldAttackState;
     public event System.Action<EnemyAnimationState> AnimationStateChanged;
     public event System.Action<EnemyAgent> Died;
+
+    /// <summary>Separates lethal combat resolution from the death animation for authored story beats.</summary>
+    public void SetDeathAnimationDeferred(bool deferred)
+    {
+        if (IsDead) return;
+        deferDeathAnimation = deferred;
+    }
+
+    /// <summary>Plays a previously deferred death animation. Boss corpses remain in the scene.</summary>
+    public void PlayDeferredDeathAnimation()
+    {
+        if (!IsDead || !deferredDeathAnimationPending) return;
+        deferredDeathAnimationPending = false;
+        deferDeathAnimation = false;
+        PlayDeathAnimation();
+    }
 
     private EnemyChaseState chaseState;
     private EnemyRoamState roamState;
@@ -183,7 +206,8 @@ public sealed class EnemyAgent : MonoBehaviour
         if (bossCombatController == null || !bossCombatController.UsesBehaviorTree)
             stateMachine.FixedTick();
         Vector2 currentPosition = body.position;
-        Vector2 clampedPosition = CameraBounds.Clamp(worldCamera, currentPosition, boundaryPadding, transform.position.z);
+        Vector2 clampedPosition = currentPosition;
+        PlayAreaBounds.TryClampPosition(currentPosition, boundaryPadding, out clampedPosition);
         if ((clampedPosition - currentPosition).sqrMagnitude > 0.000001f)
         {
             body.position = clampedPosition;
@@ -201,11 +225,10 @@ public sealed class EnemyAgent : MonoBehaviour
                 Mathf.Max(data.MoveSpeed, desiredVelocity.magnitude));
         }
 
-        Vector2 clampedNext = CameraBounds.Clamp(
-            worldCamera,
-            clampedPosition + movementVelocity * (PlayerCharacterController.EnemyTimeScale * Time.fixedDeltaTime),
-            boundaryPadding,
-            transform.position.z);
+        Vector2 nextPosition = clampedPosition
+            + movementVelocity * (PlayerCharacterController.EnemyTimeScale * Time.fixedDeltaTime);
+        Vector2 clampedNext = nextPosition;
+        PlayAreaBounds.TryClampPosition(nextPosition, boundaryPadding, out clampedNext);
         body.linearVelocity = (clampedNext - clampedPosition) / Time.fixedDeltaTime;
     }
 
@@ -778,14 +801,35 @@ public sealed class EnemyAgent : MonoBehaviour
 
         if (visualAnimator != null && supportsDeath)
         {
-            visualAnimator.ResetTrigger(Attack);
-            visualAnimator.SetTrigger(Death);
-            if (bossCombat == null)
-                StartCoroutine(DestroyAfterDeathAnimation(GetDeathAnimationDuration()));
+            if (deferDeathAnimation)
+            {
+                deferredDeathAnimationPending = true;
+                visualAnimator.ResetTrigger(Attack);
+                visualAnimator.ResetTrigger(Death);
+                visualAnimator.ResetTrigger(Hurt);
+                visualAnimator.ResetTrigger(Guard);
+                visualAnimator.ResetTrigger(DashAttack);
+                visualAnimator.ResetTrigger(TripleAttack);
+                visualAnimator.SetBool(IsMoving, false);
+                visualAnimator.Play(Idle, 0, 0f);
+                visualAnimator.Update(0f);
+                return;
+            }
+
+            PlayDeathAnimation();
             return;
         }
 
         if (bossCombat == null) Destroy(gameObject);
+    }
+
+    private void PlayDeathAnimation()
+    {
+        if (visualAnimator == null || !supportsDeath) return;
+        visualAnimator.ResetTrigger(Attack);
+        visualAnimator.SetTrigger(Death);
+        if (bossCombatController == null)
+            StartCoroutine(DestroyAfterDeathAnimation(GetDeathAnimationDuration()));
     }
 
     private System.Collections.IEnumerator DestroyAfterDeathAnimation(float duration)

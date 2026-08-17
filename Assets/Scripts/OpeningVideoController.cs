@@ -28,6 +28,7 @@ public sealed class OpeningVideoController : MonoBehaviour
     public event Action Finished;
 
     private bool finishing;
+    private bool musicPausedForOpening;
     private PresentationSession performanceSession;
 
     private static string CurrentBuildPlayedKey
@@ -51,6 +52,8 @@ public sealed class OpeningVideoController : MonoBehaviour
             return;
         }
 
+        PauseMusicForOpening();
+
         if (videoRoot != null) videoRoot.SetActive(true);
         if (videoCanvasGroup != null)
         {
@@ -63,6 +66,11 @@ public sealed class OpeningVideoController : MonoBehaviour
     private void Start()
     {
         if (!WillPlayOnThisLaunch) return;
+
+        // SceneManager.sceneLoaded runs after Awake and can restart the scene BGM.
+        // Pause it again here, immediately before video preparation, so the built
+        // player cannot overlap the movie with its main-scene music.
+        PauseMusicForOpening();
 
         if (videoPlayer == null || videoPlayer.clip == null)
         {
@@ -79,6 +87,7 @@ public sealed class OpeningVideoController : MonoBehaviour
 
     private void OnDestroy()
     {
+        ResumeMusicAfterOpening();
         performanceSession?.Dispose();
         performanceSession = null;
         if (videoPlayer == null) return;
@@ -136,6 +145,21 @@ public sealed class OpeningVideoController : MonoBehaviour
         if (videoRoot != null) videoRoot.SetActive(false);
         performanceSession?.Dispose();
         performanceSession = null;
+        ResumeMusicAfterOpening();
         Finished?.Invoke();
+    }
+
+    private void ResumeMusicAfterOpening()
+    {
+        if (!musicPausedForOpening) return;
+
+        musicPausedForOpening = false;
+        GameAudioManager.ResumeSceneMusic();
+    }
+
+    private void PauseMusicForOpening()
+    {
+        GameAudioManager.StopMusicForDialogue();
+        musicPausedForOpening = true;
     }
 }

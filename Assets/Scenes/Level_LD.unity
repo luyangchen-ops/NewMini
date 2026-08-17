@@ -7209,26 +7209,6 @@ MonoBehaviour:
   victoryRestartButton: {fileID: 1163896331}
   mainMenuSceneName: Level_LD
   sceneFlow: {fileID: 1805794917}
---- !u!114 &910000001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 248873401}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1892f4b33be94dc495b5f927001661c3, type: 3}
-  m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::RespawnPointManager
-  player: {fileID: 1408464640}
-  respawnPoints:
-  - {fileID: 1179852421}
-  - {fileID: 588903794}
-  - {fileID: 427735360}
-  - {fileID: 1679384262}
-  - {fileID: 1428799865}
-  startingPointIndex: 0
 --- !u!114 &248873403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10862,7 +10842,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &360553902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23137,6 +23117,26 @@ MonoBehaviour:
   onAllWavesCleared:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &910000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 248873401}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1892f4b33be94dc495b5f927001661c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RespawnPointManager
+  player: {fileID: 1408464640}
+  respawnPoints:
+  - {fileID: 1179852421}
+  - {fileID: 588903794}
+  - {fileID: 427735360}
+  - {fileID: 1679384262}
+  - {fileID: 1428799865}
+  startingPointIndex: 0
 --- !u!1001 &911573169
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -48353,6 +48353,27 @@ MonoBehaviour:
   guardArcherSpawnPoints:
   - {fileID: 928943198}
   - {fileID: 584196035}
+  bossWaveSpawner: {fileID: 894549037}
+  reinforcementPrefabs:
+  - {fileID: 8596929465333153107, guid: 7513f6c33541e8440a486e9d12ff20c5, type: 3}
+  - {fileID: 1000, guid: ac76861895f1dac48981520d119d1d0e, type: 3}
+  - {fileID: 2000, guid: d8ffcc6e514f86047ac9f88b26e9d13b, type: 3}
+  - {fileID: 3000, guid: 94645a7045925d448ba94f8f187219fb, type: 3}
+  reinforcementSpawnPoints:
+  - {fileID: 662407362}
+  - {fileID: 1035478060}
+  - {fileID: 1387111420}
+  - {fileID: 384276770}
+  - {fileID: 1354972783}
+  - {fileID: 75404348}
+  - {fileID: 656094933}
+  - {fileID: 2083855242}
+  - {fileID: 197460077}
+  - {fileID: 1376226682}
+  - {fileID: 267324689}
+  - {fileID: 935187658}
+  reinforcementCount: 5
+  reinforcementSpawnDelay: 10
   arenaCombatZone: {fileID: 901033677}
   bossHudRoot: {fileID: 615834395}
   contractCountText: {fileID: 2036682735}

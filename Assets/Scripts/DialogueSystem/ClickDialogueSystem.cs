@@ -16,6 +16,8 @@ public sealed class ClickDialogueSystem : MonoBehaviour
     public event Action DialogueFinished;
     public event Action DialogueInterrupted;
     public event Action DialogueResumed;
+    /// <summary>Raised when the player finishes the current line and advances past it.</summary>
+    public event Action<int, string, string> DialogueLineCompleted;
     /// <summary>Return true after starting a director to consume an authored CSV interruption cue.</summary>
     public event Func<string, bool> DialogueInterruptionShouldPlay;
     /// <summary>Return true to defer revealing the indexed line until ShowDeferredDialogueLine is called.</summary>
@@ -45,13 +47,22 @@ public sealed class ClickDialogueSystem : MonoBehaviour
 
     private readonly struct DialogueLine
     {
-        public DialogueLine(SpeakerKind speaker, string speakerName, string content, Transform followTarget = null, string interruptionCue = null)
-        { Speaker = speaker; SpeakerName = speakerName; Content = content; FollowTarget = followTarget; InterruptionCue = interruptionCue; }
+        public DialogueLine(SpeakerKind speaker, string speakerName, string content, Transform followTarget = null,
+            string interruptionCue = null, string completionCue = null)
+        {
+            Speaker = speaker;
+            SpeakerName = speakerName;
+            Content = content;
+            FollowTarget = followTarget;
+            InterruptionCue = interruptionCue;
+            CompletionCue = completionCue;
+        }
         public SpeakerKind Speaker { get; }
         public string SpeakerName { get; }
         public string Content { get; }
         public Transform FollowTarget { get; }
         public string InterruptionCue { get; }
+        public string CompletionCue { get; }
     }
 
     [Header("Scene-authored UI")]
@@ -374,6 +385,7 @@ public sealed class ClickDialogueSystem : MonoBehaviour
     {
         if (!isDialoguePlaying || isTransitioning || isInterruptedForPerformance || isWaitingForDeferredLine) return;
         if (TryPlayMarkedInterruptionAfterCurrentLine()) return;
+        NotifyCurrentLineCompleted();
         int nextLine = currentLine + 1;
         if (nextLine >= dialogueLines.Count)
         {
@@ -389,6 +401,13 @@ public sealed class ClickDialogueSystem : MonoBehaviour
             return;
         }
         ShowLine(dialogueLines[currentLine]);
+    }
+
+    private void NotifyCurrentLineCompleted()
+    {
+        if (currentLine < 0 || currentLine >= dialogueLines.Count) return;
+        DialogueLine line = dialogueLines[currentLine];
+        DialogueLineCompleted?.Invoke(currentLine, line.SpeakerName, line.CompletionCue);
     }
 
     private void ShowLine(DialogueLine line)
@@ -587,7 +606,8 @@ public sealed class ClickDialogueSystem : MonoBehaviour
                 ? SpeakerKind.System
                 : speaker == "角色" ? SpeakerKind.Character : SpeakerKind.Soldier;
             string cue = rows[i].Count > 2 ? rows[i][2].Trim() : null;
-            dialogueLines.Add(new DialogueLine(kind, speaker, rows[i][1].Trim(), null, cue));
+            string completionCue = rows[i].Count > 3 ? rows[i][3].Trim() : null;
+            dialogueLines.Add(new DialogueLine(kind, speaker, rows[i][1].Trim(), null, cue, completionCue));
         }
     }
 
