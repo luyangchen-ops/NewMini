@@ -10838,7 +10838,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &360553902
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22809,7 +22809,7 @@ MonoBehaviour:
       - {fileID: 498379310}
       count: 2
   - waveName: Wave 2
-    delayBeforeWave: 2
+    delayBeforeWave: 0
     spawns:
     - enemyType: 3
       enemyPrefab: {fileID: 3000, guid: 94645a7045925d448ba94f8f187219fb, type: 3}
@@ -22832,7 +22832,7 @@ MonoBehaviour:
       - {fileID: 90229444}
       count: 2
   - waveName: Wave 3
-    delayBeforeWave: 2
+    delayBeforeWave: 0
     spawns:
     - enemyType: 0
       enemyPrefab: {fileID: 8596929465333153107, guid: 7513f6c33541e8440a486e9d12ff20c5, type: 3}
@@ -22868,6 +22868,7 @@ MonoBehaviour:
       - {fileID: 2137074000}
       count: 4
   spawnedEnemyParent: {fileID: 1845040661}
+  remainingEnemiesToStartNextWave: 1
   onWaveStarted:
     m_PersistentCalls:
       m_Calls:
@@ -23100,6 +23101,7 @@ MonoBehaviour:
       - {fileID: 1960143074}
       count: 2
   spawnedEnemyParent: {fileID: 1204936600}
+  remainingEnemiesToStartNextWave: 0
   onWaveStarted:
     m_PersistentCalls:
       m_Calls: []
@@ -33062,6 +33064,7 @@ MonoBehaviour:
       - {fileID: 984482777}
       count: 3
   spawnedEnemyParent: {fileID: 1828512647}
+  remainingEnemiesToStartNextWave: 0
   onWaveStarted:
     m_PersistentCalls:
       m_Calls: []
@@ -34233,7 +34236,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!225 &1334082102
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -45537,6 +45540,7 @@ MonoBehaviour:
       - {fileID: 317216864}
       count: 2
   spawnedEnemyParent: {fileID: 1095113421}
+  remainingEnemiesToStartNextWave: 0
   onWaveStarted:
     m_PersistentCalls:
       m_Calls: []
@@ -47237,6 +47241,7 @@ MonoBehaviour:
       - {fileID: 2116937404}
       count: 1
   spawnedEnemyParent: {fileID: 1694690786}
+  remainingEnemiesToStartNextWave: 0
   onWaveStarted:
     m_PersistentCalls:
       m_Calls: []

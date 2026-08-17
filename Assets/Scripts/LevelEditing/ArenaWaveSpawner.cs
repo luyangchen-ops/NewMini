@@ -34,6 +34,8 @@ public sealed class ArenaWaveSpawner : MonoBehaviour
     [Header("Waves")]
     [SerializeField] private WaveDefinition[] waves;
     [SerializeField] private Transform spawnedEnemyParent;
+    [Tooltip("Alive-enemy threshold used to start the next wave. Zero waits for a full clear. The final wave always waits for every enemy to die.")]
+    [SerializeField, Min(0)] private int remainingEnemiesToStartNextWave;
     [Header("Events")]
     [SerializeField] private UnityEvent<int> onWaveStarted;
     [SerializeField] private UnityEvent<int> onWaveCleared;
@@ -105,7 +107,9 @@ public sealed class ArenaWaveSpawner : MonoBehaviour
 
             SpawnWave(wave);
             onWaveStarted?.Invoke(i);
-            yield return new WaitUntil(() => CountAliveEnemies() == 0);
+            bool hasNextWave = i < waves.Length - 1;
+            int advanceThreshold = hasNextWave ? remainingEnemiesToStartNextWave : 0;
+            yield return new WaitUntil(() => CountAliveEnemies() <= advanceThreshold);
             onWaveCleared?.Invoke(i);
         }
 
