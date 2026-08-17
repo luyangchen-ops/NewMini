@@ -159,6 +159,7 @@ public sealed class GameAudioManager : MonoBehaviour
     private static readonly Dictionary<GameSfx, AudioClip> ClipCache = new();
     private static readonly HashSet<GameSfx> MissingClipWarnings = new();
     private static GameAudioManager instance;
+    private static bool musicSuppressed;
 
     private AudioSource sfxSource;
     private AudioSource musicSource;
@@ -168,6 +169,7 @@ public sealed class GameAudioManager : MonoBehaviour
     private static void ResetStatics()
     {
         instance = null;
+        musicSuppressed = false;
         ClipCache.Clear();
         MissingClipWarnings.Clear();
     }
@@ -186,6 +188,15 @@ public sealed class GameAudioManager : MonoBehaviour
     {
         AudioClip clip = GetClip(sound);
         PlaySfx(clip, volumeScale);
+    }
+
+    /// <summary>Temporarily silences shared music without changing the player's settings.</summary>
+    public static void SetMusicSuppressed(bool suppressed)
+    {
+        musicSuppressed = suppressed;
+        if (instance == null) return;
+        if (suppressed) instance.musicSource.Stop();
+        else instance.ApplyMusicForScene(SceneManager.GetActiveScene());
     }
 
     /// <summary>
@@ -272,6 +283,8 @@ public sealed class GameAudioManager : MonoBehaviour
     {
         if (musicSource != null &&
             !musicSource.isPlaying &&
+            !musicSuppressed &&
+            !OpeningVideoController.ShouldPlayForCurrentBuild &&
             BattleSceneNames.Contains(SceneManager.GetActiveScene().name))
         {
             PlayBattleMusic();
@@ -300,6 +313,12 @@ public sealed class GameAudioManager : MonoBehaviour
 
     private void ApplyMusicForScene(Scene scene)
     {
+        if (musicSuppressed || OpeningVideoController.ShouldPlayForCurrentBuild)
+        {
+            if (musicSource != null && musicSource.isPlaying) musicSource.Stop();
+            return;
+        }
+
         if (BattleSceneNames.Contains(scene.name))
         {
             PlayBattleMusic();

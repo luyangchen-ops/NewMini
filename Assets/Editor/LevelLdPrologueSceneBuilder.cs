@@ -8,6 +8,7 @@ using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 using UnityEngine.Timeline;
 using UnityEngine.UI;
+using UnityEngine.Video;
 
 /// <summary>Authors the seamless 《天下第一》 main menu and prologue directly into Level_LD.</summary>
 public static class LevelLdPrologueSceneBuilder
@@ -16,6 +17,10 @@ public static class LevelLdPrologueSceneBuilder
     private const string TimelineFolder = "Assets/Timeline";
     private const string TimelinePath = TimelineFolder + "/Level01_OpeningSequence.playable";
     private const string WalkClipPath = TimelineFolder + "/Level01_HeroWalkIn.anim";
+    private const string BossEntranceTimelinePath = TimelineFolder + "/BossEntrance.playable";
+    private const string BossEntranceCameraClipPath = TimelineFolder + "/BossEntrance_CameraPan.anim";
+    private const string OpeningVideoPath = "Assets/Resources/Video/开场动画.mp4";
+    private const string OpeningVideoTexturePath = "Assets/Resources/Video/OpeningVideoRenderTexture.renderTexture";
     private const string DialoguePath = "Assets/Resources/Dialogue/Story/Level01_Opening.csv";
     private const string BossDialoguePath = "Assets/Resources/Dialogue/Story/Level01_BossClear.csv";
     private const string HealthUiFontPath = "Assets/Fonts/NotoSerifCJKsc-Regular.otf";
@@ -47,6 +52,7 @@ public static class LevelLdPrologueSceneBuilder
 
         DestroySceneObject(scene, "Root_序章演出");
         DestroySceneObject(scene, "Root_MainMenu");
+        DestroySceneObject(scene, "Root_OpeningVideo");
 
         PlayerCharacterController player = FindInScene<PlayerCharacterController>(scene);
         if (player == null)
@@ -90,8 +96,10 @@ public static class LevelLdPrologueSceneBuilder
         director.playableAsset = timeline;
         director.playOnAwake = false;
         director.extrapolationMode = DirectorWrapMode.Hold;
+        director.timeUpdateMode = DirectorUpdateMode.UnscaledGameTime;
 
         GameObject menuRoot = BuildMainMenu(scene, out CanvasGroup menuCanvasGroup, out Button startButton, out Button quitButton);
+        OpeningVideoController openingVideo = BuildOpeningVideo(scene);
         LevelPrologueController prologue = sequenceRoot.GetComponent<LevelPrologueController>();
         UnityEventTools.AddPersistentListener(startButton.onClick, prologue.StartGame);
         UnityEventTools.AddPersistentListener(quitButton.onClick, prologue.QuitGame);
@@ -129,10 +137,12 @@ public static class LevelLdPrologueSceneBuilder
         prologueSerialized.FindProperty("mainMenuRoot").objectReferenceValue = menuRoot;
         prologueSerialized.FindProperty("mainMenuCanvasGroup").objectReferenceValue = menuCanvasGroup;
         prologueSerialized.FindProperty("startButton").objectReferenceValue = startButton;
+        prologueSerialized.FindProperty("openingVideo").objectReferenceValue = openingVideo;
         prologueSerialized.FindProperty("player").objectReferenceValue = player;
         prologueSerialized.FindProperty("openingBandit").objectReferenceValue = openingBandit;
         prologueSerialized.FindProperty("heroIntroStart").objectReferenceValue = startMarker;
         prologueSerialized.FindProperty("heroIntroEnd").objectReferenceValue = endMarker;
+        prologueSerialized.FindProperty("openingBanditEnd").objectReferenceValue = banditMarker;
         prologueSerialized.FindProperty("gameplayHudRoot").objectReferenceValue = hudRoot;
         prologueSerialized.FindProperty("openingDialogue").objectReferenceValue = dialogue;
         prologueSerialized.FindProperty("gameStateUi").objectReferenceValue = gameState;
@@ -171,6 +181,8 @@ public static class LevelLdPrologueSceneBuilder
         Require(titleObject != null && titleObject.GetComponent<Text>()?.text == "天下第一", "Game title must be 《天下第一》.");
         Require(start != null && start.onClick.GetPersistentEventCount() > 0, "Btn_StartGame needs a persistent StartGame binding.");
         Require(prologue != null, "LevelPrologueController is missing.");
+        OpeningVideoController openingVideo = FindInScene<OpeningVideoController>(scene);
+        Require(openingVideo != null, "OpeningVideoController is missing.");
         Require(director != null && director.playableAsset != null, "Opening PlayableDirector or Timeline is missing.");
         Require(player != null && !player.gameObject.activeSelf, "Player must begin inactive behind the seamless menu.");
         Require(hud != null && !hud.activeSelf, "Gameplay HUD must begin inactive behind the seamless menu.");
@@ -287,6 +299,95 @@ public static class LevelLdPrologueSceneBuilder
         return root;
     }
 
+    private static TimelineAsset BuildBossEntranceTimeline(Camera camera, Vector3 bossPosition, PlayableDirector director)
+    {
+        EnsureFolder(TimelineFolder);
+        AssetDatabase.DeleteAsset(BossEntranceTimelinePath);
+        AssetDatabase.DeleteAsset(BossEntranceCameraClipPath);
+
+        Vector3 from = camera.transform.localPosition;
+        // Frame the boss in the upper third rather than exactly at screen centre.
+        Vector3 to = new Vector3(bossPosition.x, bossPosition.y - camera.orthographicSize * .35f, from.z);
+        AnimationClip pan = new AnimationClip { name = "BossEntrance_CameraPan", frameRate = 60f };
+        pan.SetCurve(string.Empty, typeof(Transform), "m_LocalPosition.x", SmoothCurve(from.x, to.x));
+        pan.SetCurve(string.Empty, typeof(Transform), "m_LocalPosition.y", SmoothCurve(from.y, to.y));
+        pan.SetCurve(string.Empty, typeof(Transform), "m_LocalPosition.z", ConstantCurve(from.z));
+        AssetDatabase.CreateAsset(pan, BossEntranceCameraClipPath);
+
+        TimelineAsset timeline = ScriptableObject.CreateInstance<TimelineAsset>();
+        timeline.name = "BossEntrance";
+        AssetDatabase.CreateAsset(timeline, BossEntranceTimelinePath);
+        AnimationTrack track = timeline.CreateTrack<AnimationTrack>(null, "Track_BossEntranceCameraPan");
+        TimelineClip clip = track.CreateClip<AnimationPlayableAsset>();
+        clip.displayName = "Clip_CameraPanToBoss";
+        clip.duration = WalkDuration;
+        ((AnimationPlayableAsset)clip.asset).clip = pan;
+        director.playableAsset = timeline;
+        director.SetGenericBinding(track, camera.transform);
+        EditorUtility.SetDirty(timeline);
+        return timeline;
+    }
+
+    private static OpeningVideoController BuildOpeningVideo(Scene scene)
+    {
+        VideoClip clip = AssetDatabase.LoadAssetAtPath<VideoClip>(OpeningVideoPath);
+        if (clip == null) throw new System.InvalidOperationException($"Opening video is missing at {OpeningVideoPath}.");
+
+        RenderTexture texture = AssetDatabase.LoadAssetAtPath<RenderTexture>(OpeningVideoTexturePath);
+        if (texture == null)
+        {
+            texture = new RenderTexture(1920, 1080, 0, RenderTextureFormat.ARGB32)
+            {
+                name = "OpeningVideoRenderTexture"
+            };
+            AssetDatabase.CreateAsset(texture, OpeningVideoTexturePath);
+        }
+
+        GameObject root = NewUi("Root_OpeningVideo", null, typeof(Canvas), typeof(CanvasScaler),
+            typeof(GraphicRaycaster), typeof(CanvasGroup), typeof(VideoPlayer), typeof(OpeningVideoController));
+        SceneManager.MoveGameObjectToScene(root, scene);
+        Canvas canvas = root.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 1000;
+        CanvasScaler scaler = root.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.matchWidthOrHeight = .5f;
+
+        Image background = ImageNode("Layer_OpeningVideoBackdrop", root.transform, Vector2.zero, Vector2.one,
+            Vector2.zero, Vector2.zero, Color.black);
+        background.raycastTarget = true;
+        GameObject imageObject = NewUi("Img_OpeningVideo", root.transform, typeof(CanvasRenderer), typeof(RawImage));
+        RectTransform imageRect = imageObject.GetComponent<RectTransform>();
+        imageRect.anchorMin = Vector2.zero;
+        imageRect.anchorMax = Vector2.one;
+        imageRect.offsetMin = Vector2.zero;
+        imageRect.offsetMax = Vector2.zero;
+        RawImage image = imageObject.GetComponent<RawImage>();
+        image.texture = texture;
+        image.color = Color.white;
+        image.raycastTarget = false;
+
+        VideoPlayer player = root.GetComponent<VideoPlayer>();
+        player.source = VideoSource.VideoClip;
+        player.clip = clip;
+        player.renderMode = VideoRenderMode.RenderTexture;
+        player.targetTexture = texture;
+        player.audioOutputMode = VideoAudioOutputMode.Direct;
+        player.playOnAwake = false;
+        player.waitForFirstFrame = true;
+        player.skipOnDrop = true;
+
+        OpeningVideoController controller = root.GetComponent<OpeningVideoController>();
+        SerializedObject serialized = new SerializedObject(controller);
+        serialized.FindProperty("videoRoot").objectReferenceValue = root;
+        serialized.FindProperty("videoCanvasGroup").objectReferenceValue = root.GetComponent<CanvasGroup>();
+        serialized.FindProperty("videoImage").objectReferenceValue = image;
+        serialized.FindProperty("videoPlayer").objectReferenceValue = player;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+        return controller;
+    }
+
     private static void BuildBossEncounter(Scene scene, PlayerCharacterController player, ClickDialogueSystem dialogue)
     {
         GameObject arena05 = FindGameObject(scene, "Root_Arena_05");
@@ -302,16 +403,25 @@ public static class LevelLdPrologueSceneBuilder
 
         GameObject root = NewWorld("Root_BossEncounter", arena05.transform);
         LevelBossEncounterController encounter = root.AddComponent<LevelBossEncounterController>();
+        BossPreludeController prelude = root.AddComponent<BossPreludeController>();
+        PlayableDirector bossEntranceDirector = root.AddComponent<PlayableDirector>();
 
         GameObject actors = NewWorld("Group_BossActors", root.transform);
         Transform spawn = NewWorld("Marker_BossSpawn", root.transform).transform;
+        Transform leftGuard = NewWorld("Marker_BossGuardArcher_Left", root.transform).transform;
+        Transform rightGuard = NewWorld("Marker_BossGuardArcher_Right", root.transform).transform;
         Transform speaker = NewWorld("Marker_BossDialogue", root.transform).transform;
         Vector3 encounterCenter = combatZone.ZoneCollider != null
             ? combatZone.ZoneCollider.bounds.center
             : arena05.transform.position;
         encounterCenter.z = 0f;
-        spawn.position = encounterCenter;
+        // Stage the opening encounter high in the arena, with two stationary archer guards.
+        spawn.position = encounterCenter + Vector3.up * 2.5f;
+        leftGuard.position = spawn.position + Vector3.left * 1.2f;
+        rightGuard.position = spawn.position + Vector3.right * 1.2f;
         speaker.position = encounterCenter;
+        Camera entranceCamera = Camera.main != null ? Camera.main : FindInScene<Camera>(scene);
+        if (entranceCamera != null) BuildBossEntranceTimeline(entranceCamera, spawn.position, bossEntranceDirector);
 
         GameObject bossPrefab = BuildBossPrefab(scene);
         GameObject bossHud = BuildBossHud(scene, out Text contractCountText);
@@ -321,6 +431,12 @@ public static class LevelLdPrologueSceneBuilder
         serialized.FindProperty("bossPrefab").objectReferenceValue = bossPrefab;
         serialized.FindProperty("bossSpawnPoint").objectReferenceValue = spawn;
         serialized.FindProperty("spawnedBossParent").objectReferenceValue = actors.transform;
+        serialized.FindProperty("guardArcherPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<GameObject>(AssetDatabase.GUIDToAssetPath("ac76861895f1dac48981520d119d1d0e"));
+        SerializedProperty guards = serialized.FindProperty("guardArcherSpawnPoints");
+        guards.arraySize = 2;
+        guards.GetArrayElementAtIndex(0).objectReferenceValue = leftGuard;
+        guards.GetArrayElementAtIndex(1).objectReferenceValue = rightGuard;
+        serialized.FindProperty("arenaCombatZone").objectReferenceValue = combatZone;
         serialized.FindProperty("bossHudRoot").objectReferenceValue = bossHud;
         serialized.FindProperty("contractCountText").objectReferenceValue = contractCountText;
         serialized.FindProperty("dialogueSystem").objectReferenceValue = dialogue;
@@ -329,17 +445,55 @@ public static class LevelLdPrologueSceneBuilder
         serialized.FindProperty("npcSpeakerAnchor").objectReferenceValue = speaker;
         serialized.ApplyModifiedPropertiesWithoutUndo();
 
+        SerializedObject zoneSerialized = new SerializedObject(combatZone);
+        zoneSerialized.FindProperty("deferWavesUntilRequested").boolValue = true;
+        zoneSerialized.ApplyModifiedPropertiesWithoutUndo();
+
+        SerializedObject preludeSerialized = new SerializedObject(prelude);
+        preludeSerialized.FindProperty("arena").objectReferenceValue = combatZone;
+        preludeSerialized.FindProperty("encounter").objectReferenceValue = encounter;
+        preludeSerialized.FindProperty("dialogue").objectReferenceValue = dialogue;
+        preludeSerialized.FindProperty("bossBeforeDialogue").objectReferenceValue = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/Resources/Dialogue/Story/Level01_BossBefore.csv");
+        preludeSerialized.FindProperty("player").objectReferenceValue = player;
+        preludeSerialized.FindProperty("incenseDestination").objectReferenceValue = FindGameObject(scene, "03_IncenseBurner")?.transform;
+        preludeSerialized.FindProperty("bossEntranceDirector").objectReferenceValue = bossEntranceDirector;
+        preludeSerialized.FindProperty("presentationCamera").objectReferenceValue = entranceCamera;
+        preludeSerialized.ApplyModifiedPropertiesWithoutUndo();
+
+        for (int index = finalWaves.WaveStartedEvent.GetPersistentEventCount() - 1; index >= 0; index--)
+        {
+            Object target = finalWaves.WaveStartedEvent.GetPersistentTarget(index);
+            if (target == null || target is LevelBossEncounterController)
+                UnityEventTools.RemovePersistentListener(finalWaves.WaveStartedEvent, index);
+        }
+        UnityEventTools.AddPersistentListener(finalWaves.WaveStartedEvent, encounter.SpawnBossWithFirstWave);
+
         for (int index = finalWaves.AllWavesClearedEvent.GetPersistentEventCount() - 1; index >= 0; index--)
         {
             Object target = finalWaves.AllWavesClearedEvent.GetPersistentTarget(index);
             if (target == null || target is LevelBossEncounterController)
                 UnityEventTools.RemovePersistentListener(finalWaves.AllWavesClearedEvent, index);
         }
-        UnityEventTools.AddPersistentListener(finalWaves.AllWavesClearedEvent, encounter.SpawnBoss);
+
+        for (int index = combatZone.ZoneClearedEvent.GetPersistentEventCount() - 1; index >= 0; index--)
+        {
+            Object target = combatZone.ZoneClearedEvent.GetPersistentTarget(index);
+            if (target == null || target is LevelBossEncounterController)
+                UnityEventTools.RemovePersistentListener(combatZone.ZoneClearedEvent, index);
+        }
+        UnityEventTools.AddPersistentListener(combatZone.ZoneClearedEvent, encounter.NotifyArenaCleared);
+        for (int index = combatZone.ZoneLockedEvent.GetPersistentEventCount() - 1; index >= 0; index--)
+        {
+            Object target = combatZone.ZoneLockedEvent.GetPersistentTarget(index);
+            if (target == null || target is BossPreludeController)
+                UnityEventTools.RemovePersistentListener(combatZone.ZoneLockedEvent, index);
+        }
+        UnityEventTools.AddPersistentListener(combatZone.ZoneLockedEvent, prelude.BeginPrelude);
     }
 
     private static GameObject BuildBossPrefab(Scene scene)
     {
+        if (Application.isEditor) return BossPrefabAuthoring.BuildOrUpgrade();
         EnsureFolder(BossPrefabFolder);
         string shieldPath = AssetDatabase.GUIDToAssetPath(ShieldPrefabGuid);
         GameObject shieldPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(shieldPath);

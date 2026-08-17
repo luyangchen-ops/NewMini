@@ -14,6 +14,7 @@ public sealed class RespawnPoint : MonoBehaviour
     public static RespawnPoint Active { get; private set; }
     public string PointId => pointId;
     public Vector3 RespawnPosition => transform.position;
+    public Collider2D ActivationTrigger => activationTrigger;
 
     private void Reset()
     {

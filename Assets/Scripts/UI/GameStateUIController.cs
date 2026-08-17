@@ -13,12 +13,14 @@ public sealed class GameStateUIController : MonoBehaviour
     [SerializeField] private GameObject panelPause;
     [SerializeField] private GameObject panelHelp;
     [SerializeField] private GameObject panelDeath;
+    [SerializeField] private GameObject panelVictory;
     [SerializeField] private Button pauseContinueButton;
     [SerializeField] private GameObject[] helpPages;
     [SerializeField] private Button helpPreviousButton;
     [SerializeField] private Button helpNextButton;
     [SerializeField] private Text helpPageIndicator;
     [SerializeField] private Button deathContinueButton;
+    [SerializeField] private Button victoryRestartButton;
     [Header("Navigation")]
     [SerializeField] private string mainMenuSceneName = "Begin";
     [SerializeField] private SceneFlowController sceneFlow;
@@ -28,6 +30,7 @@ public sealed class GameStateUIController : MonoBehaviour
     private bool isPauseShown;
     private bool isHelpShown;
     private bool isDeathShown;
+    private bool isVictoryShown;
     private bool hudWasActive;
     private bool returnToPauseAfterHelp;
     private int helpPageIndex;
@@ -43,11 +46,11 @@ public sealed class GameStateUIController : MonoBehaviour
     }
 
     private void OnEnable() { if (player == null) player = FindAnyObjectByType<PlayerCharacterController>(); if (player != null) player.Died += ShowDeath; }
-    private void OnDisable() { if (player != null) player.Died -= ShowDeath; if (isPauseShown || isHelpShown || isDeathShown) RestoreTimeAndHud(); }
+    private void OnDisable() { if (player != null) player.Died -= ShowDeath; if (isPauseShown || isHelpShown || isDeathShown || isVictoryShown) RestoreTimeAndHud(); }
 
     private void Update()
     {
-        if (isDeathShown || Keyboard.current?.escapeKey.wasPressedThisFrame != true) return;
+        if (isDeathShown || isVictoryShown || Keyboard.current?.escapeKey.wasPressedThisFrame != true) return;
         if (isHelpShown) CloseHelp();
         else if (isPauseShown) ClosePause();
         else if (!DialogueIsPlaying()) ShowPause();
@@ -55,7 +58,7 @@ public sealed class GameStateUIController : MonoBehaviour
 
     public void ShowPause()
     {
-        if (isPauseShown || isHelpShown || isDeathShown) return;
+        if (isPauseShown || isHelpShown || isDeathShown || isVictoryShown) return;
         isPauseShown = true; EnterFrozenUiState(); panelPause?.SetActive(true); Select(pauseContinueButton);
     }
 
@@ -75,7 +78,7 @@ public sealed class GameStateUIController : MonoBehaviour
     /// <summary>Opens the tutorial directly from gameplay, for example after the prologue enemy is defeated.</summary>
     public void ShowHelpFromGameplay()
     {
-        if (isPauseShown || isHelpShown || isDeathShown) return;
+        if (isPauseShown || isHelpShown || isDeathShown || isVictoryShown) return;
         returnToPauseAfterHelp = false;
         isHelpShown = true;
         helpPageIndex = 0;
@@ -109,20 +112,24 @@ public sealed class GameStateUIController : MonoBehaviour
     public void ContinueFromCheckpoint()
     {
         Vector3 position = RespawnPoint.TryGetActivePosition(out Vector3 checkpoint) ? checkpoint : levelStartPosition;
-        panelPause?.SetActive(false); panelHelp?.SetActive(false); panelDeath?.SetActive(false);
-        isPauseShown = false; isHelpShown = false; isDeathShown = false; returnToPauseAfterHelp = false; RestoreTimeAndHud(); player?.RespawnAt(position); EventSystem.current?.SetSelectedGameObject(null);
+        panelPause?.SetActive(false); panelHelp?.SetActive(false); panelDeath?.SetActive(false); panelVictory?.SetActive(false);
+        isPauseShown = false; isHelpShown = false; isDeathShown = false; isVictoryShown = false; returnToPauseAfterHelp = false;
+        RestoreTimeAndHud();
+        ArenaCombatZone.ResetIncompleteZonesForRetry();
+        player?.RespawnAt(position);
+        EventSystem.current?.SetSelectedGameObject(null);
     }
 
     public void ReturnToMainMenu()
     {
-        isPauseShown = false; isHelpShown = false; isDeathShown = false; Time.timeScale = 1f;
+        isPauseShown = false; isHelpShown = false; isDeathShown = false; isVictoryShown = false; Time.timeScale = 1f;
         if (sceneFlow != null) sceneFlow.ReturnToMainMenu();
         else { GameAudioSettings.Save(); SceneManager.LoadScene(mainMenuSceneName); }
     }
 
     public void RestartCurrentLevel()
     {
-        isPauseShown = false; isHelpShown = false; isDeathShown = false; Time.timeScale = 1f;
+        isPauseShown = false; isHelpShown = false; isDeathShown = false; isVictoryShown = false; Time.timeScale = 1f;
         if (sceneFlow != null) sceneFlow.RestartCurrentLevel();
         else SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
@@ -131,6 +138,22 @@ public sealed class GameStateUIController : MonoBehaviour
     {
         if (isDeathShown) return;
         isPauseShown = false; isHelpShown = false; isDeathShown = true; panelPause?.SetActive(false); panelHelp?.SetActive(false); EnterFrozenUiState(); panelDeath?.SetActive(true); Select(deathContinueButton);
+    }
+
+    /// <summary>Shows the scene-authored victory panel after the final dialogue ends.</summary>
+    public void ShowVictory()
+    {
+        if (isVictoryShown) return;
+        isPauseShown = false;
+        isHelpShown = false;
+        isDeathShown = false;
+        isVictoryShown = true;
+        panelPause?.SetActive(false);
+        panelHelp?.SetActive(false);
+        panelDeath?.SetActive(false);
+        EnterFrozenUiState();
+        panelVictory?.SetActive(true);
+        Select(victoryRestartButton);
     }
 
     private void RefreshHelpPages()

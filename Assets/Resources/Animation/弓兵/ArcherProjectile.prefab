@@ -82,7 +82,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 30
+  m_SortingOrder: 30000
   m_MaskInteraction: 0
   m_Sprite: {fileID: -1300483762799135597, guid: 9b60bb0b909ef6a4fbaeeb652ac5718b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -182,3 +182,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyProjectile
   damage: 0
   lifetime: 4
+  projectileSortingOrder: 30000

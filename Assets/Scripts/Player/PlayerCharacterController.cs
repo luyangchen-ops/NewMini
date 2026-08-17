@@ -83,6 +83,7 @@ public class PlayerCharacterController : MonoBehaviour
     [Header("Authored Kill Chain Range Overlay")]
     [SerializeField] private SpriteRenderer killChainRangeOverlay;
     [SerializeField, Min(1f)] private float rangeOverlayWorldDiameter = 40f;
+    [SerializeField, Range(1f, 90f)] private float directionalTargetSearchHalfAngle = 50f;
 
     [Header("Persistent Kill Chain Events (Optional)")]
     [SerializeField] private UnityEvent onKillChainStarted = new UnityEvent();
@@ -142,6 +143,8 @@ public class PlayerCharacterController : MonoBehaviour
     private Transform bufferedTarget;
     private Transform lastKilledTarget;
     private bool isFreeKillChainDash;
+    private bool presentationLocomotionActive;
+    private Vector2 presentationLocomotionDirection;
     private PlayerSpecialItemInventory specialItems;
 
     private static readonly int Speed = Animator.StringToHash("Speed");
@@ -178,6 +181,19 @@ public class PlayerCharacterController : MonoBehaviour
     public float KillChainWindowNormalized => chainWindowDuration <= 0f
         ? 0f
         : Mathf.Clamp01(chainWindowRemaining / chainWindowDuration);
+
+    /// <summary>
+    /// Lets an authored cinematic drive the locomotion animation while it moves the
+    /// player transform. Normal input animation updates resume when disabled.
+    /// </summary>
+    public void SetPresentationLocomotion(bool moving, Vector2 direction)
+    {
+        presentationLocomotionActive = moving;
+        presentationLocomotionDirection = direction;
+
+        if (moving) UpdateFacing(direction);
+        if (visualAnimator != null) visualAnimator.SetFloat(Speed, moving ? 1f : 0f);
+    }
 
     public event Action<int> KillChainKillConfirmed;
     public event Action<int> KillChainFinished;
@@ -443,7 +459,10 @@ public class PlayerCharacterController : MonoBehaviour
         SetCurrentTarget(FindBestTarget(null));
         if (!input.PointerPressed) return;
 
-        if (IsValidTarget(currentTarget))
+        Transform directionalTarget = FindBestDirectionalTarget(PointerWorld() - body.position, null);
+        if (IsValidTarget(directionalTarget))
+            StartKillChainDash(directionalTarget);
+        else if (IsValidTarget(currentTarget))
             StartKillChainDash(currentTarget);
         else if (!HasAnyTargetInRange(null))
             StartFreeKillChainDash();
@@ -463,7 +482,12 @@ public class PlayerCharacterController : MonoBehaviour
         perfectDodgeAfterimage?.StopAndRestore();
         dashStart = body.position;
         Vector2 targetOffset = (Vector2)target.position - dashStart;
-        killDashDirection = targetOffset.sqrMagnitude > Mathf.Epsilon ? targetOffset.normalized : Vector2.right;
+        Vector2 pointerOffset = PointerWorld() - dashStart;
+        killDashDirection = targetOffset.sqrMagnitude > Mathf.Epsilon
+            ? targetOffset.normalized
+            : pointerOffset.sqrMagnitude > Mathf.Epsilon
+                ? pointerOffset.normalized
+                : visualRenderer != null && visualRenderer.flipX ? Vector2.left : Vector2.right;
         RecalculateKillDashTarget();
         dashElapsed = -AttackDashWindupDuration;
         activeDashDuration = Mathf.Max(.01f, AttackDashDuration);
@@ -683,11 +707,53 @@ public class PlayerCharacterController : MonoBehaviour
             float pointerDistance = Vector2.Distance(pointerPosition, enemy.position);
             float angle = hasAim && offset.sqrMagnitude > Mathf.Epsilon ? Vector2.Angle(aim, offset) : 0f;
             bool directAssist = pointerDistance <= TargetAssistWorldRadius;
-            if (!directAssist && (!hasAim || angle > TargetAssistMaximumAngle)) continue;
+            // A target already within the close-assist radius should remain selectable
+            // even when the pointer is slightly past it or has no reliable direction.
+            bool closeAssist = distance <= TargetAssistWorldRadius;
+            if (!directAssist && !closeAssist && (!hasAim || angle > TargetAssistMaximumAngle)) continue;
 
-            float score = directAssist
+            float score = closeAssist
+                ? distance * .01f
+                : directAssist
                 ? pointerDistance * .2f + distance * .01f
                 : 100f + angle + PerpendicularDistanceToAim(playerPosition, aim, enemy.position) * .35f + distance * .02f;
+            if (score >= bestScore) continue;
+            bestScore = score;
+            bestTarget = enemy;
+        }
+
+        return bestTarget;
+    }
+
+    /// <summary>
+    /// Lets a click outside the displayed dash radius act as a directional command.
+    /// The click need not land directly on an enemy; the nearest target in its forward
+    /// search cone is selected as long as it is reachable by the kill-chain dash.
+    /// </summary>
+    private Transform FindBestDirectionalTarget(Vector2 direction, Transform excludedTarget)
+    {
+        if (direction.sqrMagnitude <= .0001f) return null;
+
+        Vector2 playerPosition = body.position;
+        Vector2 normalizedDirection = direction.normalized;
+        float bestScore = float.PositiveInfinity;
+        Transform bestTarget = null;
+        targetCandidates.Clear();
+
+        foreach (Collider2D hit in Physics2D.OverlapCircleAll(playerPosition, AttackDashDistance))
+        {
+            Transform enemy = FindEnemy(hit.transform);
+            if (enemy == null || enemy == excludedTarget || enemy == lastKilledTarget || !targetCandidates.Add(enemy)) continue;
+            if (!IsValidTarget(enemy)) continue;
+
+            Vector2 offset = (Vector2)enemy.position - playerPosition;
+            if (offset.sqrMagnitude <= Mathf.Epsilon) return enemy;
+
+            float angle = Vector2.Angle(normalizedDirection, offset);
+            if (angle > directionalTargetSearchHalfAngle) continue;
+
+            // Prefer the target closest to the commanded direction, then the nearer one.
+            float score = angle * 10f + offset.sqrMagnitude * .01f;
             if (score >= bestScore) continue;
             bestScore = score;
             bestTarget = enemy;
@@ -820,11 +886,41 @@ public class PlayerCharacterController : MonoBehaviour
         body.linearVelocity = Vector2.zero;
         currentHealth = maximumHealth;
         HealthChanged?.Invoke(currentHealth, maximumHealth);
-        visualAnimator?.SetBool(IsDeadAnimatorParam, false);
+        ResetVisualAnimatorAfterRespawn();
         if (stateMachine != null) stateMachine.Change(PlayerStateId.Locomotion);
         EnemyTimeScale = 1f;
         enemyTimeScaleTarget = 1f;
         cameraController?.RestoreImmediately();
+    }
+
+    /// <summary>Used by boss counter attacks. It displaces without dealing health damage.</summary>
+    public void ReceiveKnockback(Vector2 direction, float distance)
+    {
+        if (isDead || direction.sqrMagnitude <= .0001f || distance <= 0f) return;
+
+        Vector2 destination = cameraController != null
+            ? cameraController.Clamp(body.position + direction.normalized * distance, Padding, transform.position.z)
+            : body.position + direction.normalized * distance;
+        body.position = destination;
+        body.linearVelocity = Vector2.zero;
+        visualAnimator?.SetTrigger(Hurt);
+    }
+
+    /// <summary>
+    /// Returns the Animator to its controller's entry state after death. Clearing the
+    /// IsDead parameter alone leaves an Animator that has no Death-to-Idle transition
+    /// displaying its final death frame.
+    /// </summary>
+    private void ResetVisualAnimatorAfterRespawn()
+    {
+        if (visualAnimator == null) return;
+
+        visualAnimator.Rebind();
+        visualAnimator.speed = animatorBaseSpeed;
+        visualAnimator.SetBool(IsDeadAnimatorParam, false);
+        visualAnimator.SetFloat(Speed, 0f);
+        visualAnimator.SetInteger(VerticalDirection, 0);
+        visualAnimator.Update(0f);
     }
 
     public void EnterCameraZoomZone(UnityEngine.Object source, float targetOrthographicSize, float blendSpeed, int priority = 0)
@@ -1269,6 +1365,12 @@ public class PlayerCharacterController : MonoBehaviour
     private void UpdateVisuals()
     {
         if (visualAnimator == null) return;
+        if (presentationLocomotionActive)
+        {
+            UpdateFacing(presentationLocomotionDirection);
+            visualAnimator.SetFloat(Speed, 1f);
+            return;
+        }
         visualAnimator.SetFloat(Speed, State == PlayerStateId.Locomotion ? input.Move.magnitude : 0f);
     }
 

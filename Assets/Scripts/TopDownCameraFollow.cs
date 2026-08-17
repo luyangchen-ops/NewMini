@@ -15,6 +15,8 @@ public sealed class TopDownCameraFollow : MonoBehaviour
 
     private Camera controlledCamera;
     private Vector3 followVelocity;
+    private Object cinematicOverrideSource;
+    private Vector3 cinematicOverridePosition;
 
     private void Awake()
     {
@@ -33,10 +35,20 @@ public sealed class TopDownCameraFollow : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (target == null || mapRenderer == null || controlledCamera == null)
+        if (controlledCamera == null)
         {
             return;
         }
+
+        if (cinematicOverrideSource != null)
+        {
+            // The presentation owner already supplies an eased path. Apply it exactly
+            // so normal camera smoothing cannot lag behind or offset Timeline framing.
+            transform.position = cinematicOverridePosition;
+            return;
+        }
+
+        if (target == null || mapRenderer == null) return;
 
         Vector3 desiredPosition = GetClampedPosition();
         transform.position = smoothTime <= 0f
@@ -48,6 +60,20 @@ public sealed class TopDownCameraFollow : MonoBehaviour
                 smoothTime,
                 Mathf.Infinity,
                 Time.unscaledDeltaTime);
+    }
+
+    /// <summary>Temporarily takes camera control away from normal player follow and map clamping.</summary>
+    public void SetCinematicOverride(Object source, Vector3 position)
+    {
+        if (source == null) return;
+        cinematicOverrideSource = source;
+        cinematicOverridePosition = position;
+        followVelocity = Vector3.zero;
+    }
+
+    public void ClearCinematicOverride(Object source)
+    {
+        if (source != null && cinematicOverrideSource == source) cinematicOverrideSource = null;
     }
 
     private void SnapToTarget()

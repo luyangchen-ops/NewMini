@@ -20,6 +20,8 @@ public sealed class ArenaCombatZone : MonoBehaviour
     [SerializeField] private bool lockOnStart;
     [SerializeField] private bool oneShot = true;
     [SerializeField, Min(0f)] private float clearCheckDelay = .15f;
+    [Tooltip("Distance the player must move inside the zone after crossing its boundary before its gates can close.")]
+    [SerializeField, Min(0f)] private float entryConfirmationDistance = .6f;
 
     [Header("Boundary")]
     [Tooltip("All gate objects that close while this combat zone is active.")]
@@ -28,6 +30,7 @@ public sealed class ArenaCombatZone : MonoBehaviour
     [Header("Enemy Waves")]
     [Tooltip("Wave spawners that run when this zone locks. The zone only unlocks after all of them complete.")]
     [SerializeField] private ArenaWaveSpawner[] waveSpawners;
+    [SerializeField] private bool deferWavesUntilRequested;
 
     [Header("Events")]
     [SerializeField] private UnityEvent onZoneLocked;
@@ -38,9 +41,72 @@ public sealed class ArenaCombatZone : MonoBehaviour
     public bool IsCleared { get; private set; }
     public int RemainingEnemyCount { get; private set; }
     public Collider2D ZoneCollider => zoneCollider;
+    public UnityEvent ZoneClearedEvent => onZoneCleared;
+    public UnityEvent ZoneLockedEvent => onZoneLocked;
+
+#if UNITY_EDITOR
+    /// <summary>Editor-only shortcut used by play-mode level skipping.</summary>
+    public void EditorForceClear()
+    {
+        if (!deferWavesUntilRequested && waveSpawners != null)
+        {
+            foreach (ArenaWaveSpawner spawner in waveSpawners)
+                if (spawner != null) spawner.ResetWaves(clearSpawnedEnemies: true);
+        }
+
+        IsCleared = true;
+        IsActive = false;
+        RemainingEnemyCount = 0;
+        previousEnemyCount = 0;
+        awaitingEntryConfirmation = false;
+        pendingEnteringPlayer = null;
+        SetGatesLocked(false);
+        onZoneCleared?.Invoke();
+    }
+#endif
+
+    /// <summary>Starts an authored deferred encounter after its entrance presentation ends.</summary>
+    public void BeginDeferredWaves(bool keepSpawnedEnemiesDisabled = false)
+    {
+        if (!IsActive || IsCleared || waveSpawners == null) return;
+        foreach (ArenaWaveSpawner spawner in waveSpawners)
+            if (spawner != null) spawner.BeginWaves(keepSpawnedEnemiesDisabled);
+    }
+
+    public void SetWavesDeferred(bool deferred) => deferWavesUntilRequested = deferred;
+
+    public void ResetDeferredWaves()
+    {
+        if (waveSpawners == null) return;
+        foreach (ArenaWaveSpawner spawner in waveSpawners)
+            if (spawner != null) spawner.ResetWaves(clearSpawnedEnemies: true);
+    }
+
+    public void SetDeferredWaveEnemiesEnabled(bool enabled)
+    {
+        if (waveSpawners == null) return;
+        foreach (ArenaWaveSpawner spawner in waveSpawners)
+            if (spawner != null) spawner.SetSpawnedEnemiesEnabled(enabled);
+    }
+
+    public bool ContainsPosition(Vector3 worldPosition) => IsInsideZone(worldPosition);
 
     private float nextClearCheckTime;
     private int previousEnemyCount = -1;
+    private PlayerCharacterController pendingEnteringPlayer;
+    private bool awaitingEntryConfirmation;
+
+    /// <summary>
+    /// Restores every uncleared arena to its pre-entry state for a checkpoint retry.
+    /// Cleared arenas deliberately remain open and completed.
+    /// </summary>
+    public static void ResetIncompleteZonesForRetry()
+    {
+        foreach (ArenaCombatZone zone in FindObjectsByType<ArenaCombatZone>(FindObjectsInactive.Exclude))
+        {
+            if (zone != null && !zone.IsCleared) zone.ResetZone();
+        }
+    }
 
     private void Reset()
     {
@@ -64,6 +130,20 @@ public sealed class ArenaCombatZone : MonoBehaviour
 
     private void Update()
     {
+        if (awaitingEntryConfirmation)
+        {
+            if (pendingEnteringPlayer == null)
+            {
+                awaitingEntryConfirmation = false;
+            }
+            else if (HasPlayerPassedBoundary(pendingEnteringPlayer.transform.position))
+            {
+                awaitingEntryConfirmation = false;
+                pendingEnteringPlayer = null;
+                ActivateZone();
+            }
+        }
+
         if (!IsActive || IsCleared || Time.time < nextClearCheckTime) return;
         nextClearCheckTime = Time.time + clearCheckDelay;
         RefreshEnemyCount();
@@ -72,7 +152,14 @@ public sealed class ArenaCombatZone : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!activateWhenPlayerEnters || IsActive || (oneShot && IsCleared)) return;
-        if (other.GetComponentInParent<PlayerCharacterController>() != null) ActivateZone();
+        PlayerCharacterController enteringPlayer = other.GetComponentInParent<PlayerCharacterController>();
+        if (enteringPlayer == null) return;
+
+        // The zone trigger starts at the same boundary as its gates. Wait until the
+        // player's pivot is clearly inside so the entry gate cannot close on them.
+        pendingEnteringPlayer = enteringPlayer;
+        awaitingEntryConfirmation = !HasPlayerPassedBoundary(enteringPlayer.transform.position);
+        if (!awaitingEntryConfirmation) ActivateZone();
     }
 
     [ContextMenu("Activate Zone")]
@@ -82,7 +169,7 @@ public sealed class ArenaCombatZone : MonoBehaviour
         IsActive = true;
         SetGatesLocked(true);
         onZoneLocked?.Invoke();
-        if (waveSpawners != null)
+        if (!deferWavesUntilRequested && waveSpawners != null)
         {
             foreach (ArenaWaveSpawner spawner in waveSpawners)
                 if (spawner != null) spawner.BeginWaves();
@@ -129,10 +216,12 @@ public sealed class ArenaCombatZone : MonoBehaviour
         IsCleared = false;
         RemainingEnemyCount = 0;
         previousEnemyCount = -1;
+        pendingEnteringPlayer = null;
+        awaitingEntryConfirmation = false;
         if (waveSpawners != null)
         {
             foreach (ArenaWaveSpawner spawner in waveSpawners)
-                if (spawner != null) spawner.ResetWaves();
+                if (spawner != null) spawner.ResetWaves(clearSpawnedEnemies: true);
         }
         SetGatesLocked(lockOnStart);
     }
@@ -141,6 +230,17 @@ public sealed class ArenaCombatZone : MonoBehaviour
     {
         Vector2 closest = zoneCollider.ClosestPoint(worldPosition);
         return ((Vector2)worldPosition - closest).sqrMagnitude < .0001f;
+    }
+
+    private bool HasPlayerPassedBoundary(Vector3 worldPosition)
+    {
+        Bounds bounds = zoneCollider.bounds;
+        float maxInset = Mathf.Min(bounds.extents.x, bounds.extents.y) - .01f;
+        float inset = Mathf.Clamp(entryConfirmationDistance, 0f, Mathf.Max(0f, maxInset));
+        return worldPosition.x >= bounds.min.x + inset
+            && worldPosition.x <= bounds.max.x - inset
+            && worldPosition.y >= bounds.min.y + inset
+            && worldPosition.y <= bounds.max.y - inset;
     }
 
     private void SetGatesLocked(bool locked)

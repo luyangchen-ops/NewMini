@@ -43,14 +43,22 @@ public sealed class ArenaWaveSpawner : MonoBehaviour
     public bool HasCompletedAllWaves { get; private set; }
     public int CurrentWaveIndex { get; private set; } = -1;
     public int CurrentAliveCount => CountAliveEnemies();
+    public UnityEvent<int> WaveStartedEvent => onWaveStarted;
     public UnityEvent AllWavesClearedEvent => onAllWavesCleared;
 
     private readonly List<GameObject> spawnedEnemies = new();
     private Coroutine waveRoutine;
+    private bool spawnEnemiesDisabled;
 
     public void BeginWaves()
     {
+        BeginWaves(false);
+    }
+
+    public void BeginWaves(bool keepSpawnedEnemiesDisabled)
+    {
         if (IsRunning || HasCompletedAllWaves) return;
+        spawnEnemiesDisabled = keepSpawnedEnemiesDisabled;
         if (waves == null || waves.Length == 0)
         {
             HasCompletedAllWaves = true;
@@ -63,14 +71,27 @@ public sealed class ArenaWaveSpawner : MonoBehaviour
     }
 
     [ContextMenu("Reset Waves")]
-    public void ResetWaves()
+    public void ResetWaves() => ResetWaves(clearSpawnedEnemies: true);
+
+    /// <summary>Stops the current wave and, when retrying, removes every enemy it spawned.</summary>
+    public void ResetWaves(bool clearSpawnedEnemies)
     {
         if (waveRoutine != null) StopCoroutine(waveRoutine);
         waveRoutine = null;
         IsRunning = false;
         HasCompletedAllWaves = false;
         CurrentWaveIndex = -1;
-        spawnedEnemies.RemoveAll(enemy => enemy == null);
+        spawnEnemiesDisabled = false;
+
+        if (!clearSpawnedEnemies)
+        {
+            spawnedEnemies.RemoveAll(enemy => enemy == null);
+            return;
+        }
+
+        foreach (GameObject enemy in spawnedEnemies)
+            if (enemy != null) Destroy(enemy);
+        spawnedEnemies.Clear();
     }
 
     private IEnumerator RunWaves()
@@ -104,9 +125,26 @@ public sealed class ArenaWaveSpawner : MonoBehaviour
             {
                 Transform point = entry.spawnPoints[index % entry.spawnPoints.Length];
                 if (point == null) continue;
-                spawnedEnemies.Add(Instantiate(entry.enemyPrefab, point.position, point.rotation, spawnedEnemyParent));
+                GameObject instance = Instantiate(entry.enemyPrefab, point.position, point.rotation, spawnedEnemyParent);
+                if (spawnEnemiesDisabled)
+                {
+                    EnemyAgent enemy = instance.GetComponent<EnemyAgent>();
+                    if (enemy != null) enemy.enabled = false;
+                }
+                spawnedEnemies.Add(instance);
             }
         }
+    }
+
+    public void SetSpawnedEnemiesEnabled(bool enabled)
+    {
+        foreach (GameObject instance in spawnedEnemies)
+        {
+            if (instance == null) continue;
+            EnemyAgent enemy = instance.GetComponent<EnemyAgent>();
+            if (enemy != null) enemy.enabled = enabled;
+        }
+        if (enabled) spawnEnemiesDisabled = false;
     }
 
     private int CountAliveEnemies()
@@ -120,7 +158,13 @@ public sealed class ArenaWaveSpawner : MonoBehaviour
                 spawnedEnemies.RemoveAt(i);
                 continue;
             }
-            if (enemy.activeInHierarchy) count++;
+            if (!enemy.activeInHierarchy) continue;
+
+            // A defeated enemy can remain active while its death animation plays.
+            // Treat the lethal hit as the wave clear point so the configured next
+            // wave is not held up by the old wave's visual cleanup.
+            EnemyAgent enemyAgent = enemy.GetComponent<EnemyAgent>();
+            if (enemyAgent == null || !enemyAgent.IsDead) count++;
         }
         return count;
     }

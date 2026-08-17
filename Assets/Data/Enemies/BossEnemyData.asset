@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40f0e8d2adf94026aa99e5a82fa86a13, type: 3}
+  m_Name: BossEnemyData
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyData
+  <Archetype>k__BackingField: 0
+  <MoveSpeed>k__BackingField: 3.7
+  <StoppingDistance>k__BackingField: 1.55
+  <MeleeFormationRadius>k__BackingField: 1.05
+  <MeleeFormationArrivalDistance>k__BackingField: 0.18
+  <MeleeSeparationRadius>k__BackingField: 0.8
+  <MeleeSeparationStrength>k__BackingField: 0.9
+  <MeleePressureLimit>k__BackingField: 1
+  <MeleeEngagementDelayRange>k__BackingField: {x: 0, y: 0}
+  <MeleeEngagementSpeedVariance>k__BackingField: 0.1
+  <MeleeAttackPreparationDelayRange>k__BackingField: {x: 0.04, y: 0.08}
+  <MeleeAttackIntervalVariance>k__BackingField: 0.2
+  <MeleeAttackRecoveryDelayRange>k__BackingField: {x: 0.08, y: 0.14}
+  <MeleeAttackHitDelay>k__BackingField: 0.42
+  <MeleeAttackDuration>k__BackingField: 0.78
+  <Damage>k__BackingField: 22
+  <AttackSfx>k__BackingField: {fileID: 8300000, guid: e074cfd2ef6bb7c45887b7b44836d705, type: 3}
+  <AttackSfxVolume>k__BackingField: 0.72
+  <StayStill>k__BackingField: 0
+  <IdleChance>k__BackingField: 0.4
+  <RoamStateDurationRange>k__BackingField: {x: 0.5, y: 1.4}
+  <RangedAttackRange>k__BackingField: 6
+  <ProjectilePrefab>k__BackingField: {fileID: 0}
+  <ProjectileSpawnOffset>k__BackingField: 0.65
+  <ProjectileSpeed>k__BackingField: 7
+  <ProjectileMaxDistance>k__BackingField: 8
+  <FireInterval>k__BackingField: 0.28
+  <RangedAttackReleaseDelay>k__BackingField: 0.25
+  <RangedAttackDuration>k__BackingField: 0.34
+  <MeleePerfectDodgeDelay>k__BackingField: 0.34
+  <MeleePerfectDodgeDuration>k__BackingField: 0.26
+  <SpearWindupDuration>k__BackingField: 0.45
+  <SpearThrustDuration>k__BackingField: 0.18
+  <SpearThrustSpeed>k__BackingField: 8
+  <SpearWindupAnimationSpeed>k__BackingField: 0.3
+  <SpearImpactNormalizedTime>k__BackingField: 0.85
+  <SpearPerfectDodgeWindowDuration>k__BackingField: 0.24
+  <SpearHitRange>k__BackingField: 2
+  <SpearHitRadius>k__BackingField: 0.4
+  <SpearHitAngle>k__BackingField: 50
+  <ShieldRearKillHalfAngle>k__BackingField: 55
+  <ShieldBlockDuration>k__BackingField: 0.55
+  <ShieldAttackWindup>k__BackingField: 0.6
+  <ShieldAttackDuration>k__BackingField: 0.95
+  <ShieldAttackInterval>k__BackingField: 2.8
+  <ShieldPerfectDodgeWindowDuration>k__BackingField: 0.28

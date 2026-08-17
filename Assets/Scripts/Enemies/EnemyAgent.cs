@@ -10,7 +10,8 @@ public sealed class EnemyAgent : MonoBehaviour
         Swordsman,
         Archer,
         ShieldBearer,
-        Spearman
+        Spearman,
+        Boss
     }
 
     /// <summary>Animation integration point; spear animation assets are intentionally not assigned yet.</summary>
@@ -41,6 +42,7 @@ public sealed class EnemyAgent : MonoBehaviour
     private float meleeAttackRecoveryEndTime = -1f;
     private float meleePerfectDodgeStartTime;
     private float meleePerfectDodgeEndTime;
+    private Vector2 spearThrustStartPosition;
     private bool isSpearWindupAnimating;
     private EnemyStateMachine stateMachine;
 
@@ -67,11 +69,13 @@ public sealed class EnemyAgent : MonoBehaviour
         && data.ProjectilePrefab != null
         && fireCooldown <= 0f
         && IsWithinRangedAttackRange();
-    public bool CanMeleeAttack => !IsDead && data != null && data.Archetype == EnemyArchetype.Melee && fireCooldown <= 0f;
+    public bool CanMeleeAttack => !IsDead && data != null && data.Archetype == EnemyArchetype.Melee
+        && (fireCooldown <= 0f || IsBossCombatant);
     public bool CanSpearAttack => !IsDead && data != null && data.Archetype == EnemyArchetype.Spearman && fireCooldown <= 0f;
     public bool IsMeleeCombatant => data != null && (data.Archetype == EnemyArchetype.Melee || data.Archetype == EnemyArchetype.Spearman);
     public bool IsDead { get; private set; }
     public bool IsShieldBearer => GetVisualStyle() == EnemyVisualStyle.ShieldBearer;
+    public bool IsBossCombatant => GetComponent<BossCombatController>() != null;
     public bool IsShieldAttackExposed { get; private set; }
     public bool IsMeleeAttackRecovering => Time.time < meleeAttackRecoveryEndTime;
     public bool IsWaitingToEngageInMelee => Time.time < meleeEngagementStartTime;
@@ -251,6 +255,7 @@ public sealed class EnemyAgent : MonoBehaviour
     public bool CanPressureTarget()
     {
         if (!HasTarget || data == null || !IsMeleeCombatant) return false;
+        if (IsBossCombatant) return true;
 
         int priority = 0;
         EntityId ownEntityId = GetEntityId();
@@ -277,6 +282,7 @@ public sealed class EnemyAgent : MonoBehaviour
     private int GetMeleePressureRank()
     {
         if (data == null) return int.MaxValue;
+        if (IsBossCombatant) return -1;
         if (data.Archetype == EnemyArchetype.Spearman) return 0;
         return IsShieldBearer ? 2 : 1;
     }
@@ -468,11 +474,36 @@ public sealed class EnemyAgent : MonoBehaviour
         }
 
         TryDamageTarget();
-        fireCooldown = data.GetMeleeAttackCooldown(data.FireInterval);
+        if (!IsBossCombatant)
+            fireCooldown = data.GetMeleeAttackCooldown(data.FireInterval);
         lastMeleeAttackTime = Time.time;
     }
 
-    public void CompleteMeleeAttack() => StartMeleeAttackRecovery();
+    public void CompleteMeleeAttack()
+    {
+        if (IsBossCombatant) fireCooldown = .28f;
+        StartMeleeAttackRecovery();
+    }
+
+    public void BeginBossFollowUpMeleeAttack()
+    {
+        FaceTarget();
+        SetDesiredVelocity(Vector2.zero);
+        meleePerfectDodgeStartTime = Time.time + data.MeleePerfectDodgeDelay;
+        meleePerfectDodgeEndTime = meleePerfectDodgeStartTime + data.MeleePerfectDodgeDuration;
+        if (supportsAttack)
+        {
+            visualAnimator.ResetTrigger(Attack);
+            visualAnimator.SetTrigger(Attack);
+        }
+        PlayAttackSfx();
+    }
+
+    public bool TryContinueBossAttackSequence()
+    {
+        BossCombatController bossCombat = GetComponent<BossCombatController>();
+        return bossCombat != null && bossCombat.TryContinueAttackSequence();
+    }
 
     public void BeginSpearAttack()
     {
@@ -491,6 +522,7 @@ public sealed class EnemyAgent : MonoBehaviour
     public void BeginSpearThrust(Vector2 direction)
     {
         isSpearWindupAnimating = false;
+        spearThrustStartPosition = body.position;
         Face(direction.x);
         float impactTime = Time.time + data.SpearThrustDuration * data.SpearImpactNormalizedTime;
         float perfectDodgeHalfDuration = data.SpearPerfectDodgeWindowDuration * .5f;
@@ -502,14 +534,22 @@ public sealed class EnemyAgent : MonoBehaviour
     {
         if (data == null || !HasTarget || direction.sqrMagnitude <= .0001f) return;
 
-        Vector2 toTarget = (Vector2)target.position - body.position;
-        if (toTarget.sqrMagnitude <= .0001f
-            || Vector2.Angle(direction, toTarget) > data.SpearHitAngle * .5f) return;
-        float forwardDistance = Vector2.Dot(direction.normalized, toTarget);
+        Vector2 normalizedDirection = direction.normalized;
+        Vector2 targetPosition = GetTargetBodyCenter();
+        Vector2 fromThrustStart = targetPosition - spearThrustStartPosition;
+        if (fromThrustStart.sqrMagnitude <= .0001f
+            || Vector2.Angle(normalizedDirection, fromThrustStart) > data.SpearHitAngle * .5f) return;
+        float forwardDistance = Vector2.Dot(normalizedDirection, fromThrustStart);
         if (forwardDistance < 0f || forwardDistance > data.SpearHitRange) return;
-        float lateralDistance = Mathf.Abs(Vector2.Perpendicular(direction.normalized).x * toTarget.x
-            + Vector2.Perpendicular(direction.normalized).y * toTarget.y);
-        if (lateralDistance > data.SpearHitRadius) return;
+
+        // The spearman moves during a thrust. Test the complete swept path rather
+        // than only its final body position, so passing through the player registers.
+        Vector2 closestOnThrust = ClosestPointOnSegment(targetPosition, spearThrustStartPosition, body.position);
+        Collider2D targetCollider = target.GetComponentInChildren<Collider2D>();
+        Vector2 targetClosestPoint = targetCollider != null
+            ? targetCollider.ClosestPoint(closestOnThrust)
+            : targetPosition;
+        if ((targetClosestPoint - closestOnThrust).sqrMagnitude > data.SpearHitRadius * data.SpearHitRadius) return;
 
         TryDamageTarget();
     }
@@ -655,6 +695,9 @@ public sealed class EnemyAgent : MonoBehaviour
     {
         if (IsDead) return;
 
+        BossCombatController bossCombat = GetComponent<BossCombatController>();
+        if (bossCombat != null && bossCombat.TryCounterPlayerHit()) return;
+
         BorrowedLifeBossController borrowedLife = GetComponent<BorrowedLifeBossController>();
         if (borrowedLife != null && borrowedLife.TryAbsorbLethalHit()) return;
 
@@ -754,6 +797,30 @@ public sealed class EnemyAgent : MonoBehaviour
         player.TakeDamage(data.Damage);
     }
 
+    /// <summary>Presentation-only archer shot: it uses the normal arrow visual but deals no damage.</summary>
+    public void PlayCinematicRangedShot(Transform cinematicTarget)
+    {
+        if (data == null || data.ProjectilePrefab == null || cinematicTarget == null) return;
+        Vector2 direction = (Vector2)cinematicTarget.position - body.position;
+        if (direction.sqrMagnitude <= .001f) return;
+        direction.Normalize();
+        Face(direction.x);
+        if (supportsShoot) { visualAnimator.ResetTrigger(Shoot); visualAnimator.SetTrigger(Shoot); }
+        Vector2 origin = visualRenderer != null ? visualRenderer.bounds.center : body.position;
+        EnemyProjectile projectile = Instantiate(data.ProjectilePrefab, origin + direction * data.ProjectileSpawnOffset,
+            Quaternion.Euler(0f, 0f, Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg));
+        projectile.Launch(cinematicTarget.position, data.ProjectileSpeed, data.ProjectileMaxDistance, gameObject, 0f);
+    }
+
+    private static Vector2 ClosestPointOnSegment(Vector2 point, Vector2 segmentStart, Vector2 segmentEnd)
+    {
+        Vector2 segment = segmentEnd - segmentStart;
+        float lengthSquared = segment.sqrMagnitude;
+        if (lengthSquared <= Mathf.Epsilon) return segmentStart;
+        float t = Mathf.Clamp01(Vector2.Dot(point - segmentStart, segment) / lengthSquared);
+        return segmentStart + segment * t;
+    }
+
     private void EnsureVisualAnimator()
     {
         if (visualAnimator == null && visualRenderer != null)
@@ -771,6 +838,7 @@ public sealed class EnemyAgent : MonoBehaviour
             EnemyVisualStyle.Archer => "Animation/弓兵/弓兵",
             EnemyVisualStyle.ShieldBearer => "Animation/盾兵/ShieldWarrior",
             EnemyVisualStyle.Spearman => "Animation/Spearman/BanditSpearman",
+            EnemyVisualStyle.Boss => "Animation/Boss/Boss",
             _ => "Animation/SwordBandit/SwordBandit"
         };
         if (string.IsNullOrEmpty(controllerPath))

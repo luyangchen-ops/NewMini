@@ -6,8 +6,12 @@ public sealed class EnemyProjectile : MonoBehaviour
     [SerializeField, Min(0f)] private float damage = 0f;
     [Tooltip("Safety fallback in case the projectile cannot cover its configured distance.")]
     [SerializeField, Min(0.05f)] private float lifetime = 4f;
+    [Header("Presentation")]
+    [Tooltip("Keeps arrows above ground and top-down props throughout their flight.")]
+    [SerializeField] private int projectileSortingOrder = 30000;
 
     private Rigidbody2D body;
+    private SpriteRenderer[] visualRenderers;
     private GameObject owner;
     private Vector2 launchPosition;
     private float maximumTravelDistance;
@@ -22,6 +26,8 @@ public sealed class EnemyProjectile : MonoBehaviour
         body.gravityScale = 0f;
         body.freezeRotation = true;
         body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        visualRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+        ApplyProjectileSortingOrder();
     }
 
     private void OnEnable()
@@ -83,6 +89,7 @@ public sealed class EnemyProjectile : MonoBehaviour
         {
             transform.right = velocity;
         }
+        ApplyProjectileSortingOrder();
         IgnoreOwnerCollisions();
     }
 
@@ -119,6 +126,13 @@ public sealed class EnemyProjectile : MonoBehaviour
     private void IgnoreOwnerCollisions()
     {
         if (owner != null) IgnoreCollisions(GetComponentsInChildren<Collider2D>(), owner.GetComponentsInChildren<Collider2D>());
+    }
+
+    private void ApplyProjectileSortingOrder()
+    {
+        if (visualRenderers == null) return;
+        foreach (SpriteRenderer renderer in visualRenderers)
+            if (renderer != null) renderer.sortingOrder = projectileSortingOrder;
     }
 
     private static void IgnoreCollisions(Collider2D[] first, Collider2D[] second)

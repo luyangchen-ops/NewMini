@@ -144,6 +144,7 @@ public sealed class EnemyAttackState : EnemyState
         {
             elapsed = 0f;
             meleeDamageDealt = false;
+            Agent.GetComponent<BossCombatController>()?.BeginAttackSequence();
             Agent.BeginMeleeAttack();
             return;
         }
@@ -180,6 +181,13 @@ public sealed class EnemyAttackState : EnemyState
 
             if (elapsed >= Agent.Data.MeleeAttackDuration)
             {
+                if (Agent.TryContinueBossAttackSequence())
+                {
+                    elapsed = 0f;
+                    meleeDamageDealt = false;
+                    Agent.BeginBossFollowUpMeleeAttack();
+                    return;
+                }
                 Agent.CompleteMeleeAttack();
                 StateMachine.ChangeState(Agent.DefaultActiveState);
             }
