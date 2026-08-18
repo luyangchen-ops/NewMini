@@ -21,7 +21,6 @@ public sealed class BossPreludeController : MonoBehaviour
     [SerializeField, Min(.1f)] private float bossCameraPanDuration = 1.5f;
     [SerializeField, Min(.1f)] private float heroRunDuration = 1.1f;
     private bool started;
-    private TopDownCameraFollow cameraFollow;
     private Camera mainCamera;
     private bool cinematicCameraObjectWasActive;
     private AudioListener mainAudioListener;
@@ -109,12 +108,10 @@ public sealed class BossPreludeController : MonoBehaviour
         for (float elapsed = 0f; elapsed < bossCameraPanDuration; elapsed += Time.unscaledDeltaTime)
         {
             Vector3 position = Vector3.Lerp(from, to, Mathf.SmoothStep(0f, 1f, elapsed / bossCameraPanDuration));
-            if (cameraFollow != null) cameraFollow.SetCinematicOverride(this, position);
-            else presentationCamera.transform.position = position;
+            SetPresentationCameraPosition(position);
             yield return null;
         }
-        if (cameraFollow != null) cameraFollow.SetCinematicOverride(this, to);
-        else presentationCamera.transform.position = to;
+        SetPresentationCameraPosition(to);
     }
 
     private IEnumerator RunHeroThenReveal()
@@ -169,7 +166,7 @@ public sealed class BossPreludeController : MonoBehaviour
         // Ordinary arena enemies do not exist during the cinematic. Start the
         // first wave only after the complete Boss-before dialogue has closed.
         arena?.BeginDeferredWaves();
-        cameraFollow?.ClearCinematicOverride(this);
+        player?.ClearCameraCinematicOverride(this);
         RestoreMainCamera();
         performanceSession?.Dispose();
         performanceSession = null;
@@ -202,7 +199,7 @@ public sealed class BossPreludeController : MonoBehaviour
             player.SetPresentationIdle(false);
         }
         encounter?.SetBossPresentationIdle(false);
-        cameraFollow?.ClearCinematicOverride(this);
+        player?.ClearCameraCinematicOverride(this);
         RestoreMainCamera();
     }
 
@@ -215,7 +212,7 @@ public sealed class BossPreludeController : MonoBehaviour
         encounter?.SetBossPresentationIdle(false);
         encounter?.ActivateGuardArchers();
         encounter?.ShowBossHud();
-        cameraFollow?.ClearCinematicOverride(this);
+        player?.ClearCameraCinematicOverride(this);
         RestoreMainCamera();
         GameAudioManager.PlayBossMusic();
         arena?.BeginDeferredWaves();
@@ -239,6 +236,7 @@ public sealed class BossPreludeController : MonoBehaviour
             player.SetPresentationIdle(false);
         }
         encounter?.SetBossPresentationIdle(false);
+        player?.ClearCameraCinematicOverride(this);
         RestoreMainCamera();
     }
 
@@ -256,17 +254,7 @@ public sealed class BossPreludeController : MonoBehaviour
 
     private void ResolvePresentationCameras()
     {
-        if (mainCamera == null && presentationCamera != null
-            && presentationCamera.GetComponent<TopDownCameraFollow>() != null)
-            mainCamera = presentationCamera;
-        if (mainCamera == null)
-        {
-            foreach (TopDownCameraFollow follow in FindObjectsByType<TopDownCameraFollow>(FindObjectsInactive.Include))
-            {
-                Camera followedCamera = follow != null ? follow.GetComponent<Camera>() : null;
-                if (followedCamera != null) { mainCamera = followedCamera; break; }
-            }
-        }
+        mainCamera ??= player != null ? player.WorldCamera : null;
         mainCamera ??= Camera.main;
         if (mainCamera == null && presentationCamera != null) mainCamera = presentationCamera;
         if (cinematicCamera == null && presentationCamera != null && presentationCamera != mainCamera)
@@ -282,9 +270,17 @@ public sealed class BossPreludeController : MonoBehaviour
         }
 
         presentationCamera = cinematicCamera != null ? cinematicCamera : mainCamera;
-        cameraFollow = presentationCamera != null ? presentationCamera.GetComponent<TopDownCameraFollow>() : null;
         mainAudioListener = mainCamera != null ? mainCamera.GetComponent<AudioListener>() : null;
         cinematicAudioListener = cinematicCamera != null ? cinematicCamera.GetComponent<AudioListener>() : null;
+    }
+
+    private void SetPresentationCameraPosition(Vector3 position)
+    {
+        if (presentationCamera == null) return;
+        if (presentationCamera == mainCamera && player != null)
+            player.SetCameraCinematicOverride(this, position);
+        else
+            presentationCamera.transform.position = position;
     }
 
     private void SwitchToCinematicCamera()

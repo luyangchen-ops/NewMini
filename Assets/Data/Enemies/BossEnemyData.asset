@@ -28,7 +28,7 @@ MonoBehaviour:
   <MeleeAttackHitDelay>k__BackingField: 0.42
   <MeleeAttackDuration>k__BackingField: 0.78
   <Damage>k__BackingField: 22
-  <AttackSfx>k__BackingField: {fileID: 8300000, guid: e074cfd2ef6bb7c45887b7b44836d705, type: 3}
+  <AttackSfx>k__BackingField: {fileID: 8300000, guid: 6cac3535452eb4e40a6e4bc9029654b5, type: 3}
   <AttackSfxVolume>k__BackingField: 0.72
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4

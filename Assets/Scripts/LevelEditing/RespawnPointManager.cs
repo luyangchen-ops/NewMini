@@ -89,8 +89,8 @@ public sealed class RespawnPointManager : MonoBehaviour
             return false;
         }
 
-        ArenaCombatZone.ResetIncompleteZonesForRetry();
         player.RespawnAt(position);
+        ArenaCombatZone.ResetIncompleteZonesForRetry(position);
         PlayerRespawned?.Invoke();
         return true;
     }

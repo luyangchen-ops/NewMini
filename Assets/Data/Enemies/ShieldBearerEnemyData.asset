@@ -26,8 +26,8 @@ MonoBehaviour:
   <MeleeAttackIntervalVariance>k__BackingField: 0.2
   <MeleeAttackRecoveryDelayRange>k__BackingField: {x: 0.25, y: 0.7}
   <Damage>k__BackingField: 15
-  <AttackSfx>k__BackingField: {fileID: 8300000, guid: 8f83b3e8067f5c144b711f5d72ffb1e5, type: 3}
-  <AttackSfxVolume>k__BackingField: 0.65
+  <AttackSfx>k__BackingField: {fileID: 8300000, guid: 880788f61eaaf8d4ea523e0288e4a85c, type: 3}
+  <AttackSfxVolume>k__BackingField: 0.9
   <StayStill>k__BackingField: 0
   <IdleChance>k__BackingField: 0.4
   <RoamStateDurationRange>k__BackingField: {x: 0.5, y: 1.4}

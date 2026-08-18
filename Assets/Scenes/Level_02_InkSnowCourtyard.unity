@@ -367,6 +367,7 @@ MonoBehaviour:
   boundaryPadding: 0.7
   worldCamera: {fileID: 2063496737}
   cameraFollowDeadZone: 0.65
+  cameraFollowOffset: {x: 0, y: -0.6257}
   maximumDragDistance: 5
   dodgeDistance: 2.5
   dodgeDuration: 0.25
@@ -2013,22 +2014,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &730000001
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2063496734}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d1f44cb2f8564de2b1314d0424bd1a8e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TopDownCameraFollow
-  target: {fileID: 201417207}
-  mapRenderer: {fileID: 1467760578}
-  smoothTime: 0.08
-  targetOffset: {x: 0, y: -0.6257}
 --- !u!1 &740000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -5088,7 +5073,6 @@ GameObject:
   - component: {fileID: 2063496737}
   - component: {fileID: 2063496736}
   - component: {fileID: 2063496738}
-  - component: {fileID: 730000001}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera

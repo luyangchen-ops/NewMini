@@ -8,6 +8,7 @@ public sealed class PlayerCameraController
     private readonly Vector3 baseLocalPosition;
     private readonly float baseOrthographicSize;
     private readonly float followDeadZoneRatio;
+    private readonly Vector2 followOffset;
     private readonly List<AreaZoomRequest> areaZoomRequests = new List<AreaZoomRequest>();
 
     private bool killChainActive;
@@ -24,6 +25,8 @@ public sealed class PlayerCameraController
     private Vector3 currentFollowPosition;
     private float areaZoomResponse = 6f;
     private int areaZoomSequence;
+    private Object cinematicOverrideSource;
+    private Vector3 cinematicOverridePosition;
 
     private sealed class AreaZoomRequest
     {
@@ -33,7 +36,10 @@ public sealed class PlayerCameraController
         public int Sequence;
     }
 
-    public PlayerCameraController(Camera camera, float followDeadZoneRatio = .65f)
+    public PlayerCameraController(
+        Camera camera,
+        float followDeadZoneRatio = .65f,
+        Vector2 followOffset = default)
     {
         Camera = camera != null ? camera : Camera.main;
         if (Camera == null) return;
@@ -42,6 +48,7 @@ public sealed class PlayerCameraController
         baseLocalPosition = cameraTransform.localPosition;
         baseOrthographicSize = Camera.orthographicSize;
         this.followDeadZoneRatio = Mathf.Clamp(followDeadZoneRatio, .1f, 1f);
+        this.followOffset = followOffset;
         currentFollowPosition = cameraTransform.position;
     }
 
@@ -128,9 +135,32 @@ public sealed class PlayerCameraController
         areaZoomResponse = Mathf.Max(.01f, blendSpeed);
     }
 
+    /// <summary>Temporarily replaces normal follow, combat offset and shake with an authored camera position.</summary>
+    public void SetCinematicOverride(Object source, Vector3 position)
+    {
+        if (source == null || Camera == null) return;
+        cinematicOverrideSource = source;
+        cinematicOverridePosition = position;
+        currentFollowPosition = position;
+    }
+
+    public void ClearCinematicOverride(Object source)
+    {
+        if (source == null || cinematicOverrideSource != source) return;
+        cinematicOverrideSource = null;
+        if (cameraTransform != null) currentFollowPosition = cameraTransform.position;
+    }
+
     public void Tick(float unscaledDeltaTime)
     {
         if (Camera == null || cameraTransform == null) return;
+
+        if (cinematicOverrideSource != null)
+        {
+            cameraTransform.position = cinematicOverridePosition;
+            currentFollowPosition = cinematicOverridePosition;
+            return;
+        }
 
         float blend = 1f - Mathf.Exp(-response * Mathf.Max(0f, unscaledDeltaTime));
         Vector3 clampedFollowPosition = PlayAreaBounds.ClampCameraPosition(
@@ -177,6 +207,7 @@ public sealed class PlayerCameraController
 
     private void SetFollowTarget(Vector2 playerPosition)
     {
+        playerPosition += followOffset;
         if (!hasFollowTarget)
         {
             desiredFollowPosition = currentFollowPosition;

@@ -102,12 +102,13 @@ public sealed class ArenaCombatZone : MonoBehaviour
 
     /// <summary>
     /// Restores every uncleared arena to its pre-entry state for a checkpoint retry.
-    /// An arena that was active when the player died is immediately restarted: the
-    /// respawn point can be inside its trigger, so waiting for another enter event
-    /// would otherwise leave its newly cleared enemy list empty forever.
+    /// An arena that was active when the player died is immediately restarted only
+    /// when the player respawns inside its trigger. Checkpoints outside an arena keep
+    /// its entrance open until the player enters again.
+    /// Breakable props inside an immediately restarted arena are restored as well.
     /// Cleared arenas deliberately remain open and completed.
     /// </summary>
-    public static void ResetIncompleteZonesForRetry()
+    public static void ResetIncompleteZonesForRetry(Vector3 respawnPosition)
     {
         foreach (ArenaCombatZone zone in FindObjectsByType<ArenaCombatZone>(FindObjectsInactive.Exclude))
         {
@@ -115,7 +116,18 @@ public sealed class ArenaCombatZone : MonoBehaviour
 
             bool wasActive = zone.IsActive;
             zone.ResetZone();
-            if (wasActive) zone.ActivateZone();
+            if (!wasActive || !zone.ContainsPosition(respawnPosition)) continue;
+
+            zone.ResetBreakableProps();
+            zone.ActivateZone();
+        }
+    }
+
+    private void ResetBreakableProps()
+    {
+        foreach (BreakableMapProp prop in FindObjectsByType<BreakableMapProp>(FindObjectsInactive.Include))
+        {
+            if (prop != null && ContainsPosition(prop.transform.position)) prop.ResetProp();
         }
     }
 

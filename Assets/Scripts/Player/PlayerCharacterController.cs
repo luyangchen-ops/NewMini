@@ -17,6 +17,8 @@ public class PlayerCharacterController : MonoBehaviour
     [SerializeField] private Camera worldCamera;
     [Tooltip("Viewport dead-zone ratio. Lower values make the camera start following while the player is closer to screen center.")]
     [SerializeField, Range(.1f, 1f)] private float cameraFollowDeadZone = .65f;
+    [Tooltip("World-space framing offset applied to the normal player-follow target.")]
+    [SerializeField] private Vector2 cameraFollowOffset;
     [SerializeField, Min(.01f)] private float maximumDragDistance = 3f;
     [SerializeField, Min(0f)] private float dodgeDistance = 2.5f;
     [SerializeField, Min(.01f)] private float dodgeDuration = .25f;
@@ -289,7 +291,7 @@ public class PlayerCharacterController : MonoBehaviour
         body.freezeRotation = true;
         body.interpolation = RigidbodyInterpolation2D.Interpolate;
         input = new PlayerInputController();
-        cameraController = new PlayerCameraController(worldCamera, cameraFollowDeadZone);
+        cameraController = new PlayerCameraController(worldCamera, cameraFollowDeadZone, cameraFollowOffset);
         stateMachine = new PlayerStateMachine();
         visualAnimator ??= GetComponentInChildren<Animator>(true);
         if (visualRenderer == null && visualAnimator != null) visualRenderer = visualAnimator.GetComponent<SpriteRenderer>();
@@ -1046,6 +1048,20 @@ public class PlayerCharacterController : MonoBehaviour
     public void ExitCameraZoomZone(UnityEngine.Object source, float blendSpeed)
     {
         cameraController?.ExitAreaZoom(source, blendSpeed);
+    }
+
+    public Camera WorldCamera => cameraController?.Camera != null
+        ? cameraController.Camera
+        : worldCamera != null ? worldCamera : Camera.main;
+
+    public void SetCameraCinematicOverride(UnityEngine.Object source, Vector3 position)
+    {
+        cameraController?.SetCinematicOverride(source, position);
+    }
+
+    public void ClearCameraCinematicOverride(UnityEngine.Object source)
+    {
+        cameraController?.ClearCinematicOverride(source);
     }
 
     public void RestoreHealth(float amount)

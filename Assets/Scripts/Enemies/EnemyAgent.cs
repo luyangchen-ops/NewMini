@@ -29,6 +29,13 @@ public sealed class EnemyAgent : MonoBehaviour
     [SerializeField] private SpriteRenderer visualRenderer;
     [SerializeField, Min(0f)] private float boundaryPadding = 0.5f;
 
+    [Header("Obstacle Avoidance")]
+    [SerializeField] private bool avoidObstacles = true;
+    [SerializeField, Min(0.1f)] private float obstacleLookAheadDistance = 1.25f;
+    [SerializeField, Range(15f, 80f)] private float obstacleSideProbeAngle = 45f;
+    [SerializeField, Range(0.1f, 2f)] private float obstacleSteeringStrength = 1.15f;
+    [SerializeField, Min(0f)] private float obstacleSideCommitDuration = 0.45f;
+
     private Rigidbody2D body;
     private Collider2D[] bodyColliders;
     private Vector2 desiredVelocity;
@@ -45,6 +52,9 @@ public sealed class EnemyAgent : MonoBehaviour
     private float meleePerfectDodgeEndTime;
     private Vector2 spearThrustStartPosition;
     private bool isSpearWindupAnimating;
+    private readonly RaycastHit2D[] obstacleCastHits = new RaycastHit2D[16];
+    private float obstacleAvoidanceSide;
+    private float obstacleSideCommitEndTime;
     private EnemyStateMachine stateMachine;
     private BossCombatController bossCombatController;
 
@@ -225,11 +235,119 @@ public sealed class EnemyAgent : MonoBehaviour
                 Mathf.Max(data.MoveSpeed, desiredVelocity.magnitude));
         }
 
+        movementVelocity = ApplyObstacleAvoidance(movementVelocity);
+
         Vector2 nextPosition = clampedPosition
             + movementVelocity * (PlayerCharacterController.EnemyTimeScale * Time.fixedDeltaTime);
         Vector2 clampedNext = nextPosition;
         PlayAreaBounds.TryClampPosition(nextPosition, boundaryPadding, out clampedNext);
         body.linearVelocity = (clampedNext - clampedPosition) / Time.fixedDeltaTime;
+    }
+
+    private Vector2 ApplyObstacleAvoidance(Vector2 velocity)
+    {
+        float speed = velocity.magnitude;
+        if (!avoidObstacles || speed <= .0001f || body == null) return velocity;
+
+        Vector2 forward = velocity / speed;
+        float castDistance = obstacleLookAheadDistance + speed * Time.fixedDeltaTime;
+        if (!TryGetNearestObstacle(forward, castDistance, out RaycastHit2D obstacleHit))
+        {
+            if (Time.time >= obstacleSideCommitEndTime) obstacleAvoidanceSide = 0f;
+            return velocity;
+        }
+
+        if (obstacleAvoidanceSide == 0f || Time.time >= obstacleSideCommitEndTime)
+        {
+            obstacleAvoidanceSide = ChooseAvoidanceSide(forward, castDistance);
+            obstacleSideCommitEndTime = Time.time + obstacleSideCommitDuration;
+        }
+
+        // The hit normal pushes the enemy away from the surface while the tangent
+        // carries it around the obstacle. Keeping the chosen side briefly prevents
+        // rapid left/right flipping when approaching a wall head-on.
+        Vector2 tangent = new Vector2(-obstacleHit.normal.y, obstacleHit.normal.x);
+        if (Vector2.Dot(tangent, Rotate90(forward) * obstacleAvoidanceSide) < 0f)
+            tangent = -tangent;
+
+        float proximity = 1f - Mathf.Clamp01(obstacleHit.distance / castDistance);
+        float steering = Mathf.Clamp01(proximity * obstacleSteeringStrength);
+        Vector2 steeredDirection = forward * (1f - steering * .85f)
+            + tangent * (steering * 1.2f)
+            + obstacleHit.normal * (steering * .35f);
+        return steeredDirection.sqrMagnitude > .0001f
+            ? steeredDirection.normalized * speed
+            : tangent * speed;
+    }
+
+    private float ChooseAvoidanceSide(Vector2 forward, float probeDistance)
+    {
+        Vector2 leftDirection = Rotate(forward, obstacleSideProbeAngle);
+        Vector2 rightDirection = Rotate(forward, -obstacleSideProbeAngle);
+        float leftClearance = GetObstacleClearance(leftDirection, probeDistance);
+        float rightClearance = GetObstacleClearance(rightDirection, probeDistance);
+
+        if (!Mathf.Approximately(leftClearance, rightClearance))
+            return leftClearance > rightClearance ? 1f : -1f;
+
+        if (HasTarget)
+        {
+            Vector2 toTarget = (Vector2)target.position - body.position;
+            float leftProgress = Vector2.Dot(leftDirection, toTarget);
+            float rightProgress = Vector2.Dot(rightDirection, toTarget);
+            if (!Mathf.Approximately(leftProgress, rightProgress))
+                return leftProgress > rightProgress ? 1f : -1f;
+        }
+
+        // Stable tie-breaker keeps different enemies from making the same choice.
+        return (GetEntityId().GetHashCode() & 1) == 0 ? 1f : -1f;
+    }
+
+    private float GetObstacleClearance(Vector2 direction, float distance)
+    {
+        return TryGetNearestObstacle(direction, distance, out RaycastHit2D hit)
+            ? hit.distance
+            : distance;
+    }
+
+    private bool TryGetNearestObstacle(Vector2 direction, float distance, out RaycastHit2D nearestHit)
+    {
+        ContactFilter2D filter = new ContactFilter2D
+        {
+            useTriggers = false,
+            useLayerMask = false
+        };
+        int hitCount = body.Cast(direction, filter, obstacleCastHits, distance);
+        float nearestDistance = float.PositiveInfinity;
+        nearestHit = default;
+
+        for (int i = 0; i < hitCount; i++)
+        {
+            RaycastHit2D hit = obstacleCastHits[i];
+            if (!IsStaticObstacle(hit.collider) || hit.distance >= nearestDistance) continue;
+            nearestDistance = hit.distance;
+            nearestHit = hit;
+        }
+
+        return nearestDistance < float.PositiveInfinity;
+    }
+
+    private static bool IsStaticObstacle(Collider2D candidate)
+    {
+        if (candidate == null || candidate.isTrigger) return false;
+        Rigidbody2D candidateBody = candidate.attachedRigidbody;
+        return candidateBody == null || candidateBody.bodyType == RigidbodyType2D.Static;
+    }
+
+    private static Vector2 Rotate90(Vector2 direction) => new Vector2(-direction.y, direction.x);
+
+    private static Vector2 Rotate(Vector2 direction, float degrees)
+    {
+        float radians = degrees * Mathf.Deg2Rad;
+        float sin = Mathf.Sin(radians);
+        float cos = Mathf.Cos(radians);
+        return new Vector2(direction.x * cos - direction.y * sin,
+            direction.x * sin + direction.y * cos);
     }
 
     public void SetDesiredVelocity(Vector2 velocity)
@@ -494,7 +612,6 @@ public sealed class EnemyAgent : MonoBehaviour
             visualAnimator.ResetTrigger(Attack);
             visualAnimator.SetTrigger(Attack);
         }
-        PlayAttackSfx();
     }
 
     /// <summary>Starts a behavior-tree-authored Boss strike with an explicit dodge window.</summary>
@@ -513,7 +630,6 @@ public sealed class EnemyAgent : MonoBehaviour
             visualAnimator.ResetTrigger(Attack);
             visualAnimator.SetTrigger(Attack);
         }
-        PlayAttackSfx();
     }
 
     public void CancelBossBehaviorAttack()
@@ -532,6 +648,7 @@ public sealed class EnemyAgent : MonoBehaviour
             return;
         }
 
+        PlayAttackSfx();
         TryDamageTarget();
         if (!IsBossCombatant)
             fireCooldown = data.GetMeleeAttackCooldown(data.FireInterval);
@@ -556,7 +673,6 @@ public sealed class EnemyAgent : MonoBehaviour
             visualAnimator.ResetTrigger(Attack);
             visualAnimator.SetTrigger(Attack);
         }
-        PlayAttackSfx();
     }
 
     public bool TryContinueBossAttackSequence()
@@ -576,7 +692,6 @@ public sealed class EnemyAgent : MonoBehaviour
             visualAnimator.ResetTrigger(Attack);
             visualAnimator.SetTrigger(Attack);
         }
-        PlayAttackSfx();
     }
 
     public void BeginSpearThrust(Vector2 direction)
@@ -584,6 +699,7 @@ public sealed class EnemyAgent : MonoBehaviour
         isSpearWindupAnimating = false;
         spearThrustStartPosition = body.position;
         Face(direction.x);
+        PlayAttackSfx();
         float impactTime = Time.time + data.SpearThrustDuration * data.SpearImpactNormalizedTime;
         float perfectDodgeHalfDuration = data.SpearPerfectDodgeWindowDuration * .5f;
         meleePerfectDodgeStartTime = impactTime - perfectDodgeHalfDuration;
@@ -641,6 +757,7 @@ public sealed class EnemyAgent : MonoBehaviour
             return;
         }
 
+        PlayAttackSfx();
         TryDamageTarget();
         fireCooldown = data.GetMeleeAttackCooldown(data.ShieldAttackInterval);
     }
@@ -710,6 +827,7 @@ public sealed class EnemyAgent : MonoBehaviour
     {
         SetDesiredVelocity(Vector2.zero);
         FaceTarget();
+        GameAudioManager.PlaySfx(GameSfx.ShieldWarriorBlock, .82f);
         if (supportsBlock)
         {
             visualAnimator.ResetTrigger(Block);

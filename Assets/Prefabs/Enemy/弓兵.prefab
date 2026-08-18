@@ -142,7 +142,6 @@ MonoBehaviour:
   worldCamera: {fileID: 0}
   visualAnimator: {fileID: 1005}
   visualRenderer: {fileID: 1002}
-  attackSfxSource: {fileID: 0}
   boundaryPadding: 0.5
 --- !u!95 &1005
 Animator:
