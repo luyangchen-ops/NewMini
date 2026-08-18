@@ -108,11 +108,11 @@ public static class KillChainFeedbackSceneAuthoring
         Stretch(layer.GetComponent<RectTransform>());
 
         BuildActivePrompt(layer.transform, out GameObject active, out Text activeCount, out Text activeTitle,
-            out Text activeReward, out Image activeAccent, out RectTransform activeInkRevealMask,
+            out Image activeAccent, out RectTransform activeInkRevealMask,
             out CanvasGroup activeTextGroup, out CanvasGroup activeBloodInkGroup, out RectTransform activeBloodInk);
 
         GameObject settlement = NewUi("Panel_连斩结算", layer.transform, typeof(CanvasGroup));
-        Rect(settlement.GetComponent<RectTransform>(), new Vector2(.82f, .79f), new Vector2(.82f, .79f), Vector2.zero, new Vector2(520f, 175f));
+        Rect(settlement.GetComponent<RectTransform>(), new Vector2(.5f, .79f), new Vector2(.5f, .79f), Vector2.zero, new Vector2(520f, 175f));
         settlement.GetComponent<CanvasGroup>().alpha = 0f;
         Image settlementInk = ImageNode("Img_结算墨底", settlement.transform, Vector2.zero, new Vector2(500f, 212f), Color.white);
         settlementInk.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(SettlementBannerPath);
@@ -135,7 +135,6 @@ public static class KillChainFeedbackSceneAuthoring
         serialized.FindProperty("activeChainContent").objectReferenceValue = active.GetComponent<RectTransform>();
         serialized.FindProperty("activeCountText").objectReferenceValue = activeCount;
         serialized.FindProperty("activeTitleText").objectReferenceValue = activeTitle;
-        serialized.FindProperty("activeRewardHintText").objectReferenceValue = activeReward;
         serialized.FindProperty("activeAccent").objectReferenceValue = activeAccent;
         serialized.FindProperty("activeInkRevealMask").objectReferenceValue = activeInkRevealMask;
         serialized.FindProperty("activeTextGroup").objectReferenceValue = activeTextGroup;
@@ -171,7 +170,7 @@ public static class KillChainFeedbackSceneAuthoring
         if (oldActive != null) Object.DestroyImmediate(oldActive.gameObject);
 
         BuildActivePrompt(layer, out GameObject active, out Text activeCount, out Text activeTitle,
-            out Text activeReward, out Image activeAccent, out RectTransform activeInkRevealMask,
+            out Image activeAccent, out RectTransform activeInkRevealMask,
             out CanvasGroup activeTextGroup, out CanvasGroup activeBloodInkGroup, out RectTransform activeBloodInk);
         active.transform.SetSiblingIndex(siblingIndex);
 
@@ -180,7 +179,6 @@ public static class KillChainFeedbackSceneAuthoring
         serialized.FindProperty("activeChainContent").objectReferenceValue = active.GetComponent<RectTransform>();
         serialized.FindProperty("activeCountText").objectReferenceValue = activeCount;
         serialized.FindProperty("activeTitleText").objectReferenceValue = activeTitle;
-        serialized.FindProperty("activeRewardHintText").objectReferenceValue = activeReward;
         serialized.FindProperty("activeAccent").objectReferenceValue = activeAccent;
         serialized.FindProperty("activeInkRevealMask").objectReferenceValue = activeInkRevealMask;
         serialized.FindProperty("activeTextGroup").objectReferenceValue = activeTextGroup;
@@ -190,28 +188,28 @@ public static class KillChainFeedbackSceneAuthoring
     }
 
     private static void BuildActivePrompt(Transform parent, out GameObject active, out Text activeCount,
-        out Text activeTitle, out Text activeReward, out Image activeAccent,
+        out Text activeTitle, out Image activeAccent,
         out RectTransform activeInkRevealMask, out CanvasGroup activeTextGroup,
         out CanvasGroup activeBloodInkGroup, out RectTransform activeBloodInk)
     {
         active = NewUi("Panel_连斩进行中", parent, typeof(CanvasGroup));
-        Rect(active.GetComponent<RectTransform>(), new Vector2(.90f, .61f), new Vector2(.90f, .61f),
-            Vector2.zero, new Vector2(300f, 160f));
+        Rect(active.GetComponent<RectTransform>(), new Vector2(0f, .61f), new Vector2(0f, .61f),
+            new Vector2(245f, 0f), new Vector2(450f, 240f));
         active.GetComponent<CanvasGroup>().alpha = 0f;
 
         GameObject inkMask = NewUi("Mask_连斩墨迹揭示", active.transform, typeof(RectMask2D));
         activeInkRevealMask = inkMask.GetComponent<RectTransform>();
         Rect(activeInkRevealMask, new Vector2(.5f, .5f), new Vector2(.5f, .5f),
-            new Vector2(-145f, -12f), new Vector2(290f, 112f));
+            new Vector2(-217.5f, -18f), new Vector2(435f, 168f));
         activeInkRevealMask.pivot = new Vector2(0f, .5f);
-        Image activeInk = ImageNode("Img_连斩斩痕墨迹", inkMask.transform, new Vector2(145f, 0f),
-            new Vector2(290f, 145f), Color.white);
+        Image activeInk = ImageNode("Img_连斩斩痕墨迹", inkMask.transform, new Vector2(217.5f, 0f),
+            new Vector2(435f, 218f), Color.white);
         activeInk.sprite = LoadUiSprite(ActiveSlashInkPath);
         activeInk.preserveAspect = true;
         activeInk.rectTransform.localEulerAngles = new Vector3(0f, 0f, -2f);
 
-        Image bloodInk = ImageNode("Img_连斩血墨", inkMask.transform, new Vector2(145f, 0f),
-            new Vector2(290f, 145f), Color.white);
+        Image bloodInk = ImageNode("Img_连斩血墨", inkMask.transform, new Vector2(217.5f, 0f),
+            new Vector2(435f, 218f), Color.white);
         bloodInk.sprite = LoadUiSprite(ActiveBloodInkPath);
         bloodInk.preserveAspect = true;
         bloodInk.rectTransform.localEulerAngles = new Vector3(0f, 0f, -2f);
@@ -222,19 +220,16 @@ public static class KillChainFeedbackSceneAuthoring
 
         GameObject textGroup = NewUi("Group_连斩文字", active.transform, typeof(CanvasGroup));
         Rect(textGroup.GetComponent<RectTransform>(), new Vector2(.5f, .5f), new Vector2(.5f, .5f),
-            Vector2.zero, new Vector2(300f, 160f));
+            Vector2.zero, new Vector2(450f, 240f));
         activeTextGroup = textGroup.GetComponent<CanvasGroup>();
         activeTextGroup.alpha = 0f;
         Color warmInkText = new(.94f, .90f, .78f, 1f);
-        activeCount = TextNode("Txt_连斩数字", textGroup.transform, new Vector2(-16f, 45f),
-            new Vector2(110f, 72f), "0", 58, warmInkText, FontStyle.Bold);
-        AddInkOutline(activeCount, new Color(.06f, .05f, .045f, .88f), new Vector2(1.5f, -1.5f));
-        activeTitle = TextNode("Txt_连斩标题", textGroup.transform, new Vector2(58f, 40f),
-            new Vector2(62f, 32f), "伺 机", 18, warmInkText, FontStyle.Bold);
-        AddInkOutline(activeTitle, new Color(.06f, .05f, .045f, .82f), new Vector2(1f, -1f));
-        activeReward = TextNode("Txt_连斩奖励提示", textGroup.transform, new Vector2(20f, -51f),
-            new Vector2(205f, 24f), "再斩 3 人 · 气势加倍", 13,
-            new Color(warmInkText.r, warmInkText.g, warmInkText.b, .72f));
+        activeCount = TextNode("Txt_连斩数字", textGroup.transform, new Vector2(-35f, 18f),
+            new Vector2(180f, 120f), "0", 96, warmInkText, FontStyle.Bold);
+        AddInkOutline(activeCount, new Color(.04f, .035f, .03f, .94f), new Vector2(2.5f, -2.5f));
+        activeTitle = TextNode("Txt_连斩标题", textGroup.transform, new Vector2(100f, 10f),
+            new Vector2(110f, 56f), "伺 机", 32, warmInkText, FontStyle.Bold);
+        AddInkOutline(activeTitle, new Color(.04f, .035f, .03f, .92f), new Vector2(2f, -2f));
     }
 
     private static void BindPlayerEvents(PlayerCharacterController player, KillChainSettlementFeedback feedback)

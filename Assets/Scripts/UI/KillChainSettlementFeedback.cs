@@ -13,7 +13,6 @@ public sealed class KillChainSettlementFeedback : MonoBehaviour
     [SerializeField] private RectTransform activeChainContent;
     [SerializeField] private Text activeCountText;
     [SerializeField] private Text activeTitleText;
-    [SerializeField] private Text activeRewardHintText;
     [SerializeField] private Image activeAccent;
     [SerializeField] private RectTransform activeInkRevealMask;
     [SerializeField] private CanvasGroup activeTextGroup;
@@ -203,14 +202,6 @@ public sealed class KillChainSettlementFeedback : MonoBehaviour
             activeTitleText.color = activeTextColor;
         }
         bool bonusActive = killCount >= bonusMomentumThreshold;
-        if (activeRewardHintText != null)
-        {
-            int remaining = Mathf.Max(0, bonusMomentumThreshold - killCount);
-            activeRewardHintText.text = bonusActive ? "势起 · 气势加倍" : $"再斩 {remaining} 人 · 气势加倍";
-            activeRewardHintText.color = bonusActive
-                ? rewardColor
-                : new Color(activeTextColor.r, activeTextColor.g, activeTextColor.b, .72f);
-        }
         if (activeAccent != null)
             activeAccent.color = bonusActive ? Color.white : new Color(1f, 1f, 1f, .78f);
     }
