@@ -924,7 +924,6 @@ MonoBehaviour:
   effectAnimator: {fileID: 6245786512669643351}
   effectRenderer: {fileID: 6752726645437474258}
   characterVisual: {fileID: 4760778042625739405}
-  characterAnimator: {fileID: 7918957539251434405}
   effectDuration: 0.75
 --- !u!1 &6287507317972642017
 GameObject:

@@ -35,6 +35,7 @@ public sealed class ExtraHudController : MonoBehaviour
         if (player != null)
         {
             player.HealthChanged += RefreshHealth;
+            RefreshHealth(player.CurrentHealth, player.MaximumHealth);
         }
     }
 

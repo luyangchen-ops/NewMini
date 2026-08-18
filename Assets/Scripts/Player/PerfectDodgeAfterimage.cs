@@ -6,25 +6,19 @@ public sealed class PerfectDodgeAfterimage : MonoBehaviour
     [SerializeField] private Animator effectAnimator;
     [SerializeField] private SpriteRenderer effectRenderer;
     [SerializeField] private GameObject characterVisual;
-    [SerializeField] private Animator characterAnimator;
     [SerializeField, Min(0.01f)] private float effectDuration = 0.5f;
 
     private Coroutine hideRoutine;
-    private static readonly int IdleState = Animator.StringToHash("Idle");
+
+    private void Awake()
+    {
+        effectAnimator ??= GetComponent<Animator>();
+        effectRenderer ??= GetComponent<SpriteRenderer>();
+    }
 
     public void Play(bool flipX)
     {
         gameObject.SetActive(true);
-
-        if (effectAnimator == null)
-        {
-            effectAnimator = GetComponent<Animator>();
-        }
-
-        if (effectRenderer == null)
-        {
-            effectRenderer = GetComponent<SpriteRenderer>();
-        }
 
         if (effectRenderer != null)
         {
@@ -58,15 +52,14 @@ public sealed class PerfectDodgeAfterimage : MonoBehaviour
             hideRoutine = null;
         }
 
-        RestoreCharacter();
-        gameObject.SetActive(false);
+        if (gameObject.activeSelf) gameObject.SetActive(false);
+        else RestoreCharacter();
     }
 
     private IEnumerator HideAfterDelay()
     {
         yield return new WaitForSeconds(effectDuration);
         hideRoutine = null;
-        RestoreCharacter();
         gameObject.SetActive(false);
     }
 
@@ -78,11 +71,6 @@ public sealed class PerfectDodgeAfterimage : MonoBehaviour
         }
 
         characterVisual.SetActive(true);
-        if (characterAnimator != null && characterAnimator.isActiveAndEnabled)
-        {
-            characterAnimator.Play(IdleState, 0, 0f);
-            characterAnimator.Update(0f);
-        }
     }
 
     private void OnDisable()

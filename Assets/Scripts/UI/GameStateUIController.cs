@@ -21,7 +21,9 @@ public sealed class GameStateUIController : MonoBehaviour
     [SerializeField] private Button helpNextButton;
     [SerializeField] private Text helpPageIndicator;
     [SerializeField] private Button deathContinueButton;
+    [SerializeField] private Button deathHeavenlyAidButton;
     [SerializeField] private Button victoryRestartButton;
+    [SerializeField] private LevelBossEncounterController bossEncounter;
     [Header("Navigation")]
     [SerializeField] private string mainMenuSceneName = "Begin";
     [SerializeField] private SceneFlowController sceneFlow;
@@ -40,6 +42,7 @@ public sealed class GameStateUIController : MonoBehaviour
         player ??= FindAnyObjectByType<PlayerCharacterController>();
         respawnPointManager ??= FindAnyObjectByType<RespawnPointManager>();
         sceneFlow ??= FindAnyObjectByType<SceneFlowController>();
+        bossEncounter ??= FindAnyObjectByType<LevelBossEncounterController>(FindObjectsInactive.Include);
         if (gameplayHudRoot == null) gameplayHudRoot = GameObject.Find("Root_角色战斗HUD");
         panelPause?.SetActive(false); panelHelp?.SetActive(false); panelDeath?.SetActive(false);
         RefreshHelpPages();
@@ -125,6 +128,13 @@ public sealed class GameStateUIController : MonoBehaviour
         EventSystem.current?.SetSelectedGameObject(null);
     }
 
+    public void ContinueWithHeavenlyAid()
+    {
+        bossEncounter ??= FindAnyObjectByType<LevelBossEncounterController>(FindObjectsInactive.Include);
+        if (bossEncounter == null || !bossEncounter.TryRequestHeavenlyAid()) return;
+        ContinueFromCheckpoint();
+    }
+
     public void ReturnToMainMenu()
     {
         isPauseShown = false; isHelpShown = false; isDeathShown = false; isVictoryShown = false; Time.timeScale = 1f;
@@ -142,6 +152,20 @@ public sealed class GameStateUIController : MonoBehaviour
     private void ShowDeath()
     {
         if (isDeathShown) return;
+        bossEncounter ??= FindAnyObjectByType<LevelBossEncounterController>(FindObjectsInactive.Include);
+        respawnPointManager ??= RespawnPointManager.Instance;
+        bool bossFightDeath = bossEncounter != null
+            && bossEncounter.IsBossStageCheckpoint(respawnPointManager);
+        if (deathHeavenlyAidButton != null)
+        {
+            deathHeavenlyAidButton.gameObject.SetActive(bossFightDeath);
+            deathHeavenlyAidButton.interactable = bossFightDeath && bossEncounter.CanRequestHeavenlyAid;
+            Text label = deathHeavenlyAidButton.GetComponentInChildren<Text>(true);
+            if (label != null)
+                label.text = bossEncounter != null && bossEncounter.CanRequestHeavenlyAid
+                    ? "寻求天道帮助（Boss 最大血量 -33）"
+                    : "天道助力已至极限（Boss 最低血量 33）";
+        }
         isPauseShown = false; isHelpShown = false; isDeathShown = true; panelPause?.SetActive(false); panelHelp?.SetActive(false); EnterFrozenUiState(); panelDeath?.SetActive(true); Select(deathContinueButton);
     }
 

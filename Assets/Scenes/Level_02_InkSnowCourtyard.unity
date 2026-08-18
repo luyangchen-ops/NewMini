@@ -4223,7 +4223,6 @@ MonoBehaviour:
   effectAnimator: {fileID: 1561073514}
   effectRenderer: {fileID: 1561073515}
   characterVisual: {fileID: 831400100}
-  characterAnimator: {fileID: 831400103}
   effectDuration: 0.75
 --- !u!95 &1561073514
 Animator:

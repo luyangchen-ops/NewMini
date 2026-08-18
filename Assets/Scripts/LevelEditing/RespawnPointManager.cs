@@ -90,6 +90,7 @@ public sealed class RespawnPointManager : MonoBehaviour
         }
 
         player.RespawnAt(position);
+        BreakableMapProp.ResetAllForCheckpointRetry();
         ArenaCombatZone.ResetIncompleteZonesForRetry(position);
         PlayerRespawned?.Invoke();
         return true;

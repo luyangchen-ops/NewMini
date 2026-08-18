@@ -16,6 +16,7 @@ public sealed class BorrowedLifeBossController : MonoBehaviour
     [SerializeField] private UnityEvent onAllContractsBroken = new UnityEvent();
 
     public int RemainingContracts { get; private set; }
+    public int MaximumContracts => Mathf.Max(1, startingContracts);
     public int Phase { get; private set; } = 1;
 
     private void Awake()
@@ -27,6 +28,15 @@ public sealed class BorrowedLifeBossController : MonoBehaviour
     public void ConfigurePresentation(Text countText)
     {
         contractCountText = countText;
+        RefreshPresentation();
+    }
+
+    /// <summary>Applies the encounter's current difficulty before the Boss fight begins.</summary>
+    public void ConfigureMaximumContracts(int maximumContracts)
+    {
+        startingContracts = Mathf.Max(1, maximumContracts);
+        RemainingContracts = startingContracts;
+        Phase = 1;
         RefreshPresentation();
     }
 

@@ -28,6 +28,22 @@ public static class GameStateUiSceneBuilder
         Build(scene);
     }
 
+    [MenuItem("NewMini/UI/Add Boss Heavenly Aid To Death Screens")]
+    public static void AddBossHeavenlyAidToDeathScreens()
+    {
+        string[] scenePaths = { ExtraScenePath, "Assets/Scenes/Level_LD.unity" };
+        foreach (string scenePath in scenePaths)
+        {
+            Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+            GameStateUIController controller = Object.FindAnyObjectByType<GameStateUIController>(FindObjectsInactive.Include);
+            if (controller == null) throw new System.InvalidOperationException($"{scenePath} needs a GameStateUIController.");
+            EnsureBossHeavenlyAidButton(scene, controller);
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+        }
+        AssetDatabase.SaveAssets();
+    }
+
     private static void EnsureExtraScene()
     {
         if (EditorApplication.isPlayingOrWillChangePlaymode) return;
@@ -96,7 +112,7 @@ public static class GameStateUiSceneBuilder
                 "Page_04_KillChain",
                 "Assets/Resources/UI/Tutorial/Artwork/Tutorial_Page04_KillChain.png",
                 "完美闪避后：连续处决",
-                "将鼠标移向范围内敌人，左键发动连斩\n连续选择下一个目标；右键可取消"),
+                "将鼠标移向范围内敌人，左键发动连斩\n连续选择下一个目标；右键可取消\n连击击杀可回复生命，残血时注意利用"),
             HelpPage(
                 pagesRoot.transform,
                 "Page_05_Ultimate",
@@ -113,16 +129,17 @@ public static class GameStateUiSceneBuilder
         Text deathMark = TextNode("Txt_DeathMark", death.transform, new Vector2(0f, 250f), new Vector2(520f, 300f), "卒", 220, new Color(.78f, .015f, .02f, 1f)); deathMark.fontStyle = FontStyle.Bold;
         TextNode("Txt_DeathTitle", death.transform, new Vector2(0f, 75f), new Vector2(700f, 80f), "此身已殒", 42, new Color(.92f, .82f, .78f, 1f));
         Button deathContinue = ButtonNode("Btn_DeathContinue", death.transform, new Vector2(0f, -75f), "从上一个存档点继续");
-        Button deathMenu = ButtonNode("Btn_DeathMainMenu", death.transform, new Vector2(0f, -205f), "返回主菜单");
+        Button deathHeavenlyAid = ButtonNode("Btn_DeathHeavenlyAid", death.transform, new Vector2(0f, -185f), "寻求天道帮助（Boss 最大血量 -33）", new Vector2(560f, 82f), 24);
+        Button deathMenu = ButtonNode("Btn_DeathMainMenu", death.transform, new Vector2(0f, -295f), "返回主菜单");
 
         GameStateUIController controller = root.GetComponent<GameStateUIController>();
         RespawnPointManager respawnManager = root.GetComponent<RespawnPointManager>();
-        UnityEventTools.AddPersistentListener(pauseContinue.onClick, controller.ContinueFromCheckpoint); UnityEventTools.AddPersistentListener(pauseHelp.onClick, controller.ShowHelp); UnityEventTools.AddPersistentListener(pauseMenu.onClick, controller.ReturnToMainMenu); UnityEventTools.AddPersistentListener(previous.onClick, controller.PreviousHelpPage); UnityEventTools.AddPersistentListener(next.onClick, controller.NextHelpPage); UnityEventTools.AddPersistentListener(helpBack.onClick, controller.CloseHelp); UnityEventTools.AddPersistentListener(deathContinue.onClick, controller.ContinueFromCheckpoint); UnityEventTools.AddPersistentListener(deathMenu.onClick, controller.ReturnToMainMenu);
+        UnityEventTools.AddPersistentListener(pauseContinue.onClick, controller.ContinueFromCheckpoint); UnityEventTools.AddPersistentListener(pauseHelp.onClick, controller.ShowHelp); UnityEventTools.AddPersistentListener(pauseMenu.onClick, controller.ReturnToMainMenu); UnityEventTools.AddPersistentListener(previous.onClick, controller.PreviousHelpPage); UnityEventTools.AddPersistentListener(next.onClick, controller.NextHelpPage); UnityEventTools.AddPersistentListener(helpBack.onClick, controller.CloseHelp); UnityEventTools.AddPersistentListener(deathContinue.onClick, controller.ContinueFromCheckpoint); UnityEventTools.AddPersistentListener(deathHeavenlyAid.onClick, controller.ContinueWithHeavenlyAid); UnityEventTools.AddPersistentListener(deathMenu.onClick, controller.ReturnToMainMenu);
         PlayerCharacterController player = Object.FindAnyObjectByType<PlayerCharacterController>();
         SerializedObject serialized = new SerializedObject(controller);
         serialized.FindProperty("player").objectReferenceValue = player; serialized.FindProperty("respawnPointManager").objectReferenceValue = respawnManager; serialized.FindProperty("gameplayHudRoot").objectReferenceValue = GameObject.Find("Root_角色战斗HUD"); serialized.FindProperty("panelPause").objectReferenceValue = pause; serialized.FindProperty("panelHelp").objectReferenceValue = help; serialized.FindProperty("panelDeath").objectReferenceValue = death; serialized.FindProperty("pauseContinueButton").objectReferenceValue = pauseContinue; serialized.FindProperty("helpPreviousButton").objectReferenceValue = previous; serialized.FindProperty("helpNextButton").objectReferenceValue = next; serialized.FindProperty("helpPageIndicator").objectReferenceValue = pageIndicator; serialized.FindProperty("helpPages").arraySize = pages.Length;
         for (int i = 0; i < pages.Length; i++) serialized.FindProperty("helpPages").GetArrayElementAtIndex(i).objectReferenceValue = pages[i];
-        serialized.FindProperty("deathContinueButton").objectReferenceValue = deathContinue; serialized.ApplyModifiedPropertiesWithoutUndo();
+        serialized.FindProperty("deathContinueButton").objectReferenceValue = deathContinue; serialized.FindProperty("deathHeavenlyAidButton").objectReferenceValue = deathHeavenlyAid; serialized.FindProperty("bossEncounter").objectReferenceValue = Object.FindAnyObjectByType<LevelBossEncounterController>(FindObjectsInactive.Include); serialized.ApplyModifiedPropertiesWithoutUndo();
 
         RespawnPoint[] orderedPoints = Object.FindObjectsByType<RespawnPoint>(FindObjectsInactive.Include)
             .Where(point => point.gameObject.scene == scene)
@@ -135,7 +152,43 @@ public static class GameStateUiSceneBuilder
         for (int i = 0; i < orderedPoints.Length; i++) pointSequence.GetArrayElementAtIndex(i).objectReferenceValue = orderedPoints[i];
         serializedManager.FindProperty("startingPointIndex").intValue = 0;
         serializedManager.ApplyModifiedPropertiesWithoutUndo();
-        pause.SetActive(false); help.SetActive(false); death.SetActive(false); EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene); AssetDatabase.SaveAssets();
+        deathHeavenlyAid.gameObject.SetActive(false); pause.SetActive(false); help.SetActive(false); death.SetActive(false); EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene); AssetDatabase.SaveAssets();
+    }
+
+    private static void EnsureBossHeavenlyAidButton(Scene scene, GameStateUIController controller)
+    {
+        SerializedObject serialized = new(controller);
+        GameObject death = serialized.FindProperty("panelDeath").objectReferenceValue as GameObject;
+        if (death == null) throw new System.InvalidOperationException($"{scene.path} needs an authored death panel.");
+
+        Button deathContinue = serialized.FindProperty("deathContinueButton").objectReferenceValue as Button;
+        Button deathMenu = death.transform.Find("Btn_DeathMainMenu")?.GetComponent<Button>();
+        if (deathContinue != null) deathContinue.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -75f);
+        if (deathMenu != null) deathMenu.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -295f);
+
+        Transform existing = death.transform.Find("Btn_DeathHeavenlyAid");
+        Button aid = existing != null
+            ? existing.GetComponent<Button>()
+            : ButtonNode("Btn_DeathHeavenlyAid", death.transform, new Vector2(0f, -185f),
+                "寻求天道帮助（Boss 最大血量 -33）", new Vector2(560f, 82f), 24);
+        aid.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -185f);
+        aid.GetComponent<RectTransform>().sizeDelta = new Vector2(560f, 82f);
+        if (!HasPersistentListener(aid, controller, nameof(GameStateUIController.ContinueWithHeavenlyAid)))
+            UnityEventTools.AddPersistentListener(aid.onClick, controller.ContinueWithHeavenlyAid);
+        aid.gameObject.SetActive(false);
+
+        serialized.FindProperty("deathHeavenlyAidButton").objectReferenceValue = aid;
+        serialized.FindProperty("bossEncounter").objectReferenceValue = Object.FindAnyObjectByType<LevelBossEncounterController>(FindObjectsInactive.Include);
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static bool HasPersistentListener(Button button, Object target, string methodName)
+    {
+        for (int i = 0; i < button.onClick.GetPersistentEventCount(); i++)
+            if (button.onClick.GetPersistentTarget(i) == target
+                && button.onClick.GetPersistentMethodName(i) == methodName)
+                return true;
+        return false;
     }
 
     private static void EnsureEventSystem(Scene scene)

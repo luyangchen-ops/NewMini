@@ -13,6 +13,11 @@ public sealed class LevelBossEncounterController : MonoBehaviour
     private const string BossDialogueSpeakerName = "\u88D8\u4E5D";
     private const string BossDeathDialogueCue = "boss_death";
 
+    [Header("Heavenly Aid Difficulty")]
+    [SerializeField, Min(1)] private int initialBossMaximumContracts = 99;
+    [SerializeField, Min(1)] private int heavenlyAidReduction = 33;
+    [SerializeField, Min(1)] private int minimumBossMaximumContracts = 33;
+
     [Header("Authored Boss Spawn")]
     [SerializeField] private GameObject bossPrefab;
     [SerializeField] private Transform bossSpawnPoint;
@@ -26,9 +31,11 @@ public sealed class LevelBossEncounterController : MonoBehaviour
     [SerializeField] private Transform[] reinforcementSpawnPoints;
     [SerializeField, Min(1)] private int reinforcementCount = 5;
     [SerializeField, Min(0f)] private float reinforcementSpawnDelay = 10f;
+    [SerializeField, Range(0f, 1f)] private float shieldReinforcementChance = .1f;
 
     [Header("Encounter Completion")]
     [SerializeField] private ArenaCombatZone arenaCombatZone;
+    [SerializeField] private RespawnPoint bossCheckpoint;
 
     [Header("Authored Boss HUD")]
     [SerializeField] private GameObject bossHudRoot;
@@ -67,9 +74,25 @@ public sealed class LevelBossEncounterController : MonoBehaviour
     private bool arenaCleared;
     private bool epilogueStarted;
     private Coroutine epilogueRoutine;
+    private int currentBossMaximumContracts;
+
+    public bool IsBossFightActive => bossSpawned && !bossDefeated && activeBoss != null;
+    public int CurrentBossMaximumContracts => currentBossMaximumContracts;
+    public bool CanRequestHeavenlyAid => currentBossMaximumContracts > minimumBossMaximumContracts;
+
+    public bool IsBossStageCheckpoint(RespawnPointManager respawnManager)
+    {
+        return IsBossFightActive
+            || bossCheckpoint != null && respawnManager != null
+            && respawnManager.CurrentPoint == bossCheckpoint;
+    }
 
     private void Awake()
     {
+        minimumBossMaximumContracts = Mathf.Max(1, minimumBossMaximumContracts);
+        initialBossMaximumContracts = Mathf.Max(minimumBossMaximumContracts, initialBossMaximumContracts);
+        heavenlyAidReduction = Mathf.Max(1, heavenlyAidReduction);
+        currentBossMaximumContracts = initialBossMaximumContracts;
         if (bossHudRoot != null) bossHudRoot.SetActive(false);
         if (arenaCombatZone != null) arenaCombatZone.ZoneReset += ResetEncounterForRetry;
         if (bossWaveSpawner != null)
@@ -97,6 +120,7 @@ public sealed class LevelBossEncounterController : MonoBehaviour
         activeBossCombat = instance.GetComponent<BossCombatController>();
 
         BorrowedLifeBossController borrowedLife = instance.GetComponent<BorrowedLifeBossController>();
+        borrowedLife?.ConfigureMaximumContracts(currentBossMaximumContracts);
         borrowedLife?.ConfigurePresentation(contractCountText);
         if (activeBoss != null)
         {
@@ -106,6 +130,16 @@ public sealed class LevelBossEncounterController : MonoBehaviour
         else Debug.LogError("Borrowed-life boss prefab needs an EnemyAgent component.", instance);
 
         SpawnGuardArchers();
+    }
+
+    /// <summary>Reduces subsequent Boss retries by one tier, down to the authored minimum.</summary>
+    public bool TryRequestHeavenlyAid()
+    {
+        if (!CanRequestHeavenlyAid) return false;
+        currentBossMaximumContracts = Mathf.Max(
+            minimumBossMaximumContracts,
+            currentBossMaximumContracts - heavenlyAidReduction);
+        return true;
     }
 
     /// <summary>Keeps the authored Boss visible and idling while the pre-fight dialogue plays.</summary>
@@ -274,13 +308,21 @@ public sealed class LevelBossEncounterController : MonoBehaviour
 
     private GameObject GetRandomReinforcementPrefab()
     {
-        int startIndex = Random.Range(0, reinforcementPrefabs.Length);
-        for (int offset = 0; offset < reinforcementPrefabs.Length; offset++)
+        List<GameObject> shieldPrefabs = new();
+        List<GameObject> otherPrefabs = new();
+        foreach (GameObject prefab in reinforcementPrefabs)
         {
-            GameObject prefab = reinforcementPrefabs[(startIndex + offset) % reinforcementPrefabs.Length];
-            if (prefab != null) return prefab;
+            if (prefab == null) continue;
+            EnemyAgent enemy = prefab.GetComponent<EnemyAgent>();
+            if (enemy != null && enemy.IsShieldBearer) shieldPrefabs.Add(prefab);
+            else otherPrefabs.Add(prefab);
         }
-        return null;
+
+        bool chooseShield = shieldPrefabs.Count > 0
+            && (otherPrefabs.Count == 0 || Random.value < shieldReinforcementChance);
+        List<GameObject> candidates = chooseShield ? shieldPrefabs : otherPrefabs;
+        if (candidates.Count == 0) candidates = shieldPrefabs;
+        return candidates.Count > 0 ? candidates[Random.Range(0, candidates.Count)] : null;
     }
 
     private void KillAllBossArenaMinions()

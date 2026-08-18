@@ -163,6 +163,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BreakableMapProp
   clickToBreak: 0
   disableCollidersOnBreak: 1
+  remainsVisibleDuration: 2
 --- !u!61 &6512007433158453587
 BoxCollider2D:
   m_ObjectHideFlags: 0

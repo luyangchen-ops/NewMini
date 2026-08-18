@@ -503,7 +503,7 @@ public sealed class BossCombatController : MonoBehaviour
         if (!actionDamageDealt && actionElapsed >= strikeStartTime + tripleStrikeHitDelay)
         {
             actionDamageDealt = true;
-            agent.PerformMeleeAttack();
+            agent.PerformMeleeAttack(false);
         }
 
         if (tripleStrikeIndex < 2 && actionElapsed >= (tripleStrikeIndex + 1) * tripleStrikeInterval)
@@ -539,7 +539,7 @@ public sealed class BossCombatController : MonoBehaviour
             if (!actionDamageDealt && travelElapsed >= impactTime)
             {
                 actionDamageDealt = true;
-                agent.PerformMeleeAttack();
+                agent.PerformMeleeAttack(false);
             }
             return BossNodeStatus.Running;
         }

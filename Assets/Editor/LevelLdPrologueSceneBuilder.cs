@@ -396,8 +396,9 @@ public static class LevelLdPrologueSceneBuilder
 
         ArenaWaveSpawner finalWaves = arena05.GetComponentInChildren<ArenaWaveSpawner>(true);
         ArenaCombatZone combatZone = arena05.GetComponentInChildren<ArenaCombatZone>(true);
-        if (finalWaves == null || combatZone == null)
-            throw new System.InvalidOperationException("Root_Arena_05 needs its authored wave spawner and combat zone.");
+        RespawnPoint bossCheckpoint = arena05.GetComponentInChildren<RespawnPoint>(true);
+        if (finalWaves == null || combatZone == null || bossCheckpoint == null)
+            throw new System.InvalidOperationException("Root_Arena_05 needs its authored wave spawner, combat zone, and respawn point.");
 
         // Checkpoint death restarts the complete Boss combat state. BossPreludeController
         // skips the already-seen introduction on retry and begins the reset waves directly.
@@ -463,7 +464,9 @@ public static class LevelLdPrologueSceneBuilder
             reinforcementSpawnPoints.GetArrayElementAtIndex(i).objectReferenceValue = reinforcementPoints[i];
         serialized.FindProperty("reinforcementCount").intValue = 5;
         serialized.FindProperty("reinforcementSpawnDelay").floatValue = 10f;
+        serialized.FindProperty("shieldReinforcementChance").floatValue = .1f;
         serialized.FindProperty("arenaCombatZone").objectReferenceValue = combatZone;
+        serialized.FindProperty("bossCheckpoint").objectReferenceValue = bossCheckpoint;
         serialized.FindProperty("bossHudRoot").objectReferenceValue = bossHud;
         serialized.FindProperty("contractCountText").objectReferenceValue = contractCountText;
         serialized.FindProperty("dialogueSystem").objectReferenceValue = dialogue;
@@ -512,9 +515,10 @@ public static class LevelLdPrologueSceneBuilder
         for (int index = combatZone.ZoneLockedEvent.GetPersistentEventCount() - 1; index >= 0; index--)
         {
             Object target = combatZone.ZoneLockedEvent.GetPersistentTarget(index);
-            if (target == null || target is BossPreludeController)
+            if (target == null || target is BossPreludeController || target == bossCheckpoint)
                 UnityEventTools.RemovePersistentListener(combatZone.ZoneLockedEvent, index);
         }
+        UnityEventTools.AddPersistentListener(combatZone.ZoneLockedEvent, bossCheckpoint.Activate);
         UnityEventTools.AddPersistentListener(combatZone.ZoneLockedEvent, prelude.BeginPrelude);
     }
 

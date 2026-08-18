@@ -391,3 +391,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BossAnimationSfx
   attackSfx: {fileID: 8300000, guid: 6cac3535452eb4e40a6e4bc9029654b5, type: 3}
+  tripleAttackSfx: {fileID: 8300000, guid: 753ca7b02c034683836adb5c16cc9868, type: 3}
+  dashAttackSfx: {fileID: 8300000, guid: 63477b91e0c845799fe46657a663b25f, type: 3}
+  guardImpactSfx: {fileID: 8300000, guid: 69de536b682d45c8a9677012b8ddb9cd, type: 3}
+  guardRepelSfx: {fileID: 8300000, guid: 381697a45b654b3ab29d23683bb6ec52, type: 3}
+  hurtSfx: {fileID: 8300000, guid: 6a15cbc1f28a4fbe85d717d641bd3b5c, type: 3}
+  deathSfx: {fileID: 8300000, guid: ed1f4df2ece94741b2800237ae08ef84, type: 3}

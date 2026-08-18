@@ -81,7 +81,8 @@ public enum GameSfx
     ShieldActivated,
     ThrowingKnifeLaunched,
     ShieldWarriorBlock,
-    ShieldWarriorAttack
+    ShieldWarriorAttack,
+    SpearmanAttack
 }
 
 /// <summary>Centralized, persistent playback for shared 2D sound effects.</summary>
@@ -104,7 +105,8 @@ public sealed class GameAudioManager : MonoBehaviour
 
     private static readonly Dictionary<GameSfx, string> ResourcePaths = new()
     {
-        { GameSfx.BreakableDestroyed, "Audio/SE/SFX_Prop_WoodBarrel_Break" },
+        { GameSfx.BreakableDestroyed, "Audio/SE/Character/SFX_Prop_WoodBarrel_Break" },
+        { GameSfx.SpearmanAttack, "Audio/SE/Enemy/BanditSpearman_Thrust" },
         { GameSfx.HealingActivated, "Audio/SE/SFX_Item_Heal_Activate" },
         { GameSfx.ShieldActivated, "Audio/SE/SFX_Item_Shield_Activate" },
         { GameSfx.ThrowingKnifeLaunched, "Audio/SE/SFX_Weapon_ThrowingKnife_Launch" },

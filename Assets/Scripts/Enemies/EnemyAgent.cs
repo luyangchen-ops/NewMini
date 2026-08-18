@@ -641,14 +641,14 @@ public sealed class EnemyAgent : MonoBehaviour
         SetMovementAnimation(false);
     }
 
-    public void PerformMeleeAttack()
+    public void PerformMeleeAttack(bool playAttackSfx = true)
     {
         if (!CanMeleeAttack)
         {
             return;
         }
 
-        PlayAttackSfx();
+        if (playAttackSfx) PlayAttackSfx();
         TryDamageTarget();
         if (!IsBossCombatant)
             fireCooldown = data.GetMeleeAttackCooldown(data.FireInterval);
@@ -699,7 +699,7 @@ public sealed class EnemyAgent : MonoBehaviour
         isSpearWindupAnimating = false;
         spearThrustStartPosition = body.position;
         Face(direction.x);
-        PlayAttackSfx();
+        GameAudioManager.PlaySfx(GameSfx.SpearmanAttack, .9f);
         float impactTime = Time.time + data.SpearThrustDuration * data.SpearImpactNormalizedTime;
         float perfectDodgeHalfDuration = data.SpearPerfectDodgeWindowDuration * .5f;
         meleePerfectDodgeStartTime = impactTime - perfectDodgeHalfDuration;
