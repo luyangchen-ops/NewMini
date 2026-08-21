@@ -13,23 +13,73 @@ public static class BuildBanditSpearmanAnimator
 {
     private const string Root = "Assets/Resources/Animation/Spearman";
     private const string AtlasV4Path = Root + "/BanditSpearman_Atlas_v4.png";
+    private const string MoveAtlasV2Path = Root + "/BanditSpearman_Move_v2.png";
     private const string ControllerPath = Root + "/BanditSpearman.controller";
 
     [MenuItem("Tools/Animation/Update Bandit Spearman Animator From V4")]
     public static void BuildFromV4()
     {
+        ConfigureMoveV2Atlas();
+
         Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(AtlasV4Path).OfType<Sprite>().ToArray();
         if (sprites.Length == 0)
         {
             throw new InvalidOperationException($"No Sprite sub-assets found at {AtlasV4Path}.");
         }
 
+        Sprite[] moveSprites = AssetDatabase.LoadAllAssetsAtPath(MoveAtlasV2Path)
+            .OfType<Sprite>()
+            .OrderBy(sprite => sprite.rect.x)
+            .ToArray();
+        if (moveSprites.Length != 4)
+        {
+            throw new InvalidOperationException(
+                $"Expected 4 alternating-foot move frames, found {moveSprites.Length} at {MoveAtlasV2Path}.");
+        }
+
         AnimationClip idle = CreateClip("BanditSpearman_Idle", GetFramesByRow(sprites, 700f, float.PositiveInfinity), 6f, true);
-        AnimationClip move = CreateClip("BanditSpearman_Move", GetFramesByRow(sprites, 490f, 700f), 10f, true);
+        AnimationClip move = CreateClip("BanditSpearman_Move", moveSprites, 8f, true);
         AnimationClip dash = CreateClip("BanditSpearman_DashAttack", GetFramesByRow(sprites, 220f, 490f), 12f, false);
         AnimationClip death = CreateClip("BanditSpearman_Death", GetFramesByRow(sprites, float.NegativeInfinity, 220f), 8f, false);
         CreateController(idle, move, dash, death);
         AssetDatabase.SaveAssets();
+    }
+
+    private static void ConfigureMoveV2Atlas()
+    {
+        AssetDatabase.ImportAsset(MoveAtlasV2Path, ImportAssetOptions.ForceSynchronousImport);
+        TextureImporter importer = AssetImporter.GetAtPath(MoveAtlasV2Path) as TextureImporter;
+        if (importer == null)
+        {
+            throw new InvalidOperationException($"TextureImporter not found at {MoveAtlasV2Path}.");
+        }
+
+        importer.textureType = TextureImporterType.Sprite;
+        importer.spriteImportMode = SpriteImportMode.Multiple;
+        importer.spritePixelsPerUnit = 100f;
+        importer.alphaIsTransparency = true;
+        importer.mipmapEnabled = false;
+        importer.filterMode = FilterMode.Bilinear;
+        importer.textureCompression = TextureImporterCompression.Uncompressed;
+
+#pragma warning disable CS0618
+        SpriteMetaData[] frames = new SpriteMetaData[4];
+        for (int index = 0; index < frames.Length; index++)
+        {
+            frames[index] = new SpriteMetaData
+            {
+                name = $"BanditSpearman_Move_v2_{index + 1:00}",
+                rect = new Rect(index * 256f, 0f, 256f, 256f),
+                alignment = (int)SpriteAlignment.Custom,
+                // The artwork shares a y=8 foot line. Keeping the pivot 112 pixels
+                // above it matches the prefab's existing center-root convention.
+                pivot = new Vector2(.5f, .46875f),
+                border = Vector4.zero
+            };
+        }
+        importer.spritesheet = frames;
+#pragma warning restore CS0618
+        importer.SaveAndReimport();
     }
 
     private static Sprite[] GetFramesByRow(IEnumerable<Sprite> sprites, float minY, float maxY)

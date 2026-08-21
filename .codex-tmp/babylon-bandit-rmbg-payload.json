@@ -1,0 +1,8 @@
+{
+  "weights_file": "solid",
+  "resolution": "4128x1024",
+  "tolerance": 80,
+  "edge_smooth": 0,
+  "bg_color": "#00ff00",
+  "chat_id": "codex-bandit-spearman-move-20260821"
+}

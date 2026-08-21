@@ -8,9 +8,12 @@ using UnityEngine;
 public static class RebuildShieldWarriorAnimator
 {
     private const string Root = "Assets/Resources/Animation/盾兵";
-    private const string AtlasPath = Root + "/ShieldWarrior_ReferenceInkStyle 1.png";
+    private const string ReferenceAtlasPath = Root + "/ShieldWarrior_ReferenceInkStyle 1.png";
+    private const string RunAtlasPath = Root + "/framesheet-1787297301120 (1).png";
     private const string ControllerPath = Root + "/ShieldWarrior.controller";
-    private const int ExpectedSpriteCount = 38;
+    private const int ExpectedReferenceSpriteCount = 38;
+    private const int ExpectedRunSpriteCount = 9;
+    private const float RunFrameRate = 12f;
 
     private static readonly (string State, int Count, float FrameRate, bool Loop)[] Rows =
     {
@@ -24,50 +27,65 @@ public static class RebuildShieldWarriorAnimator
     [MenuItem("Tools/Animation/Rebuild Shield Warrior Animator")]
     public static void Rebuild()
     {
-        ConfigureAtlas();
+        ConfigureReferenceAtlas();
+        ConfigureRunAtlas();
 
-        Sprite[] sprites = AssetDatabase.LoadAllAssetsAtPath(AtlasPath)
+        Sprite[] referenceSprites = AssetDatabase.LoadAllAssetsAtPath(ReferenceAtlasPath)
             .OfType<Sprite>()
             .ToArray();
-        if (sprites.Length != ExpectedSpriteCount)
+        if (referenceSprites.Length != ExpectedReferenceSpriteCount)
         {
             throw new InvalidOperationException(
-                $"Expected {ExpectedSpriteCount} shield-warrior sprites, found {sprites.Length} at {AtlasPath}.");
+                $"Expected {ExpectedReferenceSpriteCount} shield-warrior sprites, found {referenceSprites.Length} at {ReferenceAtlasPath}.");
         }
 
-        Dictionary<string, Sprite> spritesByName = sprites.ToDictionary(sprite => sprite.name);
+        Sprite[] runSprites = AssetDatabase.LoadAllAssetsAtPath(RunAtlasPath)
+            .OfType<Sprite>()
+            .ToArray();
+        if (runSprites.Length != ExpectedRunSpriteCount)
+        {
+            throw new InvalidOperationException(
+                $"Expected {ExpectedRunSpriteCount} shield-warrior run sprites, found {runSprites.Length} at {RunAtlasPath}.");
+        }
+
+        Dictionary<string, Sprite> referenceSpritesByName = referenceSprites.ToDictionary(sprite => sprite.name);
+        Dictionary<string, Sprite> runSpritesByName = runSprites.ToDictionary(sprite => sprite.name);
         Dictionary<string, AnimationClip> clips = new(StringComparer.Ordinal);
         foreach ((string state, int count, float frameRate, bool loop) in Rows)
         {
+            bool isRun = state == "Run";
             clips[state] = CreateClip(
                 $"ShieldWarrior_{state}",
-                GetFrames(spritesByName, state, count),
-                frameRate,
+                GetFrames(
+                    isRun ? runSpritesByName : referenceSpritesByName,
+                    state,
+                    isRun ? ExpectedRunSpriteCount : count),
+                isRun ? RunFrameRate : frameRate,
                 loop);
         }
 
         CreateController(clips);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log("Shield Warrior atlas, five clips, and Animator Controller rebuilt successfully.");
+        Debug.Log("Shield Warrior atlases, five clips, and Animator Controller rebuilt successfully.");
     }
 
-    private static void ConfigureAtlas()
+    private static void ConfigureReferenceAtlas()
     {
-        AssetDatabase.ImportAsset(AtlasPath, ImportAssetOptions.ForceSynchronousImport);
-        TextureImporter importer = AssetImporter.GetAtPath(AtlasPath) as TextureImporter;
+        AssetDatabase.ImportAsset(ReferenceAtlasPath, ImportAssetOptions.ForceSynchronousImport);
+        TextureImporter importer = AssetImporter.GetAtPath(ReferenceAtlasPath) as TextureImporter;
         if (importer == null)
         {
-            throw new InvalidOperationException($"TextureImporter not found for {AtlasPath}.");
+            throw new InvalidOperationException($"TextureImporter not found for {ReferenceAtlasPath}.");
         }
 
 #pragma warning disable CS0618
         SpriteMetaData[] sourceMetadata = importer.spritesheet;
 #pragma warning restore CS0618
-        if (sourceMetadata.Length != ExpectedSpriteCount)
+        if (sourceMetadata.Length != ExpectedReferenceSpriteCount)
         {
             throw new InvalidOperationException(
-                $"The adjusted atlas must contain {ExpectedSpriteCount} valid slices before rebuilding; found {sourceMetadata.Length}.");
+                $"The reference atlas must contain {ExpectedReferenceSpriteCount} valid slices before rebuilding; found {sourceMetadata.Length}.");
         }
 
         importer.textureType = TextureImporterType.Sprite;
@@ -81,13 +99,73 @@ public static class RebuildShieldWarriorAnimator
         importer.isReadable = true;
         importer.SaveAndReimport();
 
-        Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(AtlasPath);
+        Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(ReferenceAtlasPath);
         if (texture == null)
         {
-            throw new InvalidOperationException($"Texture could not be loaded at {AtlasPath}.");
+            throw new InvalidOperationException($"Texture could not be loaded at {ReferenceAtlasPath}.");
         }
 
         SpriteMetaData[] rebuiltMetadata = BuildMetadata(sourceMetadata, texture);
+#pragma warning disable CS0618
+        importer.spritesheet = rebuiltMetadata;
+#pragma warning restore CS0618
+        importer.isReadable = false;
+        importer.SaveAndReimport();
+    }
+
+    private static void ConfigureRunAtlas()
+    {
+        AssetDatabase.ImportAsset(RunAtlasPath, ImportAssetOptions.ForceSynchronousImport);
+        TextureImporter importer = AssetImporter.GetAtPath(RunAtlasPath) as TextureImporter;
+        if (importer == null)
+        {
+            throw new InvalidOperationException($"TextureImporter not found for {RunAtlasPath}.");
+        }
+
+#pragma warning disable CS0618
+        SpriteMetaData[] sourceMetadata = importer.spritesheet;
+#pragma warning restore CS0618
+        if (sourceMetadata.Length != ExpectedRunSpriteCount)
+        {
+            throw new InvalidOperationException(
+                $"The run atlas must contain {ExpectedRunSpriteCount} valid slices before rebuilding; found {sourceMetadata.Length}.");
+        }
+
+        importer.textureType = TextureImporterType.Sprite;
+        importer.spriteImportMode = SpriteImportMode.Multiple;
+        importer.spritePixelsPerUnit = 134f;
+        importer.alphaIsTransparency = true;
+        importer.mipmapEnabled = false;
+        importer.filterMode = FilterMode.Bilinear;
+        importer.textureCompression = TextureImporterCompression.Uncompressed;
+        importer.maxTextureSize = 4096;
+        importer.isReadable = true;
+        importer.SaveAndReimport();
+
+        Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(RunAtlasPath);
+        if (texture == null)
+        {
+            throw new InvalidOperationException($"Texture could not be loaded at {RunAtlasPath}.");
+        }
+
+        List<SpriteMetaData> frames = sourceMetadata
+            .OrderBy(item => item.rect.center.x)
+            .ToList();
+        float groundLine = frames.Max(item => item.rect.y);
+        SpriteMetaData[] rebuiltMetadata = new SpriteMetaData[frames.Count];
+        for (int frame = 0; frame < frames.Count; frame++)
+        {
+            SpriteMetaData sourceItem = frames[frame];
+            rebuiltMetadata[frame] = new SpriteMetaData
+            {
+                name = $"ShieldWarrior_Run_{frame + 1:00}",
+                rect = sourceItem.rect,
+                alignment = (int)SpriteAlignment.Custom,
+                pivot = CalculateFootPivot(texture, sourceItem.rect, groundLine),
+                border = Vector4.zero
+            };
+        }
+
 #pragma warning disable CS0618
         importer.spritesheet = rebuiltMetadata;
 #pragma warning restore CS0618
@@ -100,7 +178,7 @@ public static class RebuildShieldWarriorAnimator
         List<SpriteMetaData> sorted = source
             .OrderByDescending(item => item.rect.center.y)
             .ToList();
-        List<SpriteMetaData> result = new(ExpectedSpriteCount);
+        List<SpriteMetaData> result = new(ExpectedReferenceSpriteCount);
         int offset = 0;
 
         foreach ((string state, int count, _, _) in Rows)

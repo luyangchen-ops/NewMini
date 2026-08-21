@@ -220,9 +220,9 @@ public partial class PlayerCharacterController
         Transform overlayTransform = killChainRangeOverlay.transform;
         overlayTransform.position = new Vector3(body.position.x, body.position.y, transform.position.z - .1f);
         float spriteSize = Mathf.Max(.01f, killChainRangeOverlay.sprite.bounds.size.x);
-        overlayTransform.localScale = Vector3.one * (rangeOverlayWorldDiameter / spriteSize);
+        overlayTransform.localScale = Vector3.one * (RangeOverlayWorldDiameter / spriteSize);
         killChainRangeOverlay.GetPropertyBlock(feedbackProperties);
-        feedbackProperties.SetFloat(RangeRadius01, AttackDashDistance / rangeOverlayWorldDiameter);
+        feedbackProperties.SetFloat(RangeRadius01, AttackDashDistance / RangeOverlayWorldDiameter);
         feedbackProperties.SetFloat(EffectStrength, strength);
         killChainRangeOverlay.SetPropertyBlock(feedbackProperties);
     }
@@ -241,7 +241,7 @@ public partial class PlayerCharacterController
     {
         float slowRange = Mathf.Max(.01f, 1f - BulletTimeScale);
         float bulletTimeLoopEnvelope = Mathf.Clamp01((1f - EnemyTimeScale) / slowRange);
-        float volume = bulletTimeLoopEnvelope * bulletTimeLoopVolume;
+        float volume = bulletTimeLoopEnvelope * BulletTimeLoopVolume;
         GameAudioManager.SetSfxLoop(BulletTimeLoopSfx, volume, bulletTimeLoopEnvelope > .001f);
     }
 
@@ -251,14 +251,14 @@ public partial class PlayerCharacterController
     private void PlaySheathePresentation()
     {
         visualAnimator?.SetTrigger(Sheathe);
-        PlaySfx(KillChainEndSfx, killChainEndVolume);
+        PlaySfx(KillChainEndSfx, KillChainEndVolume);
     }
 
     private void PlayKillSfx()
     {
         float pitch = 1f + Mathf.Min(Mathf.Max(0, killChainCount - 1), 4) * .035f;
-        PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume, pitch);
+        PlaySfx(HitBladeFleshSfx, HitBladeFleshVolume, pitch);
         AudioClip confirmation = KillConfirmSfx != null ? KillConfirmSfx : killSfx;
-        PlaySfx(confirmation, killConfirmVolume, pitch);
+        PlaySfx(confirmation, KillConfirmVolume, pitch);
     }
 }

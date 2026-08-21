@@ -20,7 +20,7 @@ public partial class PlayerCharacterController
             Vector2 targetPoint = enemy != null ? (Vector2)enemy.position : hit.bounds.center;
             Vector2 offset = targetPoint - body.position;
             if (offset.sqrMagnitude > Mathf.Epsilon
-                && Vector2.Angle(direction, offset) > normalAttackArcAngle * .5f) continue;
+                && Vector2.Angle(direction, offset) > NormalAttackArcAngle * .5f) continue;
             if (offset.sqrMagnitude >= closestDistanceSquared) continue;
             closestTarget = target;
             closestBreakable = breakable;
@@ -54,14 +54,14 @@ public partial class PlayerCharacterController
         {
             if (enemyAgent != null && enemyAgent.IsBossCombatant)
                 AwardMomentumFromBossDamage();
-            PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
+            PlaySfx(HitBladeFleshSfx, HitBladeFleshVolume);
             return;
         }
         SpecialItemDropSpawner.TryDropFromEnemy(closestTarget.position);
         if (enemyAgent == null) KillEnemy(closestTarget);
         RestoreHealth(NormalKillHealthRestore);
         AwardMomentum(0);
-        PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
+        PlaySfx(HitBladeFleshSfx, HitBladeFleshVolume);
         PlaySfx(killSfx);
     }
 
@@ -71,7 +71,7 @@ public partial class PlayerCharacterController
         if (damage <= 0f || isDead || IsInvulnerable) return;
         if (specialItems != null && specialItems.TryBlockAttack()) return;
         currentHealth = Mathf.Max(0f, currentHealth - damage);
-        HealthChanged?.Invoke(currentHealth, maximumHealth);
+        HealthChanged?.Invoke(currentHealth, MaximumHealth);
         if (currentHealth > 0f)
         {
             visualAnimator?.SetTrigger(Hurt);
@@ -92,9 +92,9 @@ public partial class PlayerCharacterController
         transform.position = position;
         body.position = position;
         body.linearVelocity = Vector2.zero;
-        currentHealth = maximumHealth;
+        currentHealth = MaximumHealth;
         killChainTutorialHold = false;
-        HealthChanged?.Invoke(currentHealth, maximumHealth);
+        HealthChanged?.Invoke(currentHealth, MaximumHealth);
         ResetVisualAnimatorAfterRespawn();
         if (stateMachine != null) stateMachine.Change(PlayerStateId.Locomotion);
         EnemyTimeScale = 1f;
@@ -180,19 +180,19 @@ public partial class PlayerCharacterController
     public void RestoreHealth(float amount)
     {
         if (amount <= 0f) return;
-        currentHealth = Mathf.Min(maximumHealth, currentHealth + amount);
-        HealthChanged?.Invoke(currentHealth, maximumHealth);
+        currentHealth = Mathf.Min(MaximumHealth, currentHealth + amount);
+        HealthChanged?.Invoke(currentHealth, MaximumHealth);
     }
 
     private void AwardMomentum(int comboLength)
     {
-        int amount = momentumPerKill;
-        if (comboLength >= comboRewardThreshold) amount += bonusMomentumPerComboKill;
+        int amount = MomentumPerKill;
+        if (comboLength >= ComboRewardThreshold) amount += BonusMomentumPerComboKill;
 
         int previousMomentum = currentMomentum;
-        currentMomentum = Mathf.Min(maximumMomentum, currentMomentum + amount);
+        currentMomentum = Mathf.Min(MaximumMomentum, currentMomentum + amount);
         if (currentMomentum != previousMomentum)
-            MomentumChanged?.Invoke(currentMomentum, maximumMomentum);
+            MomentumChanged?.Invoke(currentMomentum, MaximumMomentum);
     }
 
     /// <summary>Awards momentum for a real Boss health/contract loss outside the ultimate.</summary>

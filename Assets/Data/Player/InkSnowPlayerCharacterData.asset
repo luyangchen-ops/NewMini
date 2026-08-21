@@ -1,0 +1,85 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d85d21cda2c44f7a9b3e5f1148c0a11, type: 3}
+  m_Name: InkSnowPlayerCharacterData
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerCharacterData
+  movement:
+    <MoveSpeed>k__BackingField: 5
+    <BoundaryPadding>k__BackingField: 0.7
+  dodge:
+    <Distance>k__BackingField: 2.5
+    <Duration>k__BackingField: 0.25
+    <PerfectDistanceRatio>k__BackingField: 0.3
+    <Cooldown>k__BackingField: 1
+  combat:
+    <NormalAttackCooldown>k__BackingField: 0.5
+    <NormalAttackRange>k__BackingField: 1.25
+    <NormalAttackArcAngle>k__BackingField: 220
+    <NormalKillHealthRestore>k__BackingField: 5
+    <KillChainHealthRestore>k__BackingField: 15
+  vitals:
+    <MaximumHealth>k__BackingField: 100
+    <MaximumMomentum>k__BackingField: 20
+    <StartingMomentum>k__BackingField: 20
+    <MomentumPerKill>k__BackingField: 1
+    <ComboRewardThreshold>k__BackingField: 3
+    <BonusMomentumPerComboKill>k__BackingField: 1
+  killChain:
+    <MaximumAimDistance>k__BackingField: 5
+    <AttackDashDistance>k__BackingField: 5
+    <AttackDashWindupDuration>k__BackingField: 0.03
+    <AttackDashDuration>k__BackingField: 0.18
+    <AttackDashOvershoot>k__BackingField: 0.3
+    <BulletTimeEnemyScale>k__BackingField: 0.1
+    <DashEnemyTimeScale>k__BackingField: 0.35
+    <BulletTimeEnterDuration>k__BackingField: 0.12
+    <BulletTimeExitDuration>k__BackingField: 0.18
+    <PerfectDodgeFreezeDuration>k__BackingField: 0.05
+    <InitialWindow>k__BackingField: 1.5
+    <TimeRestorePerKill>k__BackingField: 1.5
+    <ImpactFreezeDuration>k__BackingField: 0.055
+    <InputBufferDuration>k__BackingField: 0.12
+    <ExitProtection>k__BackingField: 0.2
+    <TargetAssistWorldRadius>k__BackingField: 0.9
+    <TargetAssistMaximumAngle>k__BackingField: 25
+    <DirectionalSearchHalfAngle>k__BackingField: 50
+    <RangeOverlayWorldDiameter>k__BackingField: 40
+    <CameraZoomFactor>k__BackingField: 0.95
+    <CameraFocusOffset>k__BackingField: 0.2
+    <CameraResponse>k__BackingField: 16
+    <PerfectDodgeCameraShake>k__BackingField: 0.06
+    <KillCameraShake>k__BackingField: 0.08
+    <MaximumCameraShake>k__BackingField: 0.16
+  ultimate:
+    <MaximumTargets>k__BackingField: 12
+    <MarkRadius>k__BackingField: 0.55
+    <TrailPointDistance>k__BackingField: 0.08
+    <MarkDuration>k__BackingField: 3.5
+    <ExecutionInterval>k__BackingField: 0.075
+    <FinisherDuration>k__BackingField: 0.22
+    <CameraZoomFactor>k__BackingField: 0.86
+  feedback:
+    <BulletTimeLoopVolume>k__BackingField: 0.45
+    <DashWindCutVolume>k__BackingField: 0.9
+    <HitBladeFleshVolume>k__BackingField: 0.85
+    <KillConfirmVolume>k__BackingField: 1
+    <KillChainEndVolume>k__BackingField: 0.9
+    <PerfectDodgeSfx>k__BackingField: {fileID: 0}
+    <BulletTimeLoopSfx>k__BackingField: {fileID: 0}
+    <DashWindCutSfx>k__BackingField: {fileID: 0}
+    <HitBladeFleshSfx>k__BackingField: {fileID: 0}
+    <KillConfirmSfx>k__BackingField: {fileID: 0}
+    <KillChainEndSfx>k__BackingField: {fileID: 0}
+    <UltimateTrailWidthMultiplier>k__BackingField: 1.75
+    <UltimateTrailStartColor>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
+    <UltimateTrailEndColor>k__BackingField: {r: 1, g: 0.08, b: 0.03, a: 0.9}
+    <UltimateMarkedColor>k__BackingField: {r: 1, g: 0.12, b: 0.06, a: 1}

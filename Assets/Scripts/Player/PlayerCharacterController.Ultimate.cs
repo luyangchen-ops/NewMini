@@ -15,14 +15,14 @@ public partial class PlayerCharacterController
         ultimateExecutionIndex = 0;
         ultimateExecutedKills = 0;
         ultimateSwipeStarted = false;
-        ultimateMarkTimeRemaining = ultimateMarkDuration;
+        ultimateMarkTimeRemaining = UltimateMarkDuration;
         body.linearVelocity = Vector2.zero;
 
         stateMachine.Change(PlayerStateId.UltimateTargeting);
         EnemyTimeScale = 0f;
         enemyTimeScaleTarget = 0f;
         BeginUltimateLinePresentation();
-        cameraController.BeginKillChain(ultimateCameraZoomFactor, 0f, 22f, .08f, MaximumCameraShake * 1.5f);
+        cameraController.BeginKillChain(UltimateCameraZoomFactor, 0f, 22f, .08f, MaximumCameraShake * 1.5f);
         PlaySfx(PerfectDodgeSfx != null ? PerfectDodgeSfx : parrySfx);
         onUltimateStarted?.Invoke();
         UltimateStarted?.Invoke();
@@ -53,7 +53,7 @@ public partial class PlayerCharacterController
         {
             MarkUltimateTargetsAlong(ultimateLastPointerPosition, pointerPosition);
             if ((pointerPosition - ultimateLastPointerPosition).sqrMagnitude
-                >= ultimateTrailPointDistance * ultimateTrailPointDistance)
+                >= UltimateTrailPointDistance * UltimateTrailPointDistance)
             {
                 AddUltimateTrailPoint(pointerPosition);
                 ultimateLastPointerPosition = pointerPosition;
@@ -77,12 +77,12 @@ public partial class PlayerCharacterController
     {
         ultimateBossesTouchedThisSegment.Clear();
         float distance = Vector2.Distance(from, to);
-        float sampleSpacing = Mathf.Max(.05f, ultimateMarkRadius * .5f);
+        float sampleSpacing = Mathf.Max(.05f, UltimateMarkRadius * .5f);
         int sampleCount = Mathf.Max(1, Mathf.CeilToInt(distance / sampleSpacing));
         for (int sample = 0; sample <= sampleCount; sample++)
         {
             Vector2 point = Vector2.Lerp(from, to, sample / (float)sampleCount);
-            foreach (Collider2D hit in Physics2D.OverlapCircleAll(point, ultimateMarkRadius))
+            foreach (Collider2D hit in Physics2D.OverlapCircleAll(point, UltimateMarkRadius))
             {
                 Transform enemy = FindEnemy(hit.transform);
                 if (!IsTargetAlive(enemy)) continue;
@@ -96,7 +96,7 @@ public partial class PlayerCharacterController
                 else
                 {
                     if (ultimateTargetSet.Contains(enemy)
-                        || ultimateTargetSet.Count >= ultimateMaximumTargets) continue;
+                        || ultimateTargetSet.Count >= UltimateMaximumTargets) continue;
                     ultimateTargetSet.Add(enemy);
                 }
 
@@ -115,7 +115,7 @@ public partial class PlayerCharacterController
         {
             if (renderer == null || ultimateMarkedRenderers.ContainsKey(renderer)) continue;
             ultimateMarkedRenderers.Add(renderer, renderer.color);
-            renderer.color = Color.Lerp(renderer.color, ultimateMarkedColor, .78f);
+            renderer.color = Color.Lerp(renderer.color, UltimateMarkedColor, .78f);
         }
 
         Vector2 impactDirection = (Vector2)enemy.position - body.position;
@@ -134,7 +134,7 @@ public partial class PlayerCharacterController
         }
 
         currentMomentum = 0;
-        MomentumChanged?.Invoke(currentMomentum, maximumMomentum);
+        MomentumChanged?.Invoke(currentMomentum, MaximumMomentum);
         ultimateExecutionIndex = 0;
         ultimateExecutedKills = 0;
         stateTimer = .08f;
@@ -182,15 +182,15 @@ public partial class PlayerCharacterController
         if (hitResult == EnemyAgent.PlayerAttackResult.Guarded)
         {
             PlaySfx(parrySfx);
-            stateTimer = ultimateExecutionInterval;
+            stateTimer = UltimateExecutionInterval;
             return;
         }
 
         PlayBloodHitEffect(target, slashDirection);
         if (hitResult == EnemyAgent.PlayerAttackResult.Damaged)
         {
-            PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
-            stateTimer = ultimateExecutionInterval;
+            PlaySfx(HitBladeFleshSfx, HitBladeFleshVolume);
+            stateTimer = UltimateExecutionInterval;
             return;
         }
 
@@ -200,14 +200,14 @@ public partial class PlayerCharacterController
         ultimateExecutedKills++;
 
         cameraController.AddKillImpact(slashDirection, MaximumCameraShake, ultimateExecutedKills);
-        PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
-        PlaySfx(KillConfirmSfx != null ? KillConfirmSfx : killSfx, killConfirmVolume);
-        stateTimer = ultimateExecutionInterval;
+        PlaySfx(HitBladeFleshSfx, HitBladeFleshVolume);
+        PlaySfx(KillConfirmSfx != null ? KillConfirmSfx : killSfx, KillConfirmVolume);
+        stateTimer = UltimateExecutionInterval;
     }
 
     private void BeginUltimateFinisher()
     {
-        stateTimer = ultimateFinisherDuration;
+        stateTimer = UltimateFinisherDuration;
         stateMachine.Change(PlayerStateId.UltimateFinisher);
         cameraController.AddKillImpact(Vector2.up, MaximumCameraShake * 1.4f, ultimateExecutedKills + 3);
     }
@@ -217,9 +217,9 @@ public partial class PlayerCharacterController
         stateTimer -= Time.unscaledDeltaTime;
         if (ultimateLine != null)
         {
-            float alpha = Mathf.Clamp01(stateTimer / Mathf.Max(.01f, ultimateFinisherDuration));
-            ultimateLine.startColor = WithAlpha(ultimateTrailStartColor, alpha);
-            ultimateLine.endColor = WithAlpha(ultimateTrailEndColor, alpha);
+            float alpha = Mathf.Clamp01(stateTimer / Mathf.Max(.01f, UltimateFinisherDuration));
+            ultimateLine.startColor = WithAlpha(UltimateTrailStartColor, alpha);
+            ultimateLine.endColor = WithAlpha(UltimateTrailEndColor, alpha);
         }
 
         if (stateTimer <= 0f) EndUltimate(true);
@@ -270,9 +270,9 @@ public partial class PlayerCharacterController
         ultimateLineOriginalEndColor = ultimateLine.endColor;
         ultimateLineSettingsSaved = true;
         ultimateLine.useWorldSpace = true;
-        ultimateLine.widthMultiplier = ultimateLineOriginalWidthMultiplier * ultimateTrailWidthMultiplier;
-        ultimateLine.startColor = ultimateTrailStartColor;
-        ultimateLine.endColor = ultimateTrailEndColor;
+        ultimateLine.widthMultiplier = ultimateLineOriginalWidthMultiplier * UltimateTrailWidthMultiplier;
+        ultimateLine.startColor = UltimateTrailStartColor;
+        ultimateLine.endColor = UltimateTrailEndColor;
         ultimateLine.positionCount = 0;
         if (arrowRoot != null) arrowRoot.SetActive(true);
         if (arrowHead != null) arrowHead.gameObject.SetActive(false);
@@ -323,12 +323,12 @@ public partial class PlayerCharacterController
         float pulse = .58f + Mathf.Sin(Time.unscaledTime * 14f) * .2f;
         foreach (KeyValuePair<SpriteRenderer, Color> marked in ultimateMarkedRenderers)
         {
-            if (marked.Key != null) marked.Key.color = Color.Lerp(marked.Value, ultimateMarkedColor, pulse);
+            if (marked.Key != null) marked.Key.color = Color.Lerp(marked.Value, UltimateMarkedColor, pulse);
         }
 
         if (ultimateLine != null && ultimateLineSettingsSaved && State != PlayerStateId.UltimateFinisher)
             ultimateLine.widthMultiplier = ultimateLineOriginalWidthMultiplier
-                * ultimateTrailWidthMultiplier
+                * UltimateTrailWidthMultiplier
                 * (1f + Mathf.Sin(Time.unscaledTime * 18f) * .08f);
     }
 

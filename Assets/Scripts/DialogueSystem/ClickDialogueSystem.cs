@@ -98,6 +98,10 @@ public sealed class ClickDialogueSystem : MonoBehaviour
     [SerializeField] private Vector2 characterOffset = new Vector2(1.05f, 1.45f);
     [SerializeField] private Vector2 soldierOffset = new Vector2(-1.05f, 1.45f);
     [SerializeField] private Vector2 systemPosition = new Vector2(0f, 310f);
+    [SerializeField] private Vector2 minimumBubbleSize = new Vector2(420f, 128f);
+    [SerializeField, Min(1f)] private float maximumBubbleWidth = 760f;
+    [SerializeField] private Vector2 bubbleTextPadding = new Vector2(180f, 80f);
+    [SerializeField, Min(0f)] private float dialogueSafeMargin = 18f;
     [SerializeField, Min(0f)] private float minimumLineReadTime = 1.8f;
     [SerializeField, Min(0f)] private float secondsPerCharacter = .055f;
     [SerializeField, Min(0f)] private float maximumLineReadTime = 4.5f;
@@ -105,6 +109,7 @@ public sealed class ClickDialogueSystem : MonoBehaviour
     private readonly List<DialogueLine> dialogueLines = new List<DialogueLine>();
     private readonly List<Behaviour> pausedBehaviours = new List<Behaviour>();
     private readonly HashSet<int> triggeredInterruptionLines = new HashSet<int>();
+    private readonly Vector3[] letterboxWorldCorners = new Vector3[4];
     private RectTransform activeBubble;
     private Transform activeSpeaker;
     private Vector2 activeWorldOffset;
@@ -428,7 +433,11 @@ public sealed class ClickDialogueSystem : MonoBehaviour
             : "Panel_ActiveCharacterBubble";
         activeBubble.gameObject.SetActive(true);
         Text label = activeBubble.GetComponentInChildren<Text>(true);
-        if (label != null) label.text = line.Content;
+        if (label != null)
+        {
+            label.text = line.Content;
+            ResizeBubbleToContent(activeBubble, label);
+        }
 
         activeSpeaker = line.FollowTarget;
         if (line.FollowTarget != null) activeWorldOffset = worldOffset;
@@ -450,8 +459,33 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         Vector2 target = lowerScreenPresentation
             ? GetLowerScreenBubblePosition()
             : systemPresentation ? systemPosition : GetWorldBubblePosition(activeSpeaker, activeWorldOffset);
-        Vector2 start = systemPresentation ? target + Vector2.up * (Screen.height * .55f) : target + Vector2.up * 36f;
+        target = ClampBubbleToPresentationArea(target, activeBubble);
+        float enterOffset = systemPresentation ? 72f : 36f;
+        float enterDirection = target.y >= 0f ? -1f : 1f;
+        Vector2 start = ClampBubbleToPresentationArea(
+            target + Vector2.up * (enterOffset * enterDirection), activeBubble);
         bubbleAnimation = StartCoroutine(AnimateBubble(start, target));
+    }
+
+    private void ResizeBubbleToContent(RectTransform bubble, Text label)
+    {
+        float minimumWidth = minimumBubbleSize.x > 0f ? minimumBubbleSize.x : 420f;
+        float minimumHeight = minimumBubbleSize.y > 0f ? minimumBubbleSize.y : 128f;
+        float maximumWidth = Mathf.Max(minimumWidth, maximumBubbleWidth);
+        float horizontalPadding = Mathf.Max(0f, bubbleTextPadding.x);
+        float verticalPadding = Mathf.Max(0f, bubbleTextPadding.y);
+
+        label.horizontalOverflow = HorizontalWrapMode.Wrap;
+        label.verticalOverflow = VerticalWrapMode.Overflow;
+        Canvas.ForceUpdateCanvases();
+
+        float width = Mathf.Clamp(label.preferredWidth + horizontalPadding, minimumWidth, maximumWidth);
+        bubble.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, width);
+        Canvas.ForceUpdateCanvases();
+
+        float height = Mathf.Max(minimumHeight, label.preferredHeight + verticalPadding);
+        bubble.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+        LayoutRebuilder.ForceRebuildLayoutImmediate(bubble);
     }
 
     private IEnumerator EndDialogue()
@@ -675,7 +709,11 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         return rows;
     }
 
-    private void PositionWorldBubble(RectTransform bubble, Transform speaker, Vector2 offset) => bubble.anchoredPosition = GetWorldBubblePosition(speaker, offset);
+    private void PositionWorldBubble(RectTransform bubble, Transform speaker, Vector2 offset)
+    {
+        Vector2 target = GetWorldBubblePosition(speaker, offset);
+        bubble.anchoredPosition = ClampBubbleToPresentationArea(target, bubble);
+    }
 
     private Vector2 GetWorldBubblePosition(Transform speaker, Vector2 offset)
     {
@@ -721,6 +759,52 @@ public sealed class ClickDialogueSystem : MonoBehaviour
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             bubbleContainer, screen, GetCanvasCamera(), out Vector2 local);
         return local;
+    }
+
+    private Vector2 ClampBubbleToPresentationArea(Vector2 position, RectTransform bubble)
+    {
+        if (bubbleContainer == null || bubble == null) return position;
+
+        Rect containerRect = bubbleContainer.rect;
+        float margin = Mathf.Max(0f, dialogueSafeMargin);
+        float safeLeft = containerRect.xMin + margin;
+        float safeRight = containerRect.xMax - margin;
+        float safeBottom = containerRect.yMin + margin;
+        float safeTop = containerRect.yMax - margin;
+
+        RectTransform bottomRect = BottomLetterboxRect;
+        if (bottomLetterbox != null && bottomLetterbox.activeInHierarchy && bottomRect != null)
+            safeBottom = Mathf.Max(safeBottom, GetLetterboxLocalEdge(bottomRect, maximum: true) + margin);
+
+        RectTransform topRect = TopLetterboxRect;
+        if (topLetterbox != null && topLetterbox.activeInHierarchy && topRect != null)
+            safeTop = Mathf.Min(safeTop, GetLetterboxLocalEdge(topRect, maximum: false) - margin);
+
+        Rect bubbleRect = bubble.rect;
+        float minimumX = safeLeft - bubbleRect.xMin;
+        float maximumX = safeRight - bubbleRect.xMax;
+        float minimumY = safeBottom - bubbleRect.yMin;
+        float maximumY = safeTop - bubbleRect.yMax;
+
+        float x = minimumX <= maximumX
+            ? Mathf.Clamp(position.x, minimumX, maximumX)
+            : (safeLeft + safeRight - bubbleRect.xMin - bubbleRect.xMax) * .5f;
+        float y = minimumY <= maximumY
+            ? Mathf.Clamp(position.y, minimumY, maximumY)
+            : (safeBottom + safeTop - bubbleRect.yMin - bubbleRect.yMax) * .5f;
+        return new Vector2(x, y);
+    }
+
+    private float GetLetterboxLocalEdge(RectTransform letterbox, bool maximum)
+    {
+        letterbox.GetWorldCorners(letterboxWorldCorners);
+        float edge = maximum ? float.NegativeInfinity : float.PositiveInfinity;
+        foreach (Vector3 worldCorner in letterboxWorldCorners)
+        {
+            float localY = bubbleContainer.InverseTransformPoint(worldCorner).y;
+            edge = maximum ? Mathf.Max(edge, localY) : Mathf.Min(edge, localY);
+        }
+        return edge;
     }
 
     private Camera GetCanvasCamera()

@@ -1,0 +1,388 @@
+fileFormatVersion: 2
+guid: 9298200f454c4fc4f8a736779a30dd9a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5129429276862684169
+    second: ShieldWarrior_Run_01
+  - first:
+      213: 1027986736029391746
+    second: ShieldWarrior_Run_02
+  - first:
+      213: -1892173045722640890
+    second: ShieldWarrior_Run_03
+  - first:
+      213: -4329810918833042799
+    second: ShieldWarrior_Run_04
+  - first:
+      213: -7291073249579991558
+    second: ShieldWarrior_Run_05
+  - first:
+      213: -8184535781212695194
+    second: ShieldWarrior_Run_06
+  - first:
+      213: -1823280440428489100
+    second: ShieldWarrior_Run_07
+  - first:
+      213: -1172276853082021162
+    second: ShieldWarrior_Run_08
+  - first:
+      213: 980614231532749592
+    second: ShieldWarrior_Run_09
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 4096
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 134
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: iOS
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_01
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 19
+        width: 279
+        height: 215
+      alignment: 9
+      pivot: {x: 0.4744398, y: 0.06976744}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 90c93eb10c46f2740800000000000000
+      internalID: 5129429276862684169
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_02
+      rect:
+        serializedVersion: 2
+        x: 489
+        y: 34
+        width: 279
+        height: 202
+      alignment: 9
+      pivot: {x: 0.50821966, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28b58da6d74244e00800000000000000
+      internalID: 1027986736029391746
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_03
+      rect:
+        serializedVersion: 2
+        x: 946
+        y: 17
+        width: 278
+        height: 219
+      alignment: 9
+      pivot: {x: 0.5428605, y: 0.07762557}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60e022cd3a6adb5e0800000000000000
+      internalID: -1892173045722640890
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_04
+      rect:
+        serializedVersion: 2
+        x: 1395
+        y: 13
+        width: 286
+        height: 221
+      alignment: 9
+      pivot: {x: 0.56594944, y: 0.09502262}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 19a495ed8eb69e3c0800000000000000
+      internalID: -4329810918833042799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_05
+      rect:
+        serializedVersion: 2
+        x: 1848
+        y: 12
+        width: 294
+        height: 225
+      alignment: 9
+      pivot: {x: 0.5449084, y: 0.09777778}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: afd7e6f5287e0da90800000000000000
+      internalID: -7291073249579991558
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_06
+      rect:
+        serializedVersion: 2
+        x: 2302
+        y: 10
+        width: 292
+        height: 229
+      alignment: 9
+      pivot: {x: 0.52006567, y: 0.10480349}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 665d75d0210ba6e80800000000000000
+      internalID: -8184535781212695194
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_07
+      rect:
+        serializedVersion: 2
+        x: 2751
+        y: 25
+        width: 303
+        height: 217
+      alignment: 9
+      pivot: {x: 0.53466, y: 0.041474655}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 476975e791862b6e0800000000000000
+      internalID: -1823280440428489100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_08
+      rect:
+        serializedVersion: 2
+        x: 3205
+        y: 8
+        width: 304
+        height: 233
+      alignment: 9
+      pivot: {x: 0.5626352, y: 0.11158798}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d222a1c96c3bbfe0800000000000000
+      internalID: -1172276853082021162
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ShieldWarrior_Run_09
+      rect:
+        serializedVersion: 2
+        x: 3654
+        y: 2
+        width: 314
+        height: 239
+      alignment: 9
+      pivot: {x: 0.5746461, y: 0.13389121}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 813c334b277db9d00800000000000000
+      internalID: 980614231532749592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: a8595d3c5f88de0418cf9e16319a60c2
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      ShieldWarrior_Run_01: 5129429276862684169
+      ShieldWarrior_Run_02: 1027986736029391746
+      ShieldWarrior_Run_03: -1892173045722640890
+      ShieldWarrior_Run_04: -4329810918833042799
+      ShieldWarrior_Run_05: -7291073249579991558
+      ShieldWarrior_Run_06: -8184535781212695194
+      ShieldWarrior_Run_07: -1823280440428489100
+      ShieldWarrior_Run_08: -1172276853082021162
+      ShieldWarrior_Run_09: 980614231532749592
+      framesheet-1787297301120 (1)_0: 5129429276862684169
+      framesheet-1787297301120 (1)_1: 1027986736029391746
+      framesheet-1787297301120 (1)_10: -2686322835720888757
+      framesheet-1787297301120 (1)_2: -1892173045722640890
+      framesheet-1787297301120 (1)_3: -4329810918833042799
+      framesheet-1787297301120 (1)_4: -7291073249579991558
+      framesheet-1787297301120 (1)_5: -8184535781212695194
+      framesheet-1787297301120 (1)_6: -1823280440428489100
+      framesheet-1787297301120 (1)_7: -1172276853082021162
+      framesheet-1787297301120 (1)_8: 980614231532749592
+      framesheet-1787297301120 (1)_9: -2163109202298066004
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

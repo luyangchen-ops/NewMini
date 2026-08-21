@@ -13,25 +13,15 @@ public partial class PlayerCharacterController : MonoBehaviour
 {
     public static float EnemyTimeScale { get; private set; } = 1f;
 
-    [Header("3C Data")]
+    [Header("Character Data")]
     [SerializeField] private PlayerCharacterData characterData;
 
-    [Header("Legacy Overrides (used while Character Data is empty)")]
-    [SerializeField, Min(0f)] private float moveSpeed = 5f;
-    [SerializeField, Min(0f)] private float boundaryPadding = .7f;
+    [Header("Scene Dependencies")]
     [SerializeField] private Camera worldCamera;
     [Tooltip("Viewport dead-zone ratio. Lower values make the camera start following while the player is closer to screen center.")]
     [SerializeField, Range(.1f, 1f)] private float cameraFollowDeadZone = .65f;
     [Tooltip("World-space framing offset applied to the normal player-follow target.")]
     [SerializeField] private Vector2 cameraFollowOffset;
-    [SerializeField, Min(.01f)] private float maximumDragDistance = 3f;
-    [SerializeField, Min(0f)] private float dodgeDistance = 2.5f;
-    [SerializeField, Min(.01f)] private float dodgeDuration = .25f;
-    [SerializeField, Range(0f, 1f)] private float perfectDodgeDistanceRatio = .3f;
-    [SerializeField, Min(0f)] private float dashCooldown = 1f;
-    [SerializeField, Min(0f)] private float attackDashDistance = 5f;
-    [SerializeField, Min(.01f)] private float attackDashDuration = .18f;
-    [SerializeField, Range(.01f, 1f)] private float bulletTimeEnemyScale = .1f;
     [SerializeField] private string enemyNamePrefix = "Enemy";
 
     [Header("Presentation")]
@@ -39,40 +29,13 @@ public partial class PlayerCharacterController : MonoBehaviour
     [SerializeField] private SpriteRenderer visualRenderer;
     [SerializeField] private PerfectDodgeAfterimage perfectDodgeAfterimage;
     [SerializeField] private BloodHitEffect bloodHitEffectPrefab;
-    [SerializeField, Range(0f, 1f)] private float bulletTimeLoopVolume = .45f;
-    [SerializeField, Range(0f, 1f)] private float dashWindCutVolume = .9f;
-    [SerializeField, Range(0f, 1f)] private float hitBladeFleshVolume = .85f;
-    [SerializeField, Range(0f, 1f)] private float killConfirmVolume = 1f;
-    [SerializeField, Range(0f, 1f)] private float killChainEndVolume = .9f;
     [SerializeField] private AudioClip normalAttackSfx;
     [SerializeField] private AudioClip dashAttackSfx;
     [SerializeField] private AudioClip rollSfx;
     [SerializeField] private AudioClip parrySfx;
     [SerializeField] private AudioClip killSfx;
-    [SerializeField, Min(0f)] private float normalAttackCooldown = .5f;
-    [SerializeField, Min(0f)] private float normalAttackRange = 1.5f;
-    [SerializeField, Range(1f, 360f)] private float normalAttackArcAngle = 220f;
 
-    [Header("Vitals and Momentum")]
-    [SerializeField, Min(1f)] private float maximumHealth = 100f;
-    [SerializeField, Min(1)] private int maximumMomentum = 20;
-    [SerializeField, Min(0)] private int startingMomentum = 20;
-    [SerializeField, Min(1)] private int momentumPerKill = 1;
-    [SerializeField, Min(1)] private int comboRewardThreshold = 3;
-    [SerializeField, Min(0)] private int bonusMomentumPerComboKill = 1;
-
-    [Header("Momentum Ultimate - Time Stop Slash")]
-    [SerializeField, Min(1)] private int ultimateMaximumTargets = 12;
-    [SerializeField, Min(.05f)] private float ultimateMarkRadius = .55f;
-    [SerializeField, Min(.01f)] private float ultimateTrailPointDistance = .08f;
-    [SerializeField, Min(.5f)] private float ultimateMarkDuration = 3.5f;
-    [SerializeField, Min(.01f)] private float ultimateExecutionInterval = .075f;
-    [SerializeField, Min(.01f)] private float ultimateFinisherDuration = .22f;
-    [SerializeField, Range(.75f, 1f)] private float ultimateCameraZoomFactor = .86f;
-    [SerializeField, Min(1f)] private float ultimateTrailWidthMultiplier = 1.75f;
-    [SerializeField] private Color ultimateTrailStartColor = new Color(1f, 1f, 1f, 1f);
-    [SerializeField] private Color ultimateTrailEndColor = new Color(1f, .08f, .03f, .9f);
-    [SerializeField] private Color ultimateMarkedColor = new Color(1f, .12f, .06f, 1f);
+    [Header("Momentum Ultimate Events")]
     [SerializeField] private UnityEvent onUltimateStarted = new UnityEvent();
     [SerializeField] private UnityEvent<Transform> onUltimateTargetMarked = new UnityEvent<Transform>();
     [SerializeField] private UnityEvent<int> onUltimateFinished = new UnityEvent<int>();
@@ -87,8 +50,6 @@ public partial class PlayerCharacterController : MonoBehaviour
 
     [Header("Authored Kill Chain Range Overlay")]
     [SerializeField] private SpriteRenderer killChainRangeOverlay;
-    [SerializeField, Min(1f)] private float rangeOverlayWorldDiameter = 40f;
-    [SerializeField, Range(1f, 90f)] private float directionalTargetSearchHalfAngle = 50f;
 
     [Header("Persistent Kill Chain Events (Optional)")]
     [SerializeField] private UnityEvent onKillChainStarted = new UnityEvent();
@@ -183,17 +144,17 @@ public partial class PlayerCharacterController : MonoBehaviour
     public bool IsBossGuardLocked => bossGuardControlLocked;
     public bool IsInvulnerable => IsDodging || IsKillChainActive || IsUltimateActive || Time.unscaledTime < exitProtectionUntil;
     public int KillChainCount => killChainCount;
-    public float MaximumHealth => maximumHealth;
+    public float MaximumHealth => characterData != null ? characterData.Vitals.MaximumHealth : 0f;
     public float CurrentHealth => currentHealth;
-    public float HealthNormalized => maximumHealth <= 0f ? 0f : currentHealth / maximumHealth;
+    public float HealthNormalized => MaximumHealth <= 0f ? 0f : currentHealth / MaximumHealth;
     public bool IsDead => isDead;
-    public int MaximumMomentum => maximumMomentum;
+    public int MaximumMomentum => characterData != null ? characterData.Vitals.MaximumMomentum : 0;
     public int CurrentMomentum => currentMomentum;
-    public bool IsMomentumFull => currentMomentum >= maximumMomentum;
+    public bool IsMomentumFull => currentMomentum >= MaximumMomentum;
     public float DodgeCooldownNormalized => DodgeCooldown <= 0f
         ? 0f
         : Mathf.Clamp01((dashReadyTime - Time.time) / DodgeCooldown);
-    public bool CanUseUltimate => currentMomentum >= maximumMomentum && State == PlayerStateId.Locomotion;
+    public bool CanUseUltimate => currentMomentum >= MaximumMomentum && State == PlayerStateId.Locomotion;
     public Transform CurrentKillChainTarget => currentTarget != null ? currentTarget : lockedDashTarget;
     public float KillChainWindowNormalized => chainWindowDuration <= 0f
         ? 0f
@@ -243,48 +204,78 @@ public partial class PlayerCharacterController : MonoBehaviour
     public event Action<Transform, int> UltimateTargetMarked;
     public event Action<int> UltimateFinished;
 
-    private float MoveSpeed => characterData != null ? characterData.MoveSpeed : moveSpeed;
-    private float Padding => characterData != null ? characterData.BoundaryPadding : boundaryPadding;
-    private float DodgeDistance => characterData != null ? characterData.DodgeDistance : dodgeDistance;
-    private float DodgeDuration => characterData != null ? characterData.DodgeDuration : dodgeDuration;
-    private float PerfectRatio => characterData != null ? characterData.PerfectDodgeDistanceRatio : perfectDodgeDistanceRatio;
-    private float DodgeCooldown => characterData != null ? characterData.DodgeCooldown : dashCooldown;
-    private float MaximumAimDistance => characterData != null ? characterData.MaximumAimDistance : maximumDragDistance;
-    private float AttackDashDistance => characterData != null ? characterData.AttackDashDistance : attackDashDistance;
-    private float AttackDashWindupDuration => characterData != null ? characterData.AttackDashWindupDuration : .03f;
-    private float AttackDashDuration => characterData != null ? characterData.AttackDashDuration : attackDashDuration;
-    private float BulletTimeScale => characterData != null ? characterData.BulletTimeEnemyScale : bulletTimeEnemyScale;
-    private float AttackCooldown => characterData != null ? characterData.NormalAttackCooldown : normalAttackCooldown;
-    private float NormalAttackRange => characterData != null ? characterData.NormalAttackRange : normalAttackRange;
-    private float NormalKillHealthRestore => characterData != null ? characterData.NormalKillHealthRestore : 5f;
-    private float KillChainHealthRestore => characterData != null ? characterData.KillChainHealthRestore : 15f;
-    private float AttackDashOvershoot => characterData != null ? characterData.AttackDashOvershoot : .3f;
-    private float DashEnemyTimeScale => characterData != null ? characterData.DashEnemyTimeScale : .35f;
-    private float BulletTimeEnterDuration => characterData != null ? characterData.BulletTimeEnterDuration : .12f;
-    private float BulletTimeExitDuration => characterData != null ? characterData.BulletTimeExitDuration : .18f;
-    private float PerfectDodgeFreezeDuration => characterData != null ? characterData.PerfectDodgeFreezeDuration : .05f;
-    private float KillChainInitialWindow => characterData != null ? characterData.KillChainInitialWindow : 1.5f;
-    private float KillChainTimeRestore => characterData != null ? characterData.KillChainTimeRestorePerKill : 1.5f;
-    private float KillImpactFreezeDuration => characterData != null ? characterData.KillImpactFreezeDuration : .055f;
-    private float KillChainInputBufferDuration => characterData != null ? characterData.KillChainInputBufferDuration : .12f;
-    private float KillChainExitProtection => characterData != null ? characterData.KillChainExitProtection : .2f;
-    private float TargetAssistWorldRadius => characterData != null ? characterData.TargetAssistWorldRadius : .9f;
-    private float TargetAssistMaximumAngle => characterData != null ? characterData.TargetAssistMaximumAngle : 25f;
-    private float CameraZoomFactor => characterData != null ? characterData.KillChainCameraZoomFactor : .95f;
-    private float CameraFocusOffset => characterData != null ? characterData.KillChainCameraFocusOffset : .2f;
-    private float CameraResponse => characterData != null ? characterData.KillChainCameraResponse : 16f;
-    private float PerfectDodgeCameraShake => characterData != null ? characterData.PerfectDodgeCameraShake : .06f;
-    private float KillCameraShake => characterData != null ? characterData.KillCameraShake : .08f;
-    private float MaximumCameraShake => characterData != null ? characterData.MaximumCameraShake : .16f;
-    private AudioClip PerfectDodgeSfx => characterData != null ? characterData.PerfectDodgeSfx : null;
-    private AudioClip BulletTimeLoopSfx => characterData != null ? characterData.BulletTimeLoopSfx : null;
-    private AudioClip DashWindCutSfx => characterData != null ? characterData.DashWindCutSfx : null;
-    private AudioClip HitBladeFleshSfx => characterData != null ? characterData.HitBladeFleshSfx : null;
-    private AudioClip KillConfirmSfx => characterData != null ? characterData.KillConfirmSfx : null;
-    private AudioClip KillChainEndSfx => characterData != null ? characterData.KillChainEndSfx : null;
+    private float MoveSpeed => characterData.Movement.MoveSpeed;
+    private float Padding => characterData.Movement.BoundaryPadding;
+    private float DodgeDistance => characterData.Dodge.Distance;
+    private float DodgeDuration => characterData.Dodge.Duration;
+    private float PerfectRatio => characterData.Dodge.PerfectDistanceRatio;
+    private float DodgeCooldown => characterData.Dodge.Cooldown;
+    private float MaximumAimDistance => characterData.KillChain.MaximumAimDistance;
+    private float AttackDashDistance => characterData.KillChain.AttackDashDistance;
+    private float AttackDashWindupDuration => characterData.KillChain.AttackDashWindupDuration;
+    private float AttackDashDuration => characterData.KillChain.AttackDashDuration;
+    private float BulletTimeScale => characterData.KillChain.BulletTimeEnemyScale;
+    private float AttackCooldown => characterData.Combat.NormalAttackCooldown;
+    private float NormalAttackRange => characterData.Combat.NormalAttackRange;
+    private float NormalAttackArcAngle => characterData.Combat.NormalAttackArcAngle;
+    private float NormalKillHealthRestore => characterData.Combat.NormalKillHealthRestore;
+    private float KillChainHealthRestore => characterData.Combat.KillChainHealthRestore;
+    private float AttackDashOvershoot => characterData.KillChain.AttackDashOvershoot;
+    private float DashEnemyTimeScale => characterData.KillChain.DashEnemyTimeScale;
+    private float BulletTimeEnterDuration => characterData.KillChain.BulletTimeEnterDuration;
+    private float BulletTimeExitDuration => characterData.KillChain.BulletTimeExitDuration;
+    private float PerfectDodgeFreezeDuration => characterData.KillChain.PerfectDodgeFreezeDuration;
+    private float KillChainInitialWindow => characterData.KillChain.InitialWindow;
+    private float KillChainTimeRestore => characterData.KillChain.TimeRestorePerKill;
+    private float KillImpactFreezeDuration => characterData.KillChain.ImpactFreezeDuration;
+    private float KillChainInputBufferDuration => characterData.KillChain.InputBufferDuration;
+    private float KillChainExitProtection => characterData.KillChain.ExitProtection;
+    private float TargetAssistWorldRadius => characterData.KillChain.TargetAssistWorldRadius;
+    private float TargetAssistMaximumAngle => characterData.KillChain.TargetAssistMaximumAngle;
+    private float DirectionalTargetSearchHalfAngle => characterData.KillChain.DirectionalSearchHalfAngle;
+    private float RangeOverlayWorldDiameter => characterData.KillChain.RangeOverlayWorldDiameter;
+    private float CameraZoomFactor => characterData.KillChain.CameraZoomFactor;
+    private float CameraFocusOffset => characterData.KillChain.CameraFocusOffset;
+    private float CameraResponse => characterData.KillChain.CameraResponse;
+    private float PerfectDodgeCameraShake => characterData.KillChain.PerfectDodgeCameraShake;
+    private float KillCameraShake => characterData.KillChain.KillCameraShake;
+    private float MaximumCameraShake => characterData.KillChain.MaximumCameraShake;
+    private int StartingMomentum => characterData.Vitals.StartingMomentum;
+    private int MomentumPerKill => characterData.Vitals.MomentumPerKill;
+    private int ComboRewardThreshold => characterData.Vitals.ComboRewardThreshold;
+    private int BonusMomentumPerComboKill => characterData.Vitals.BonusMomentumPerComboKill;
+    private int UltimateMaximumTargets => characterData.Ultimate.MaximumTargets;
+    private float UltimateMarkRadius => characterData.Ultimate.MarkRadius;
+    private float UltimateTrailPointDistance => characterData.Ultimate.TrailPointDistance;
+    private float UltimateMarkDuration => characterData.Ultimate.MarkDuration;
+    private float UltimateExecutionInterval => characterData.Ultimate.ExecutionInterval;
+    private float UltimateFinisherDuration => characterData.Ultimate.FinisherDuration;
+    private float UltimateCameraZoomFactor => characterData.Ultimate.CameraZoomFactor;
+    private float BulletTimeLoopVolume => characterData.Feedback.BulletTimeLoopVolume;
+    private float DashWindCutVolume => characterData.Feedback.DashWindCutVolume;
+    private float HitBladeFleshVolume => characterData.Feedback.HitBladeFleshVolume;
+    private float KillConfirmVolume => characterData.Feedback.KillConfirmVolume;
+    private float KillChainEndVolume => characterData.Feedback.KillChainEndVolume;
+    private float UltimateTrailWidthMultiplier => characterData.Feedback.UltimateTrailWidthMultiplier;
+    private Color UltimateTrailStartColor => characterData.Feedback.UltimateTrailStartColor;
+    private Color UltimateTrailEndColor => characterData.Feedback.UltimateTrailEndColor;
+    private Color UltimateMarkedColor => characterData.Feedback.UltimateMarkedColor;
+    private AudioClip PerfectDodgeSfx => characterData.Feedback.PerfectDodgeSfx;
+    private AudioClip BulletTimeLoopSfx => characterData.Feedback.BulletTimeLoopSfx;
+    private AudioClip DashWindCutSfx => characterData.Feedback.DashWindCutSfx;
+    private AudioClip HitBladeFleshSfx => characterData.Feedback.HitBladeFleshSfx;
+    private AudioClip KillConfirmSfx => characterData.Feedback.KillConfirmSfx;
+    private AudioClip KillChainEndSfx => characterData.Feedback.KillChainEndSfx;
 
     protected virtual void Awake()
     {
+        if (characterData == null)
+        {
+            Debug.LogError($"{nameof(PlayerCharacterController)} on '{name}' requires PlayerCharacterData.", this);
+            enabled = false;
+            return;
+        }
+
         feedbackProperties = new MaterialPropertyBlock();
         body = GetComponent<Rigidbody2D>();
         specialItems = GetComponent<PlayerSpecialItemInventory>();
@@ -292,8 +283,8 @@ public partial class PlayerCharacterController : MonoBehaviour
         {
             specialItems = gameObject.AddComponent<PlayerSpecialItemInventory>();
         }
-        currentHealth = maximumHealth;
-        currentMomentum = Mathf.Clamp(startingMomentum, 0, maximumMomentum);
+        currentHealth = MaximumHealth;
+        currentMomentum = Mathf.Clamp(StartingMomentum, 0, MaximumMomentum);
         playerColliders = GetComponentsInChildren<Collider2D>(true);
         body.gravityScale = 0f;
         body.freezeRotation = true;

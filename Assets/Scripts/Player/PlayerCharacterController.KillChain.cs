@@ -93,7 +93,7 @@ public partial class PlayerCharacterController
         UpdateFacing(killDashDirection);
         visualAnimator?.SetTrigger(DashAttack);
         PlaySfx(dashAttackSfx);
-        PlaySfx(DashWindCutSfx, dashWindCutVolume);
+        PlaySfx(DashWindCutSfx, DashWindCutVolume);
     }
 
     private void StartFreeKillChainDash()
@@ -121,7 +121,7 @@ public partial class PlayerCharacterController
         UpdateFacing(direction);
         visualAnimator?.SetTrigger(DashAttack);
         PlaySfx(dashAttackSfx);
-        PlaySfx(DashWindCutSfx, dashWindCutVolume);
+        PlaySfx(DashWindCutSfx, DashWindCutVolume);
     }
 
     private void HandleDashInputBuffer()
@@ -256,7 +256,7 @@ public partial class PlayerCharacterController
             if (targetAgent != null && targetAgent.IsBossCombatant)
                 AwardMomentumFromBossDamage();
             PlayBloodHitEffect(enemy, killDashDirection);
-            PlaySfx(HitBladeFleshSfx, hitBladeFleshVolume);
+            PlaySfx(HitBladeFleshSfx, HitBladeFleshVolume);
             EndKillChain();
             return;
         }
@@ -421,7 +421,7 @@ public partial class PlayerCharacterController
             if (offset.sqrMagnitude <= Mathf.Epsilon) return enemy;
 
             float angle = Vector2.Angle(normalizedDirection, offset);
-            if (angle > directionalTargetSearchHalfAngle) continue;
+            if (angle > DirectionalTargetSearchHalfAngle) continue;
 
             // A direct click always wins. Otherwise favor the nearest enemy in the
             // commanded forward cone, with angle used as a smaller tie breaker.

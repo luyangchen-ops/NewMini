@@ -362,7 +362,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c6f4025a7e849eea960d3b1719cb021, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCharacterController
-  characterData: {fileID: 0}
+  characterData: {fileID: 11400000, guid: d4b6ea52aa3f4b74882204cd1f821ec3, type: 2}
   moveSpeed: 5
   boundaryPadding: 0.7
   worldCamera: {fileID: 2063496737}

@@ -1,0 +1,6 @@
+{
+  "prompt": "Perform one precise cleanup on the supplied 4-frame horizontal bandit spearman walk-cycle atlas. In frame 2 only, remove the stray floating duplicate spearhead located above and to the right of the character's head. Frame 2 must contain exactly one complete spear: the spear held in his right hand. Fill the removed artifact with the same perfectly flat solid #00FF00 background. Preserve every character, pose, face, costume detail, knee position, planted foot, ground line, scale, slot layout, palette, and the intended held spear exactly as supplied. Frames 1, 3, and 4 must remain visually unchanged. Exactly one horizontal row of four equal slots on a 4:1 canvas. No other edits, no extra limbs, no extra weapons, no labels, no borders, no watermark.",
+  "aspect_ratio": "4:1",
+  "resolution": "2K",
+  "chat_id": "codex-bandit-spearman-move-20260821"
+}
